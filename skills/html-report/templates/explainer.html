@@ -1,0 +1,166 @@
+<!--
+  Explainer 골격 — 개념·기술·시스템 해설 문서
+  (X가 뭔지/왜 그런지 풀어 설명: tech overview, "X explained", 도메인 개념 해설)
+  사용: templates/base.html 의 <main class="content"> 안에 옮긴다.
+       kicker: "Explainer" (기술 소개면 "Tech Overview")
+       파일명: YYYY-MM-DD-explain-{slug}.html
+
+  이 타입의 성격:
+  - 결정·계획 보고서가 아니다. 독자의 머릿속에 정확한 멘탈 모델을 심는 게 목적.
+  - 순서가 생명: 왜 존재하나(문제) → 큰 그림(멘탈 모델) → 어떻게 동작하나(메커니즘)
+    → 흔한 오해 교정 → 한계. 메커니즘부터 들이밀면 실패.
+  - 보조 레이어(term/primer) 사용법이 다른 타입과 다르다: 본문 자체가 풀이이므로
+    핵심 개념은 본문에 직접 쓰고, primer 는 "곁가지 인접 개념"에만 쓴다.
+  - 추상 설명마다 비유 또는 .example 숫자 예시를 짝지어라. 비유는 어디까지
+    성립하는지 경계도 같이 말해준다 (비유 과신이 오해를 만든다).
+-->
+
+<header class="report-header">
+  <span class="kicker">Explainer</span>
+  <h1>{{주제 — 예: SQLAlchemy Dirty Checking 은 어떻게 동작하는가}}</h1>
+  <p class="subtitle">{{이 문서를 읽고 나면 알게 되는 것 한 줄}}</p>
+  <div class="report-meta">
+    <span class="item"><span class="label">작성자</span> <strong>{{작성자}}</strong></span>
+    <span class="item"><span class="label">작성일</span> <strong>{{YYYY-MM-DD}}</strong></span>
+    <span class="item"><span class="label">대상</span> <strong>{{독자 — 예: 해당 도메인 비전문 개발자}}</strong></span>
+  </div>
+</header>
+
+<section id="tldr">
+  <div class="tldr">
+    <span class="label">TL;DR</span>
+    <p>{{이 문서가 답하는 질문}} — {{그 답의 한 줄 요약}}</p>
+  </div>
+</section>
+
+<section id="why">
+  <h2>1. 왜 존재하나 — 푸는 문제</h2>
+  <p>{{이것이 없던 시절/없는 상황에서 무엇이 아팠는지. 문제를 먼저 체감시켜야 해법이 이해된다.}}</p>
+  <div class="callout note">
+    <svg class="callout-icon"><use href="#i-note"/></svg>
+    <div class="body">
+      <span class="title">비유로 먼저</span>
+      <p>{{일상 비유 한 개. 끝에 "단, 이 비유는 {{경계}}까지만 성립한다" 한 줄을 붙인다.}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="mental-model">
+  <h2>2. 큰 그림 — 멘탈 모델</h2>
+  <p>{{등장인물(구성요소)과 그들 사이 관계를 한 장으로. 세부 동작은 다음 섹션으로 미룬다.}}</p>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart LR
+    A[{{구성요소 1}}] --> B[{{구성요소 2}}]
+    B --> C[{{구성요소 3}}]
+    </div>
+    <div class="caption">그림 1. {{전체 구조 한 장}}</div>
+  </div>
+  <div class="grid cols-3">
+    <div class="card">
+      <div class="card-kicker">{{역할}}</div>
+      <h4>{{구성요소 1}}</h4>
+      <p>{{한두 문장 — 뭘 담당하는가}}</p>
+    </div>
+    <div class="card">
+      <div class="card-kicker">{{역할}}</div>
+      <h4>{{구성요소 2}}</h4>
+      <p>{{...}}</p>
+    </div>
+    <div class="card">
+      <div class="card-kicker">{{역할}}</div>
+      <h4>{{구성요소 3}}</h4>
+      <p>{{...}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <h2>3. 어떻게 동작하나</h2>
+  <p>{{시간 순/인과 순으로. 각 단계에서 "무엇이, 왜"를 함께.}}</p>
+  <ol class="steps">
+    <li>
+      <div class="title">{{단계 1}}</div>
+      <div class="desc">{{무슨 일이 일어나고, 왜 그렇게 설계됐는지}}</div>
+    </li>
+    <li>
+      <div class="title">{{단계 2}}</div>
+      <div class="desc">{{...}}</div>
+    </li>
+    <li>
+      <div class="title">{{단계 3}}</div>
+      <div class="desc">{{...}}</div>
+    </li>
+  </ol>
+
+  <div class="example">
+    <span class="label">구체 예시</span>
+    <p>{{추상 단계를 실제 값/실제 코드/실제 시나리오로 한 번 따라간다. 숫자가 있으면 숫자로.}}</p>
+  </div>
+
+  <details class="primer">
+    <summary>{{곁가지 배경지식 — 예: 이 동작의 전제가 되는 인접 개념}}</summary>
+    <div>
+      <p>{{본문 흐름에서 벗어나는 인접 개념은 primer 로. 본문 핵심 개념은 primer 에 숨기지 말 것.}}</p>
+    </div>
+  </details>
+</section>
+
+<section id="misconceptions">
+  <h2>4. 흔한 오해</h2>
+  <p>{{이 주제에서 사람들이 자주 틀리게 이해하는 지점. 오해 → 실제 순으로 교정한다.}}</p>
+  <div class="compare">
+    <div class="side danger">
+      <span class="side-label">오해</span>
+      <h4>{{흔히 이렇게 안다}}</h4>
+      <ul><li>{{...}}</li></ul>
+    </div>
+    <div class="arrow">→</div>
+    <div class="side success">
+      <span class="side-label">실제</span>
+      <h4>{{실제로는 이렇다}}</h4>
+      <ul><li>{{...}}</li></ul>
+    </div>
+  </div>
+</section>
+
+<section id="boundaries">
+  <h2>5. 한계 — 어디까지 통하나</h2>
+  <div class="callout warn">
+    <svg class="callout-icon"><use href="#i-warn"/></svg>
+    <div class="body">
+      <span class="title">이럴 땐 다르게 동작한다</span>
+      <p>{{적용 범위의 경계, 성립하지 않는 조건, 대안이 필요한 상황}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="cheatsheet">
+  <h2>6. 요약 치트시트</h2>
+  <p>다 읽은 독자가 나중에 이 표 하나만 다시 보게 만든다.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>질문</th><th>답</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>{{핵심 질문 1}}</td><td>{{한 줄 답}}</td></tr>
+        <tr><td>{{핵심 질문 2}}</td><td>{{한 줄 답}}</td></tr>
+        <tr><td>{{핵심 질문 3}}</td><td>{{한 줄 답}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="glossary">
+  <h2>용어집</h2>
+  <dl class="glossary">
+    <dt>{{용어 1}}</dt>
+    <dd>{{정의}}</dd>
+  </dl>
+</section>
+
+<footer class="report-footer">
+  <span>{{주제}} · {{YYYY-MM-DD}}</span>
+  <span>v0.1 · {{작성자}}</span>
+</footer>

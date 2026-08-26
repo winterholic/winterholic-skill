@@ -1,0 +1,1583 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{REPORT_TITLE}}</title>
+<meta name="description" content="{{REPORT_SUBTITLE}}">
+<script>
+/* 테마를 첫 페인트 전에 결정 — 다크 사용자의 라이트 플래시(FOUC)와
+   mermaid 초기 테마 오판을 방지. localStorage 접근 불가 환경 대비 try/catch. */
+(function(){
+  try{
+    var t = localStorage.getItem('html-report-theme');
+    if (t !== 'dark' && t !== 'light') t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+  }catch(e){}
+})();
+</script>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+
+/* ============================================
+   1. DESIGN TOKENS (Light)
+   ============================================ */
+:root{
+  /* Brand · Primary (Calm Pro · blue-500) */
+  --color-primary:#3B82F6;
+  --color-primary-hover:#1D4ED8;
+  --color-primary-pressed:#1E40AF;
+  --color-primary-soft:#EFF6FF;
+  --color-primary-fg:#FFFFFF;
+
+  /* Neutral · zinc */
+  --color-bg:#FFFFFF;
+  --color-bg-2:#FAFAFA;
+  --color-surface:#F4F4F5;
+  --color-surface-2:#E4E4E7;
+  --color-border:#E4E4E7;
+  --color-border-strong:#D4D4D8;
+  --color-ink:#18181B;
+  --color-ink-2:#27272A;
+  --color-ink-3:#3F3F46;
+  --color-muted:#71717A;
+  --color-muted-2:#A1A1AA;
+
+  /* Semantic — base / fg / soft (Calm Pro · emerald · amber · rose) */
+  --color-success:#0D9F6E;
+  --color-success-fg:#065F46;
+  --color-success-soft:#D1FAE5;
+  --color-warn:#D97706;
+  --color-warn-fg:#92400E;
+  --color-warn-soft:#FEF3C7;
+  --color-danger:#E11D48;
+  --color-danger-fg:#9F1239;
+  --color-danger-soft:#FFE4E6;
+  --color-info:var(--color-primary);
+  --color-info-fg:var(--color-primary-hover);
+  --color-info-soft:var(--color-primary-soft);
+
+  /* Typography */
+  --font-sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+  --font-mono:'JetBrains Mono','SF Mono',Menlo,Consolas,'D2Coding',monospace;
+  --fz-caption:12px;
+  --fz-small:13px;
+  --fz-base:15px;
+  --fz-lg:17px;
+  --fz-xl:20px;
+  --fz-2xl:26px;
+  --fz-3xl:32px;
+  --fz-4xl:40px;
+  --fz-display:52px;
+  --lh-tight:1.2;
+  --lh-snug:1.35;
+  --lh-base:1.65;
+
+  /* Spacing 4의 배수 */
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px;
+  --s-5:24px; --s-6:32px; --s-7:48px; --s-8:64px; --s-9:96px;
+
+  /* Radius */
+  --r-xs:4px; --r-sm:8px; --r-md:12px; --r-lg:16px; --r-full:999px;
+
+  /* Layout */
+  --w-content:820px;
+  --w-toc:240px;
+
+  /* Elevation — 거의 안 씀 */
+  --shadow-overlay:0 8px 24px rgba(15,23,42,.08),0 2px 6px rgba(15,23,42,.04);
+
+  /* Motion */
+  --ease-out:cubic-bezier(0.22,1,0.36,1);
+  --dur-fast:150ms;
+  --dur-base:200ms;
+
+  /* Code block (다크 고정) */
+  --code-bg:#18181B;
+  --code-fg:#E4E4E7;
+  --code-comment:#71717A;
+  --code-keyword:#93C5FD;
+  --code-string:#7FF0CB;
+  --code-number:#FFC04D;
+}
+
+/* ============================================
+   2. DESIGN TOKENS (Dark override)
+   ============================================ */
+[data-theme=dark]{
+  /* OKLCH balanced — 모든 semantic이 같은 L(명도)·C(채도) 라인, hue만 다름.
+     perceptual uniformity 보장 → 4 hue가 한 가족처럼 느껴짐. */
+  --color-primary:oklch(72% 0.15 248);
+  --color-primary-hover:oklch(80% 0.13 248);
+  --color-primary-pressed:oklch(86% 0.10 248);
+  /* 다크에선 모든 *-soft 면 배경 hue tint 폐기 — surface 로 매핑 (의미는 좌측 accent bar + 아이콘으로) */
+  --color-primary-soft:var(--color-surface);
+  --color-primary-fg:#0A1F3D;
+
+  --color-bg:#09090B;
+  --color-bg-2:#0F0F11;
+  --color-surface:#18181B;
+  --color-surface-2:#27272A;
+  --color-border:#27272A;
+  --color-border-strong:#3F3F46;
+  --color-ink:#FAFAFA;
+  --color-ink-2:#E4E4E7;
+  --color-ink-3:#D4D4D8;
+  --color-muted:#A1A1AA;
+  --color-muted-2:#71717A;
+
+  --color-success:oklch(72% 0.13 158);
+  --color-success-fg:oklch(85% 0.10 158);
+  --color-success-soft:var(--color-surface);
+  --color-warn:oklch(75% 0.13 70);
+  --color-warn-fg:oklch(87% 0.10 70);
+  --color-warn-soft:var(--color-surface);
+  --color-danger:oklch(72% 0.15 18);
+  --color-danger-fg:oklch(85% 0.10 18);
+  --color-danger-soft:var(--color-surface);
+
+  --shadow-overlay:0 8px 24px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3);
+}
+
+/* ============================================
+   3. BASE
+   ============================================ */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{
+  margin:0;
+  font-family:var(--font-sans);
+  font-size:var(--fz-base);
+  line-height:var(--lh-base);
+  color:var(--color-ink-2);
+  background:var(--color-bg);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  font-feature-settings:"tnum","ss01";
+  font-variant-numeric:tabular-nums;
+}
+img,svg{max-width:100%;display:block}
+hr{border:0;border-top:1px solid var(--color-border);margin:var(--s-7) 0}
+::selection{background:var(--color-primary-soft);color:var(--color-ink)}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{transition-duration:0!important;animation-duration:0!important}
+}
+
+/* ============================================
+   4. LAYOUT
+   ============================================ */
+.page{
+  display:grid;
+  grid-template-columns:var(--w-toc) minmax(0,var(--w-content)) 1fr;
+  gap:var(--s-7);
+  max-width:1280px;
+  margin:0 auto;
+  padding:var(--s-7) var(--s-5);
+}
+.toc{
+  position:sticky;
+  top:var(--s-5);
+  align-self:start;
+  font-size:var(--fz-small);
+  max-height:calc(100vh - var(--s-7));
+  overflow-y:auto;
+  padding-right:var(--s-3);
+}
+.toc h4{
+  font-size:var(--fz-caption);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--color-muted);
+  margin:0 0 var(--s-3);
+  font-weight:600;
+}
+.toc ol{list-style:none;padding:0;margin:0}
+.toc li{margin:var(--s-1) 0}
+.toc a{
+  color:var(--color-ink-3);
+  text-decoration:none;
+  display:block;
+  padding:6px var(--s-3);
+  border-radius:var(--r-sm);
+  border-left:2px solid transparent;
+  line-height:1.45;
+  transition:background var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out);
+}
+.toc a:hover{background:var(--color-surface);color:var(--color-ink)}
+.toc a.active{
+  color:var(--color-primary);
+  border-left-color:var(--color-primary);
+  background:var(--color-primary-soft);
+  font-weight:600;
+}
+.toc ol ol{margin-left:var(--s-3);border-left:1px solid var(--color-border);padding-left:var(--s-2)}
+.content{min-width:0}
+@media(max-width:980px){
+  .page{grid-template-columns:1fr}
+  .toc{position:static;max-height:none;border-bottom:1px solid var(--color-border);padding-bottom:var(--s-4)}
+}
+
+/* ============================================
+   5. TYPOGRAPHY
+   ============================================ */
+h1,h2,h3,h4{color:var(--color-ink);font-weight:700;line-height:var(--lh-tight)}
+h1{font-size:var(--fz-4xl);margin:0 0 var(--s-3);letter-spacing:-0.025em}
+h2{font-size:var(--fz-3xl);margin:var(--s-8) 0 var(--s-4);letter-spacing:-0.02em;line-height:var(--lh-snug)}
+h3{font-size:var(--fz-2xl);margin:var(--s-7) 0 var(--s-3);letter-spacing:-0.015em;line-height:var(--lh-snug)}
+h4{font-size:var(--fz-xl);margin:var(--s-5) 0 var(--s-2);line-height:var(--lh-snug)}
+p{margin:0 0 var(--s-4)}
+a{
+  color:var(--color-primary);
+  text-decoration:none;
+  border-bottom:1px solid transparent;
+  transition:border-color var(--dur-fast) var(--ease-out);
+}
+a:hover{border-bottom-color:var(--color-primary)}
+strong{color:var(--color-ink);font-weight:600}
+em{color:var(--color-ink-2);font-style:normal;font-weight:500} /* 한글에 italic 금지 — weight로 대체 */
+code{
+  font-family:var(--font-mono);
+  font-size:.88em;
+  background:var(--color-surface);
+  color:var(--color-ink-2);
+  padding:2px 6px;
+  border-radius:var(--r-xs);
+  border:1px solid var(--color-border);
+}
+ul,ol{margin:0 0 var(--s-4);padding-left:var(--s-5)}
+li{margin:var(--s-2) 0}
+li>p{margin:0}
+blockquote{
+  margin:var(--s-5) 0;
+  padding:var(--s-3) var(--s-5);
+  border-left:3px solid var(--color-border-strong);
+  color:var(--color-muted);
+  background:var(--color-bg-2);
+}
+
+/* ============================================
+   6. REPORT HEADER
+   ============================================ */
+.report-header{
+  border-bottom:1px solid var(--color-border);
+  padding-bottom:var(--s-6);
+  margin-bottom:var(--s-7);
+}
+.report-header .kicker{
+  display:inline-block;
+  font-size:var(--fz-caption);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--color-primary);
+  background:var(--color-primary-soft);
+  padding:5px 12px;
+  border-radius:var(--r-full);
+  font-weight:700;
+  margin-bottom:var(--s-3);
+}
+.report-header h1{margin-bottom:var(--s-3)}
+.report-header .subtitle{
+  font-size:var(--fz-lg);
+  color:var(--color-muted);
+  margin-bottom:var(--s-5);
+  font-weight:400;
+  line-height:1.5;
+}
+.report-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:var(--s-5);
+  font-size:var(--fz-small);
+  color:var(--color-muted);
+}
+.report-meta .item{display:inline-flex;align-items:center;gap:6px}
+.report-meta .label{color:var(--color-muted-2)}
+.report-meta strong{color:var(--color-ink-2);font-weight:600}
+
+/* ============================================
+   7. BADGE
+   ============================================ */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:var(--fz-caption);
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:var(--r-full);
+  background:var(--color-surface);
+  color:var(--color-ink-3);
+  border:1px solid var(--color-border);
+  line-height:1.4;
+  letter-spacing:.01em;
+}
+.badge.primary{background:var(--color-primary-soft);color:var(--color-primary);border-color:transparent}
+.badge.success{background:var(--color-success-soft);color:var(--color-success-fg);border-color:transparent}
+.badge.warn{background:var(--color-warn-soft);color:var(--color-warn-fg);border-color:transparent}
+.badge.danger{background:var(--color-danger-soft);color:var(--color-danger-fg);border-color:transparent}
+.badge.info{background:var(--color-info-soft);color:var(--color-info-fg);border-color:transparent}
+.badge.muted{background:var(--color-surface);color:var(--color-muted);border-color:transparent}
+/* 다크 — badge 도 hue tint 배경 제거. 무채색 surface + hue text/border 로 의미 전달 */
+[data-theme=dark] .badge.primary,
+[data-theme=dark] .badge.success,
+[data-theme=dark] .badge.warn,
+[data-theme=dark] .badge.danger,
+[data-theme=dark] .badge.info{
+  background:var(--color-surface-2);
+  border:1px solid var(--color-border-strong);
+}
+[data-theme=dark] .badge.primary{color:var(--color-primary)}
+[data-theme=dark] .badge.success{color:var(--color-success)}
+[data-theme=dark] .badge.warn{color:var(--color-warn)}
+[data-theme=dark] .badge.danger{color:var(--color-danger)}
+[data-theme=dark] .badge.info{color:var(--color-info)}
+
+/* ============================================
+   8. CALLOUT (with SVG icon)
+   ============================================ */
+.callout{
+  display:grid;
+  grid-template-columns:24px 1fr;
+  gap:var(--s-3);
+  padding:var(--s-4) var(--s-5);
+  border-radius:var(--r-sm);
+  border:1px solid var(--color-border);
+  background:var(--color-surface);
+  margin:var(--s-5) 0;
+  align-items:start;
+}
+.callout .callout-icon{
+  width:22px;
+  height:22px;
+  flex-shrink:0;
+  margin-top:1px;
+  color:var(--color-muted);
+}
+.callout .body{font-size:var(--fz-base);color:var(--color-ink-3);min-width:0}
+.callout .body>:first-child{margin-top:0}
+.callout .body>:last-child{margin-bottom:0}
+.callout .title{
+  font-weight:700;
+  color:var(--color-ink);
+  margin-bottom:var(--s-1);
+  display:block;
+  font-size:var(--fz-base);
+}
+.callout.note{background:var(--color-surface);border-color:var(--color-border)}
+.callout.note .callout-icon{color:var(--color-muted)}
+.callout.info{background:var(--color-info-soft);border-color:transparent}
+.callout.info .callout-icon{color:var(--color-info)}
+.callout.info .title{color:var(--color-info-fg)}
+.callout.success{background:var(--color-success-soft);border-color:transparent}
+.callout.success .callout-icon{color:var(--color-success)}
+.callout.success .title{color:var(--color-success-fg)}
+.callout.warn{background:var(--color-warn-soft);border-color:transparent}
+.callout.warn .callout-icon{color:var(--color-warn)}
+.callout.warn .title{color:var(--color-warn-fg)}
+.callout.danger{background:var(--color-danger-soft);border-color:transparent}
+.callout.danger .callout-icon{color:var(--color-danger)}
+.callout.danger .title{color:var(--color-danger-fg)}
+/* 다크에선 title도 무채색 — hue는 배경 tint + 아이콘에만. light vivid hue text가 다크에서 형광 떠보이는 것 방지 */
+[data-theme=dark] .callout.info .title,
+[data-theme=dark] .callout.success .title,
+[data-theme=dark] .callout.warn .title,
+[data-theme=dark] .callout.danger .title{color:var(--color-ink)}
+/* 다크 — soft hue tint 배경 완전 제거. surface 단색 + 좌측 4px accent bar 로 의미 전달 */
+[data-theme=dark] .callout.info,
+[data-theme=dark] .callout.success,
+[data-theme=dark] .callout.warn,
+[data-theme=dark] .callout.danger{
+  background:var(--color-surface);
+  border-left:4px solid var(--color-border);
+}
+[data-theme=dark] .callout.info{border-left-color:var(--color-info)}
+[data-theme=dark] .callout.success{border-left-color:var(--color-success)}
+[data-theme=dark] .callout.warn{border-left-color:var(--color-warn)}
+[data-theme=dark] .callout.danger{border-left-color:var(--color-danger)}
+
+/* ============================================
+   9. TL;DR (좌측 4px primary bar + surface)
+   ============================================ */
+.tldr{
+  position:relative;
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:var(--r-md);
+  padding:var(--s-5) var(--s-6);
+  margin:0 0 var(--s-7);
+  overflow:hidden;
+}
+.tldr::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:4px;
+  background:var(--color-primary);
+}
+.tldr .label{
+  font-size:var(--fz-caption);
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:var(--color-primary);
+  font-weight:700;
+  margin-bottom:var(--s-3);
+  display:block;
+}
+.tldr p{
+  font-size:var(--fz-xl);
+  color:var(--color-ink);
+  margin:0;
+  line-height:1.5;
+  font-weight:500;
+  letter-spacing:-0.01em;
+}
+.tldr ul{margin:var(--s-2) 0 0;padding-left:var(--s-5);font-size:var(--fz-lg);color:var(--color-ink-2);line-height:1.55}
+.tldr ul li{margin:var(--s-2) 0}
+
+/* ============================================
+   10. GRID & CARD
+   ============================================ */
+.grid{display:grid;gap:var(--s-4);margin:var(--s-5) 0}
+.grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grid.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:720px){.grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr}}
+
+.card{
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:var(--r-md);
+  padding:var(--s-5);
+}
+.card .card-kicker{
+  font-size:var(--fz-caption);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--color-primary);
+  font-weight:700;
+  margin-bottom:var(--s-2);
+  display:block;
+}
+.card h4{margin:0 0 var(--s-2);font-size:var(--fz-lg)}
+.card p{color:var(--color-ink-3);margin-bottom:var(--s-3)}
+.card p:last-child{margin-bottom:0}
+.card.outline{background:var(--color-bg);border-color:var(--color-border-strong)}
+.card.highlight{background:var(--color-primary-soft);border-color:transparent}
+.card.highlight .card-kicker{color:var(--color-primary-hover)}
+
+/* ============================================
+   11. STAT / KPI (sans bold, mono 폐기)
+   ============================================ */
+.stat{
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:var(--r-md);
+  padding:var(--s-5) var(--s-6);
+  text-align:left;
+}
+.stat .label{
+  font-size:var(--fz-caption);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--color-muted);
+  font-weight:700;
+  margin-bottom:var(--s-3);
+  display:block;
+}
+.stat .value{
+  font-family:var(--font-sans);
+  font-size:var(--fz-display);
+  font-weight:800;
+  color:var(--color-ink);
+  line-height:1.05;
+  letter-spacing:-0.03em;
+  display:block;
+}
+.stat .delta{
+  font-size:var(--fz-small);
+  margin-top:var(--s-2);
+  display:inline-block;
+  font-weight:600;
+}
+.stat .delta.up{color:var(--color-danger)}
+.stat .delta.down{color:var(--color-primary)}
+.stat .note{
+  font-size:var(--fz-small);
+  color:var(--color-muted);
+  margin-top:var(--s-2);
+  line-height:1.5;
+}
+
+/* ============================================
+   12. PROSCONS (중립화 기본, 명시 클래스로 색 옵트인)
+   ============================================ */
+.proscons{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-4);margin:var(--s-5) 0}
+.proscons>div{
+  padding:var(--s-5);
+  border-radius:var(--r-md);
+  border:1px solid var(--color-border);
+  background:var(--color-surface);
+}
+.proscons h4{margin:0 0 var(--s-3);display:flex;align-items:center;gap:var(--s-2);font-size:var(--fz-lg)}
+.proscons ul{margin:0;padding-left:var(--s-5)}
+.proscons li{color:var(--color-ink-3)}
+/* 명시적 의미 — 사용 시 .pros / .cons 클래스 추가. light는 h4 hue, dark는 h4도 무채색 */
+.proscons .pros{background:var(--color-success-soft);border-color:transparent}
+.proscons .pros h4{color:var(--color-success-fg)}
+.proscons .cons{background:var(--color-danger-soft);border-color:transparent}
+.proscons .cons h4{color:var(--color-danger-fg)}
+[data-theme=dark] .proscons .pros h4,
+[data-theme=dark] .proscons .cons h4{color:var(--color-ink)}
+/* 다크 — soft hue tint 제거 */
+[data-theme=dark] .proscons .pros,
+[data-theme=dark] .proscons .cons{
+  background:var(--color-surface);
+  border-left:4px solid var(--color-border);
+}
+[data-theme=dark] .proscons .pros{border-left-color:var(--color-success)}
+[data-theme=dark] .proscons .cons{border-left-color:var(--color-danger)}
+@media(max-width:720px){.proscons{grid-template-columns:1fr}}
+
+/* ============================================
+   13. TABLE
+   ============================================ */
+.table-wrap{
+  overflow-x:auto;
+  margin:var(--s-5) 0;
+  border-radius:var(--r-sm);
+  border:1px solid var(--color-border);
+  background:var(--color-bg);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:var(--fz-small);
+}
+thead{background:var(--color-surface)}
+th,td{
+  text-align:left;
+  padding:var(--s-3) var(--s-4);
+  border-bottom:1px solid var(--color-border);
+  vertical-align:top;
+  color:var(--color-ink-3);
+}
+th{
+  font-weight:700;
+  font-size:var(--fz-caption);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--color-muted);
+}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--color-bg-2)}
+td.num,th.num{font-family:var(--font-mono);text-align:right;font-variant-numeric:tabular-nums}
+td.center,th.center{text-align:center}
+
+table.decision td.score{
+  font-family:var(--font-mono);
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+  text-align:center;
+  color:var(--color-ink);
+}
+table.decision tr.winner{background:var(--color-success-soft)}
+table.decision tr.winner:hover{background:var(--color-success-soft)}
+table.decision tr.winner td{color:var(--color-success-fg);font-weight:600}
+/* 다크 — winner hue tint 제거. 강조는 surface-2 + ink */
+[data-theme=dark] table.decision tr.winner,
+[data-theme=dark] table.decision tr.winner:hover{background:var(--color-surface-2)}
+[data-theme=dark] table.decision tr.winner td{color:var(--color-ink);font-weight:700}
+
+/* ============================================
+   14. TIMELINE
+   ============================================ */
+.timeline{position:relative;margin:var(--s-5) 0;padding-left:var(--s-6);list-style:none}
+.timeline::before{
+  content:"";
+  position:absolute;
+  left:7px;
+  top:8px;
+  bottom:8px;
+  width:2px;
+  background:var(--color-border-strong);
+}
+.timeline .item{position:relative;padding-bottom:var(--s-5)}
+.timeline .item::before{
+  content:"";
+  position:absolute;
+  left:calc(-1 * var(--s-6) + 1px);
+  top:6px;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:var(--color-bg);
+  border:2px solid var(--color-border-strong);
+  box-sizing:border-box;
+}
+.timeline .item.done::before{background:var(--color-primary);border-color:var(--color-primary)}
+.timeline .item.active::before{background:var(--color-bg);border-color:var(--color-primary);box-shadow:0 0 0 4px var(--color-primary-soft)}
+.timeline .item.warn::before{background:var(--color-warn);border-color:var(--color-warn)}
+.timeline .item.danger::before{background:var(--color-danger);border-color:var(--color-danger)}
+.timeline .when{
+  font-size:var(--fz-caption);
+  color:var(--color-muted);
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.timeline .title{font-weight:700;color:var(--color-ink);margin:var(--s-1) 0;font-size:var(--fz-base)}
+.timeline .desc{color:var(--color-ink-3);font-size:var(--fz-small);line-height:1.55}
+
+/* ============================================
+   15. STEPS (grid 2칸 32px+1fr, title·desc는 grid-column:2 고정, absolute 폐기)
+   ============================================ */
+.steps{list-style:none;padding:0;margin:var(--s-5) 0;counter-reset:step}
+.steps>li{
+  counter-increment:step;
+  display:grid;
+  grid-template-columns:32px 1fr;
+  gap:var(--s-4);
+  padding:var(--s-4) var(--s-5);
+  border:1px solid var(--color-border);
+  border-radius:var(--r-sm);
+  margin:var(--s-3) 0;
+  background:var(--color-surface);
+  align-items:start;
+}
+.steps>li::before{
+  content:counter(step);
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:var(--color-primary);
+  color:var(--color-primary-fg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:var(--fz-small);
+  font-family:var(--font-sans);
+  letter-spacing:-0.02em;
+  flex-shrink:0;
+}
+.steps>li .title{grid-column:2;font-weight:700;color:var(--color-ink);font-size:var(--fz-base);display:block;margin-bottom:2px}
+.steps>li .desc{grid-column:2;color:var(--color-muted);font-size:var(--fz-small);line-height:1.55}
+
+/* ============================================
+   16. COMPARE (AS-IS / TO-BE) — 중립화
+   ============================================ */
+.compare{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:var(--s-4);
+  align-items:stretch;
+  margin:var(--s-5) 0;
+}
+.compare .side{
+  padding:var(--s-5);
+  border-radius:var(--r-md);
+  border:1px solid var(--color-border);
+  background:var(--color-surface);
+}
+.compare .side h4{margin:0 0 var(--s-3);font-size:var(--fz-lg);display:flex;align-items:center;gap:var(--s-2)}
+.compare .side ul{margin:0;padding-left:var(--s-5)}
+.compare .side li{color:var(--color-ink-3)}
+.compare .side .side-label{
+  display:inline-block;
+  font-size:var(--fz-caption);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  font-weight:700;
+  color:var(--color-muted);
+  margin-bottom:var(--s-2);
+}
+/* 명시적 의미 — .danger / .success / .primary 추가 클래스로 옵트인 */
+.compare .side.danger{background:var(--color-danger-soft);border-color:transparent}
+.compare .side.danger h4,.compare .side.danger .side-label{color:var(--color-danger-fg)}
+.compare .side.success{background:var(--color-success-soft);border-color:transparent}
+.compare .side.success h4,.compare .side.success .side-label{color:var(--color-success-fg)}
+.compare .side.primary{background:var(--color-primary-soft);border-color:transparent}
+.compare .side.primary h4,.compare .side.primary .side-label{color:var(--color-primary-hover)}
+/* 다크에서 모든 .compare side 의 h4·side-label 도 무채색 — 형광 hue 떠보임 방지 */
+[data-theme=dark] .compare .side.danger h4,
+[data-theme=dark] .compare .side.danger .side-label,
+[data-theme=dark] .compare .side.success h4,
+[data-theme=dark] .compare .side.success .side-label,
+[data-theme=dark] .compare .side.primary h4,
+[data-theme=dark] .compare .side.primary .side-label{color:var(--color-ink)}
+/* 다크 — soft hue tint 제거 */
+[data-theme=dark] .compare .side.danger,
+[data-theme=dark] .compare .side.success,
+[data-theme=dark] .compare .side.primary{
+  background:var(--color-surface);
+  border-left:4px solid var(--color-border);
+}
+[data-theme=dark] .compare .side.danger{border-left-color:var(--color-danger)}
+[data-theme=dark] .compare .side.success{border-left-color:var(--color-success)}
+[data-theme=dark] .compare .side.primary{border-left-color:var(--color-primary)}
+.compare .arrow{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--color-muted-2);
+  font-size:var(--fz-2xl);
+  font-weight:300;
+  width:32px;
+}
+@media(max-width:720px){
+  .compare{grid-template-columns:1fr}
+  .compare .arrow{display:none}
+}
+
+/* ============================================
+   17. CODE BLOCK
+   ============================================ */
+pre{
+  background:var(--code-bg);
+  color:var(--code-fg);
+  padding:var(--s-4) var(--s-5);
+  border-radius:var(--r-sm);
+  overflow-x:auto;
+  font-family:var(--font-mono);
+  font-size:13px;
+  line-height:1.65;
+  margin:var(--s-5) 0;
+  border:1px solid transparent;
+}
+pre code{background:transparent;color:inherit;padding:0;border:0;font-size:inherit}
+pre .c-comment{color:var(--code-comment);font-style:normal;opacity:.85}
+pre .c-keyword{color:var(--code-keyword)}
+pre .c-string{color:var(--code-string)}
+pre .c-number{color:var(--code-number)}
+pre .label{
+  display:inline-block;
+  font-size:11px;
+  color:var(--color-muted-2);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  margin-bottom:var(--s-2);
+  font-weight:700;
+}
+
+/* ============================================
+   18. PROGRESS
+   ============================================ */
+.progress{
+  background:var(--color-surface-2);
+  border-radius:var(--r-full);
+  height:8px;
+  overflow:hidden;
+  margin:var(--s-2) 0;
+}
+.progress>.bar{
+  height:100%;
+  background:var(--color-primary);
+  border-radius:var(--r-full);
+  transition:width var(--dur-base) var(--ease-out);
+}
+.progress.success>.bar{background:var(--color-success)}
+.progress.warn>.bar{background:var(--color-warn)}
+.progress.danger>.bar{background:var(--color-danger)}
+
+/* ============================================
+   19. CHECKLIST
+   ============================================ */
+.checklist{list-style:none;padding:0;margin:var(--s-4) 0}
+.checklist li{
+  display:flex;
+  align-items:flex-start;
+  gap:var(--s-3);
+  padding:var(--s-3) 0;
+  border-bottom:1px solid var(--color-border);
+}
+.checklist li:last-child{border-bottom:0}
+.checklist input[type=checkbox]{
+  margin-top:3px;
+  width:18px;
+  height:18px;
+  accent-color:var(--color-primary);
+  cursor:pointer;
+  flex-shrink:0;
+}
+.checklist li.done>span{text-decoration:line-through;color:var(--color-muted)}
+
+/* ============================================
+   20. RISK HEATMAP
+   ============================================ */
+.risk-grid{
+  display:grid;
+  grid-template-columns:80px repeat(3,1fr);
+  grid-template-rows:auto repeat(3,minmax(96px,1fr));
+  gap:2px;
+  background:var(--color-border);
+  margin:var(--s-5) 0;
+  border:1px solid var(--color-border);
+  border-radius:var(--r-sm);
+  overflow:hidden;
+}
+.risk-grid>div{background:var(--color-bg);padding:var(--s-3)}
+.risk-grid>.axis{
+  background:var(--color-surface);
+  font-size:var(--fz-caption);
+  font-weight:700;
+  color:var(--color-muted);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.risk-grid>.cell.low{background:var(--color-success-soft)}
+.risk-grid>.cell.mid{background:var(--color-warn-soft)}
+.risk-grid>.cell.high{background:var(--color-danger-soft)}
+.risk-grid .item{
+  display:block;
+  padding:6px 10px;
+  background:var(--color-surface);
+  border-radius:var(--r-xs);
+  margin:3px 0;
+  font-size:var(--fz-small);
+  color:var(--color-ink-2);
+  border-left:3px solid var(--color-muted);
+  line-height:1.45;
+}
+/* cell hue 따라 border 색 변경 — 카드와 cell 톤이 같은 가족으로 연결됨 */
+.risk-grid .cell.low .item{border-left-color:var(--color-success)}
+.risk-grid .cell.mid .item{border-left-color:var(--color-warn)}
+.risk-grid .cell.high .item{border-left-color:var(--color-danger)}
+/* 다크 — risk-grid cell hue tint 제거. 위험도 의미는 axis 위치 + item border-left 색으로만 전달 */
+[data-theme=dark] .risk-grid .cell.low,
+[data-theme=dark] .risk-grid .cell.mid,
+[data-theme=dark] .risk-grid .cell.high{background:var(--color-bg)}
+[data-theme=dark] .risk-grid .item{background:var(--color-surface)}
+
+/* ============================================
+   21. Q&A TOGGLE
+   ============================================ */
+details.qa{
+  border:1px solid var(--color-border);
+  border-radius:var(--r-sm);
+  margin:var(--s-3) 0;
+  background:var(--color-surface);
+  transition:background var(--dur-fast) var(--ease-out);
+}
+details.qa[open]{background:var(--color-bg)}
+details.qa summary{
+  padding:var(--s-4) var(--s-5);
+  cursor:pointer;
+  font-weight:600;
+  color:var(--color-ink);
+  list-style:none;
+  position:relative;
+  padding-right:var(--s-7);
+  font-size:var(--fz-base);
+}
+details.qa summary::-webkit-details-marker{display:none}
+details.qa summary::after{
+  content:"";
+  position:absolute;
+  right:var(--s-5);
+  top:50%;
+  width:10px;
+  height:10px;
+  border-right:2px solid var(--color-muted);
+  border-bottom:2px solid var(--color-muted);
+  transform:translateY(-70%) rotate(45deg);
+  transition:transform var(--dur-base) var(--ease-out);
+}
+details.qa[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
+details.qa>div{padding:0 var(--s-5) var(--s-5);color:var(--color-ink-3)}
+details.qa>div>:first-child{margin-top:0}
+
+/* ============================================
+   21.5 독자 보조 레이어 (TERM / PRIMER / GLOSSARY)
+   본문은 간결하게 두고, 독자 이해도가 낮을 수 있는 용어·개념을
+   별도 레이어로 분리한다. 전문가는 본문만, 초보는 펼쳐서 깊이 확보.
+   ============================================ */
+/* 인라인 용어 힌트 — 본문 흐름 유지, 점선 밑줄 + title 툴팁(정본은 하단 glossary) */
+.term{
+  border-bottom:1px dotted var(--color-muted);
+  cursor:help;
+  text-underline-offset:2px;
+}
+/* 접이식 배경지식 박스 — details.qa 변형 + 좌측 primary accent bar */
+details.primer{
+  border:1px solid var(--color-border);
+  border-left:3px solid var(--color-primary);
+  border-radius:var(--r-sm);
+  margin:var(--s-4) 0;
+  background:var(--color-surface);
+  transition:background var(--dur-fast) var(--ease-out);
+}
+details.primer[open]{background:var(--color-bg)}
+details.primer summary{
+  padding:var(--s-3) var(--s-5);
+  cursor:pointer;
+  font-weight:600;
+  color:var(--color-ink-2);
+  font-size:var(--fz-small);
+  list-style:none;
+  position:relative;
+  padding-right:var(--s-7);
+}
+details.primer summary::-webkit-details-marker{display:none}
+details.primer summary::before{
+  content:"배경지식";
+  display:inline-block;
+  margin-right:var(--s-3);
+  padding:1px var(--s-2);
+  border-radius:var(--r-full);
+  background:var(--color-primary-soft);
+  color:var(--color-primary);
+  font-size:var(--fz-caption);
+  font-weight:700;
+  letter-spacing:.04em;
+  vertical-align:middle;
+}
+details.primer summary::after{
+  content:"";
+  position:absolute;
+  right:var(--s-5);
+  top:50%;
+  width:9px;height:9px;
+  border-right:2px solid var(--color-muted);
+  border-bottom:2px solid var(--color-muted);
+  transform:translateY(-70%) rotate(45deg);
+  transition:transform var(--dur-base) var(--ease-out);
+}
+details.primer[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
+details.primer>div{padding:0 var(--s-5) var(--s-4);color:var(--color-ink-3);font-size:var(--fz-base)}
+details.primer>div>:first-child{margin-top:0}
+/* 하단 용어집 — 도메인 용어 정본 정의 목록 (인쇄·정독 대비) */
+dl.glossary{
+  display:grid;
+  grid-template-columns:minmax(120px,200px) 1fr;
+  gap:0 var(--s-5);
+  margin:var(--s-4) 0;
+}
+dl.glossary dt{
+  font-weight:600;
+  color:var(--color-ink);
+  font-size:var(--fz-base);
+  padding:var(--s-3) 0;
+}
+dl.glossary dd{
+  margin:0;
+  color:var(--color-ink-3);
+  font-size:var(--fz-small);
+  line-height:1.6;
+  padding:var(--s-3) 0;
+}
+dl.glossary dt:not(:first-child),
+dl.glossary dd:not(:nth-of-type(1)){
+  border-top:1px solid var(--color-border);
+}
+@media (max-width:720px){
+  dl.glossary{grid-template-columns:1fr;gap:0}
+  dl.glossary dt{padding-bottom:0}
+  dl.glossary dd{padding-top:var(--s-1);border-top:none}
+  dl.glossary dd:not(:nth-of-type(1)){border-top:none}
+  dl.glossary dt:not(:first-child){border-top:1px solid var(--color-border)}
+}
+
+/* ============================================
+   21.7 FORMULA & WORKED EXAMPLE (해설·방법론 문서용)
+   수식은 외부 렌더러(KaTeX 등) 없이 mono 선형 표기 +
+   <sub>/<sup> 로 쓴다. 변수 뜻은 .formula-where 로 병기.
+   ============================================ */
+.formula{
+  font-family:var(--font-mono);
+  font-size:var(--fz-base);
+  line-height:1.9;
+  background:var(--color-bg-2);
+  border:1px solid var(--color-border);
+  border-left:3px solid var(--color-primary);
+  border-radius:var(--r-sm);
+  padding:var(--s-4) var(--s-5);
+  margin:var(--s-4) 0;
+  overflow-x:auto;
+  white-space:pre-wrap;
+  color:var(--color-ink);
+}
+.formula sub,.formula sup{font-size:.72em}
+.formula .fx-comment{color:var(--color-muted);font-size:var(--fz-small)}
+.formula .fx-hl{color:var(--color-primary);font-weight:600}
+/* 변수 뜻풀이 legend — 수식 블록 바로 아래 붙여 쓴다 */
+dl.formula-where{
+  display:grid;
+  grid-template-columns:max-content 1fr;
+  gap:var(--s-1) var(--s-4);
+  margin:calc(-1 * var(--s-2)) 0 var(--s-4);
+  padding:0 var(--s-5);
+  font-size:var(--fz-small);
+}
+dl.formula-where dt{
+  font-family:var(--font-mono);
+  color:var(--color-ink-2);
+  font-weight:600;
+}
+dl.formula-where dd{margin:0;color:var(--color-muted)}
+
+/* 숫자 예시(worked example) — 개념·수식을 실제 숫자로 한 번 굴려 보여주는 박스 */
+.example{
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:var(--r-md);
+  padding:var(--s-4) var(--s-5);
+  margin:var(--s-4) 0;
+}
+.example>.label{
+  display:inline-block;
+  font-size:var(--fz-caption);
+  font-weight:700;
+  letter-spacing:.06em;
+  color:var(--color-primary);
+  margin-bottom:var(--s-2);
+}
+.example>:nth-child(2){margin-top:0}
+.example>:last-child{margin-bottom:0}
+.example .formula{background:var(--color-bg);margin:var(--s-3) 0}
+
+/* ============================================
+   22. MERMAID WRAP
+   ============================================ */
+.mermaid-wrap{
+  position:relative;
+  background:var(--color-bg-2);
+  border:1px solid var(--color-border);
+  border-radius:var(--r-md);
+  padding:var(--s-6) var(--s-5);
+  margin:var(--s-5) 0;
+  text-align:center;
+  overflow-x:auto;
+}
+.mermaid-wrap .mermaid{display:inline-block}
+.mermaid-wrap .caption{
+  font-size:var(--fz-caption);
+  color:var(--color-muted);
+  margin-top:var(--s-3);
+  text-align:center;
+  letter-spacing:.02em;
+}
+
+/* ============================================
+   22.5 DIAGRAM ZOOM (클릭 확대 라이트박스)
+   다이어그램·도표가 작아 안 보일 때 클릭 → 전체화면 확대.
+   휠 줌 · 드래그 팬 · 더블클릭 리셋 지원.
+   대상: .mermaid-wrap(자동) 또는 .zoomable 클래스를 붙인 요소(img·표 등).
+   ============================================ */
+.mermaid-wrap.zoomable,.zoomable{cursor:zoom-in}
+.zoom-hint{
+  position:absolute;
+  top:var(--s-3);
+  right:var(--s-3);
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:var(--fz-caption);
+  font-weight:600;
+  color:var(--color-muted);
+  background:var(--color-bg);
+  border:1px solid var(--color-border);
+  border-radius:var(--r-full);
+  padding:3px 10px;
+  opacity:0;
+  transition:opacity var(--dur-fast) var(--ease-out);
+  pointer-events:none;
+}
+.mermaid-wrap:hover .zoom-hint,.zoomable:hover .zoom-hint{opacity:1}
+
+.zoom-overlay{
+  position:fixed;
+  inset:0;
+  z-index:200;
+  display:none;
+  background:rgba(9,9,11,.82);
+  -webkit-backdrop-filter:blur(2px);
+  backdrop-filter:blur(2px);
+}
+.zoom-overlay.open{display:block}
+.zoom-stage{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  cursor:grab;
+  touch-action:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.zoom-stage.dragging{cursor:grabbing}
+.zoom-canvas{
+  transform-origin:center center;
+  will-change:transform;
+}
+.zoom-canvas svg,.zoom-canvas img{max-width:none!important;height:auto;display:block}
+.zoom-toolbar{
+  position:fixed;
+  bottom:var(--s-5);
+  left:50%;
+  transform:translateX(-50%);
+  z-index:201;
+  display:flex;
+  align-items:center;
+  gap:var(--s-1);
+  background:var(--color-bg);
+  border:1px solid var(--color-border);
+  border-radius:var(--r-full);
+  padding:6px;
+  box-shadow:var(--shadow-overlay);
+}
+.zoom-toolbar button{
+  width:36px;
+  height:36px;
+  border:0;
+  border-radius:var(--r-full);
+  background:transparent;
+  color:var(--color-ink-2);
+  cursor:pointer;
+  font-size:18px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:background var(--dur-fast) var(--ease-out);
+}
+.zoom-toolbar button:hover{background:var(--color-surface)}
+.zoom-toolbar .zoom-level{
+  min-width:52px;
+  text-align:center;
+  font-size:var(--fz-small);
+  color:var(--color-muted);
+  font-variant-numeric:tabular-nums;
+}
+.zoom-close{
+  position:fixed;
+  top:var(--s-5);
+  right:var(--s-5);
+  z-index:201;
+  width:40px;
+  height:40px;
+  border-radius:var(--r-full);
+  border:1px solid var(--color-border);
+  background:var(--color-bg);
+  color:var(--color-ink-2);
+  cursor:pointer;
+  font-size:20px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.zoom-close:hover{background:var(--color-surface)}
+@media print{.zoom-overlay,.zoom-hint{display:none!important}}
+
+/* ============================================
+   23. FOOTER
+   ============================================ */
+.report-footer{
+  margin-top:var(--s-9);
+  padding-top:var(--s-5);
+  border-top:1px solid var(--color-border);
+  font-size:var(--fz-small);
+  color:var(--color-muted);
+  display:flex;
+  flex-wrap:wrap;
+  gap:var(--s-4);
+  justify-content:space-between;
+}
+
+/* ============================================
+   24. THEME TOGGLE
+   ============================================ */
+.theme-toggle{
+  position:fixed;
+  top:var(--s-4);
+  right:var(--s-5);
+  z-index:100;
+  width:40px;
+  height:40px;
+  border-radius:var(--r-full);
+  border:1px solid var(--color-border);
+  background:var(--color-bg);
+  color:var(--color-ink-2);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  transition:transform var(--dur-fast) var(--ease-out),background var(--dur-fast) var(--ease-out);
+}
+.theme-toggle:hover{transform:scale(1.05);background:var(--color-surface)}
+.theme-toggle .sun{display:none}
+.theme-toggle .moon{display:block}
+[data-theme=dark] .theme-toggle .sun{display:block}
+[data-theme=dark] .theme-toggle .moon{display:none}
+
+/* ============================================
+   25. UTILITIES
+   ============================================ */
+.u-mono{font-family:var(--font-mono)}
+.u-muted{color:var(--color-muted)}
+.u-small{font-size:var(--fz-small)}
+.u-center{text-align:center}
+.u-right{text-align:right}
+.u-tnum{font-variant-numeric:tabular-nums}
+.u-nowrap{white-space:nowrap}
+.u-mt-0{margin-top:0}
+.u-mb-0{margin-bottom:0}
+
+/* ============================================
+   26. PRINT
+   ============================================ */
+@media print{
+  @page{size:A4;margin:18mm 14mm}
+  /* 다크 모드 상태로 인쇄해도 흰 종이 위에서 읽히도록 토큰을 라이트 값으로 강제 */
+  [data-theme=dark]{
+    --color-primary:#3B82F6;--color-primary-hover:#1D4ED8;--color-primary-pressed:#1E40AF;
+    --color-primary-soft:#EFF6FF;--color-primary-fg:#FFFFFF;
+    --color-bg:#FFFFFF;--color-bg-2:#FAFAFA;--color-surface:#F4F4F5;--color-surface-2:#E4E4E7;
+    --color-border:#E4E4E7;--color-border-strong:#D4D4D8;
+    --color-ink:#18181B;--color-ink-2:#27272A;--color-ink-3:#3F3F46;
+    --color-muted:#71717A;--color-muted-2:#A1A1AA;
+    --color-success:#0D9F6E;--color-success-fg:#065F46;--color-success-soft:#D1FAE5;
+    --color-warn:#D97706;--color-warn-fg:#92400E;--color-warn-soft:#FEF3C7;
+    --color-danger:#E11D48;--color-danger-fg:#9F1239;--color-danger-soft:#FFE4E6;
+    --shadow-overlay:none;
+  }
+  body{background:#fff;color:#000;font-size:11pt}
+  .page{display:block;max-width:none;padding:0}
+  .toc,.theme-toggle{display:none}
+  .content{max-width:none}
+  h2{page-break-after:avoid}
+  pre,.card,.compare,.timeline,table,.callout,.stat,.tldr{page-break-inside:avoid}
+  a{color:#000;text-decoration:underline}
+  a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}
+  .callout,.tldr,.stat,.card{box-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================
+     SVG icon sprite — callout 등에서 <use href="#i-xxx"/> 로 참조
+     ============================================ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-note" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-9"/>
+      <path d="m18 2 4 4-10 10H8v-4Z"/>
+    </symbol>
+    <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 11v5"/>
+      <circle cx="12" cy="8" r=".5" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="m8 12 3 3 5-6"/>
+    </symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
+      <path d="M12 9v4"/>
+      <circle cx="12" cy="17" r=".5" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="m15 9-6 6"/>
+      <path d="m9 9 6 6"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- 다크/라이트 토글 버튼 -->
+<button class="theme-toggle" id="themeToggle" aria-label="테마 전환" title="라이트/다크 전환">
+  <span class="sun" aria-hidden="true">☀</span><span class="moon" aria-hidden="true">☾</span>
+</button>
+
+<div class="page">
+
+  <!-- 좌측 sticky TOC. 섹션이 적으면 통째로 삭제 가능. -->
+  <aside class="toc" id="toc">
+    <h4>Contents</h4>
+    <ol id="tocList">
+      <!-- JS 가 h2/h3 를 스캔해서 자동 채움 -->
+    </ol>
+  </aside>
+
+  <main class="content">
+
+    <header class="report-header">
+      <span class="kicker">{{REPORT_TYPE}}</span>
+      <h1>{{REPORT_TITLE}}</h1>
+      <p class="subtitle">{{REPORT_SUBTITLE}}</p>
+      <div class="report-meta">
+        <span class="item"><span class="label">작성자</span> <strong>{{AUTHOR}}</strong></span>
+        <span class="item"><span class="label">작성일</span> <strong>{{DATE}}</strong></span>
+        <span class="item"><span class="label">상태</span> <span class="badge info">{{STATUS}}</span></span>
+        <span class="item"><span class="label">대상</span> <strong>{{AUDIENCE}}</strong></span>
+      </div>
+    </header>
+
+    <!-- ============================================
+         본문 시작. 아래 섹션들은 보고서 타입에 맞춰
+         references/report-types.md 의 가이드에 따라
+         components.md 의 컴포넌트로 채운다.
+         ============================================ -->
+
+    <section id="tldr">
+      <div class="tldr">
+        <span class="label">TL;DR</span>
+        <p>{{한 줄 요약 — 보고서 전체의 결론·핵심 메시지}}</p>
+      </div>
+    </section>
+
+    <section id="context">
+      <h2>1. 컨텍스트</h2>
+      <p>{{왜 이 보고서가 필요한지, 어떤 배경에서 출발했는지}}</p>
+    </section>
+
+    <!-- 타입별로 섹션이 추가됨. templates/{type}.html 참고 -->
+
+    <footer class="report-footer">
+      <span>{{REPORT_TITLE}} · {{DATE}}</span>
+      <span>v{{VERSION}} · {{AUTHOR}}</span>
+    </footer>
+
+  </main>
+</div>
+
+<!-- 다이어그램 확대 라이트박스 (클릭 시 열림. 다이어그램·이미지 없으면 통째로 삭제 가능) -->
+<div class="zoom-overlay" id="zoomOverlay" aria-hidden="true" role="dialog" aria-label="다이어그램 확대 보기">
+  <div class="zoom-stage" id="zoomStage">
+    <div class="zoom-canvas" id="zoomCanvas"></div>
+  </div>
+  <button class="zoom-close" id="zoomClose" aria-label="닫기">✕</button>
+  <div class="zoom-toolbar">
+    <button id="zoomOut" aria-label="축소" title="축소">−</button>
+    <span class="zoom-level" id="zoomLevel">100%</span>
+    <button id="zoomIn" aria-label="확대" title="확대">+</button>
+    <button id="zoomReset" aria-label="원래대로" title="원래대로">⟲</button>
+  </div>
+</div>
+
+<!-- Mermaid (다이어그램이 있는 보고서에서만 활성화. 없으면 이 두 줄 삭제) -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+// ===== Mermaid 렌더 관리 =====
+// 원본 소스를 "렌더 전에" dataset.src 로 보존해야 테마 전환 시 재렌더가 가능하다.
+// (렌더 후의 .mermaid 내용은 SVG 로 교체돼 원본이 사라지므로, 그 시점의
+//  textContent 를 소스로 쓰면 모든 다이어그램이 Syntax error 로 깨진다.)
+// innerHTML 주입 금지 — '<' 를 포함한 소스가 HTML 로 파싱돼 손상된다.
+(function(){
+  if (!window.mermaid) return;
+  var MCFG = {
+    startOnLoad: false,
+    theme: 'default',
+    themeVariables: { fontFamily: "'Pretendard Variable', sans-serif", primaryColor: '#3182F6' },
+    flowchart: { curve: 'basis', useMaxWidth: true }
+  };
+  window.renderMermaid = function(){
+    document.querySelectorAll('.mermaid').forEach(function(el){
+      if (el.dataset.src == null) el.dataset.src = el.textContent; // 최초 1회, 렌더 전 원본 보존
+      el.removeAttribute('data-processed');
+      el.textContent = el.dataset.src;
+    });
+    MCFG.theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'default';
+    mermaid.initialize(MCFG);
+    mermaid.run().catch(function(e){ console.warn('mermaid render:', e); });
+  };
+  renderMermaid();
+  // 접힌 <details> 안에서 렌더된 다이어그램은 크기가 0 — 펼칠 때 재렌더
+  document.addEventListener('toggle', function(e){
+    if (e.target.matches && e.target.matches('details') && e.target.open && e.target.querySelector('.mermaid')) renderMermaid();
+  }, true);
+})();
+</script>
+
+<script>
+// ===== Theme Toggle ===== (초기 테마는 <head> 인라인 스크립트가 첫 페인트 전에 결정)
+(function(){
+  const KEY = 'html-report-theme';
+  const root = document.documentElement;
+  const btn = document.getElementById('themeToggle');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try { localStorage.setItem(KEY, next); } catch(e) {}
+    if (window.renderMermaid) renderMermaid();
+  });
+})();
+
+// ===== Auto TOC =====
+(function(){
+  const list = document.getElementById('tocList');
+  if (!list) return;
+  const headings = document.querySelectorAll('main.content h2, main.content h3');
+  let lastH2 = null;
+  headings.forEach((h, i) => {
+    if (!h.id) h.id = 'sec-' + i;
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent;
+    li.appendChild(a);
+    if (h.tagName === 'H2') {
+      list.appendChild(li);
+      lastH2 = li;
+    } else if (h.tagName === 'H3' && lastH2) {
+      let sub = lastH2.querySelector('ol');
+      if (!sub) { sub = document.createElement('ol'); lastH2.appendChild(sub); }
+      sub.appendChild(li);
+    } else {
+      list.appendChild(li);
+    }
+  });
+
+  const links = list.querySelectorAll('a');
+  const linkByHash = {};
+  links.forEach(a => linkByHash[a.getAttribute('href')] = a);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const a = linkByHash['#' + e.target.id];
+      if (!a) return;
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => io.observe(h));
+})();
+
+// ===== Checklist 클릭 시 .done 토글 =====
+document.addEventListener('change', (e) => {
+  if (e.target.matches('.checklist input[type=checkbox]')) {
+    e.target.closest('li').classList.toggle('done', e.target.checked);
+  }
+});
+
+// ===== Diagram Zoom (클릭하면 전체화면 확대 · 휠 줌 · 드래그 팬) =====
+(function(){
+  const overlay = document.getElementById('zoomOverlay');
+  const stage   = document.getElementById('zoomStage');
+  const canvas  = document.getElementById('zoomCanvas');
+  const levelEl = document.getElementById('zoomLevel');
+  if (!overlay || !stage || !canvas) return;
+
+  let baseScale = 1, scale = 1, tx = 0, ty = 0;
+  let dragging = false, startX = 0, startY = 0;
+  const MIN = 0.5, MAX = 8; // baseScale 배수 기준
+
+  function apply(){
+    canvas.style.transform =
+      `translate(${tx}px,${ty}px) scale(${scale})`;
+    levelEl.textContent = Math.round(scale / baseScale * 100) + '%';
+  }
+
+  // cx/cy(뷰포트 좌표)를 주면 그 지점을 기준으로 줌, 없으면 화면 중심
+  function zoomTo(next, cx, cy){
+    next = Math.min(Math.max(next, baseScale * MIN), baseScale * MAX);
+    if (cx != null){
+      const rect = stage.getBoundingClientRect();
+      const ox = cx - rect.left - rect.width / 2;
+      const oy = cy - rect.top  - rect.height / 2;
+      const k = next / scale;
+      tx = ox - (ox - tx) * k;
+      ty = oy - (oy - ty) * k;
+    }
+    scale = next;
+    apply();
+  }
+
+  function open(wrap){
+    const node = wrap.querySelector('svg, img');
+    if (!node) return;
+    canvas.innerHTML = '';
+    const clone = node.cloneNode(true);
+    clone.removeAttribute('style');
+    canvas.appendChild(clone);
+
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    // 자연 크기 측정(scale=1) 후 화면에 맞춰 fit → 그 크기를 100% 기준으로
+    scale = 1; tx = 0; ty = 0;
+    canvas.style.transform = 'translate(0px,0px) scale(1)';
+    const r = clone.getBoundingClientRect();
+    const vw = window.innerWidth  * 0.92;
+    const vh = window.innerHeight * 0.84;
+    baseScale = (r.width && r.height) ? Math.min(vw / r.width, vh / r.height) : 1;
+    scale = baseScale;
+    apply();
+  }
+
+  function close(){
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    canvas.innerHTML = '';
+  }
+
+  // 다이어그램·이미지 클릭 → 열기 (mermaid 는 비동기 렌더라 이벤트 위임)
+  document.addEventListener('click', (e) => {
+    if (overlay.classList.contains('open')) return;
+    if (e.target.closest('a, button, input, details summary')) return; // 링크·버튼 클릭은 확대로 가로채지 않음
+    const wrap = e.target.closest('.mermaid-wrap, .zoomable');
+    if (!wrap || !wrap.querySelector('svg, img')) return;
+    open(wrap);
+  });
+
+  stage.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    zoomTo(scale * (e.deltaY < 0 ? 1.15 : 1 / 1.15), e.clientX, e.clientY);
+  }, { passive: false });
+
+  stage.addEventListener('pointerdown', (e) => {
+    dragging = true; stage.classList.add('dragging');
+    startX = e.clientX - tx; startY = e.clientY - ty;
+    stage.setPointerCapture(e.pointerId);
+  });
+  stage.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    tx = e.clientX - startX; ty = e.clientY - startY;
+    apply();
+  });
+  function endDrag(){ dragging = false; stage.classList.remove('dragging'); }
+  stage.addEventListener('pointerup', endDrag);
+  stage.addEventListener('pointercancel', endDrag);
+  stage.addEventListener('dblclick', () => { scale = baseScale; tx = 0; ty = 0; apply(); });
+
+  document.getElementById('zoomIn').addEventListener('click', () => zoomTo(scale * 1.25));
+  document.getElementById('zoomOut').addEventListener('click', () => zoomTo(scale / 1.25));
+  document.getElementById('zoomReset').addEventListener('click', () => { scale = baseScale; tx = 0; ty = 0; apply(); });
+  document.getElementById('zoomClose').addEventListener('click', close);
+
+  overlay.addEventListener('click', (e) => { if (e.target === overlay || e.target === stage) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.classList.contains('open')) close(); });
+
+  // 렌더 끝난 다이어그램에 확대 힌트 배지 부착 (mermaid 비동기 대응)
+  function markZoomable(){
+    document.querySelectorAll('.mermaid-wrap').forEach((w) => {
+      if (w.querySelector('svg, img') && !w.querySelector('.zoom-hint')){
+        w.classList.add('zoomable');
+        const hint = document.createElement('span');
+        hint.className = 'zoom-hint';
+        hint.textContent = '⤢ 클릭하여 확대';
+        w.appendChild(hint);
+      }
+    });
+  }
+  new MutationObserver(markZoomable).observe(document.body, { childList: true, subtree: true });
+  markZoomable();
+})();
+</script>
+
+</body>
+</html>

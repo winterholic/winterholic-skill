@@ -1,0 +1,1682 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design System Catalog — html-report</title>
+<meta name="description" content="토큰·컴포넌트 시각 카탈로그">
+<script>
+(function(){
+  try{
+    var t = localStorage.getItem('html-report-theme');
+    if (t !== 'dark' && t !== 'light') t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+  }catch(e){}
+})();
+</script>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+
+/* ============================================
+   1. DESIGN TOKENS (Light)
+   ============================================ */
+:root{
+  /* Brand · Primary (Calm Pro · blue-500) */
+  --color-primary:#3B82F6;
+  --color-primary-hover:#1D4ED8;
+  --color-primary-pressed:#1E40AF;
+  --color-primary-soft:#EFF6FF;
+  --color-primary-fg:#FFFFFF;
+
+  /* Neutral · zinc */
+  --color-bg:#FFFFFF;
+  --color-bg-2:#FAFAFA;
+  --color-surface:#F4F4F5;
+  --color-surface-2:#E4E4E7;
+  --color-border:#E4E4E7;
+  --color-border-strong:#D4D4D8;
+  --color-ink:#18181B;
+  --color-ink-2:#27272A;
+  --color-ink-3:#3F3F46;
+  --color-muted:#71717A;
+  --color-muted-2:#A1A1AA;
+
+  /* Semantic — base / fg / soft (Calm Pro · emerald · amber · rose) */
+  --color-success:#0D9F6E;
+  --color-success-fg:#065F46;
+  --color-success-soft:#D1FAE5;
+  --color-warn:#D97706;
+  --color-warn-fg:#92400E;
+  --color-warn-soft:#FEF3C7;
+  --color-danger:#E11D48;
+  --color-danger-fg:#9F1239;
+  --color-danger-soft:#FFE4E6;
+  --color-info:var(--color-primary);
+  --color-info-fg:var(--color-primary-hover);
+  --color-info-soft:var(--color-primary-soft);
+
+  /* Typography */
+  --font-sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+  --font-mono:'JetBrains Mono','SF Mono',Menlo,Consolas,'D2Coding',monospace;
+  --fz-caption:12px;
+  --fz-small:13px;
+  --fz-base:15px;
+  --fz-lg:17px;
+  --fz-xl:20px;
+  --fz-2xl:26px;
+  --fz-3xl:32px;
+  --fz-4xl:40px;
+  --fz-display:52px;
+  --lh-tight:1.2;
+  --lh-snug:1.35;
+  --lh-base:1.65;
+
+  /* Spacing 4의 배수 */
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px;
+  --s-5:24px; --s-6:32px; --s-7:48px; --s-8:64px; --s-9:96px;
+
+  /* Radius */
+  --r-xs:4px; --r-sm:8px; --r-md:12px; --r-lg:16px; --r-full:999px;
+
+  /* Layout */
+  --w-content:820px;
+  --w-toc:240px;
+
+  /* Elevation — 거의 안 씀 */
+  --shadow-overlay:0 8px 24px rgba(15,23,42,.08),0 2px 6px rgba(15,23,42,.04);
+
+  /* Motion */
+  --ease-out:cubic-bezier(0.22,1,0.36,1);
+  --dur-fast:150ms;
+  --dur-base:200ms;
+
+  /* Code block (다크 고정) */
+  --code-bg:#18181B;
+  --code-fg:#E4E4E7;
+  --code-comment:#71717A;
+  --code-keyword:#93C5FD;
+  --code-string:#7FF0CB;
+  --code-number:#FFC04D;
+}
+
+/* ============================================
+   2. DESIGN TOKENS (Dark override)
+   ============================================ */
+[data-theme=dark]{
+  /* OKLCH balanced — 모든 semantic이 같은 L(명도)·C(채도) 라인, hue만 다름.
+     perceptual uniformity 보장 → 4 hue가 한 가족처럼 느껴짐. */
+  --color-primary:oklch(72% 0.15 248);
+  --color-primary-hover:oklch(80% 0.13 248);
+  --color-primary-pressed:oklch(86% 0.10 248);
+  /* 다크에선 모든 *-soft 면 배경 hue tint 폐기 — surface 로 매핑 (의미는 좌측 accent bar + 아이콘으로) */
+  --color-primary-soft:var(--color-surface);
+  --color-primary-fg:#0A1F3D;
+
+  --color-bg:#09090B;
+  --color-bg-2:#0F0F11;
+  --color-surface:#18181B;
+  --color-surface-2:#27272A;
+  --color-border:#27272A;
+  --color-border-strong:#3F3F46;
+  --color-ink:#FAFAFA;
+  --color-ink-2:#E4E4E7;
+  --color-ink-3:#D4D4D8;
+  --color-muted:#A1A1AA;
+  --color-muted-2:#71717A;
+
+  --color-success:oklch(72% 0.13 158);
+  --color-success-fg:oklch(85% 0.10 158);
+  --color-success-soft:var(--color-surface);
+  --color-warn:oklch(75% 0.13 70);
+  --color-warn-fg:oklch(87% 0.10 70);
+  --color-warn-soft:var(--color-surface);
+  --color-danger:oklch(72% 0.15 18);
+  --color-danger-fg:oklch(85% 0.10 18);
+  --color-danger-soft:var(--color-surface);
+
+  --shadow-overlay:0 8px 24px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3);
+}
+
+/* ============================================
+   3. BASE
+   ============================================ */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{
+  margin:0;
+  font-family:var(--font-sans);
+  font-size:var(--fz-base);
+  line-height:var(--lh-base);
+  color:var(--color-ink-2);
+  background:var(--color-bg);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  font-feature-settings:"tnum","ss01";
+  font-variant-numeric:tabular-nums;
+}
+img,svg{max-width:100%;display:block}
+hr{border:0;border-top:1px solid var(--color-border);margin:var(--s-7) 0}
+::selection{background:var(--color-primary-soft);color:var(--color-ink)}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{transition-duration:0!important;animation-duration:0!important}
+}
+
+/* ============================================
+   4. LAYOUT
+   ============================================ */
+.page{
+  display:grid;
+  grid-template-columns:var(--w-toc) minmax(0,var(--w-content)) 1fr;
+  gap:var(--s-7);
+  max-width:1280px;
+  margin:0 auto;
+  padding:var(--s-7) var(--s-5);
+}
+.toc{
+  position:sticky;
+  top:var(--s-5);
+  align-self:start;
+  font-size:var(--fz-small);
+  max-height:calc(100vh - var(--s-7));
+  overflow-y:auto;
+  padding-right:var(--s-3);
+}
+.toc h4{
+  font-size:var(--fz-caption);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--color-muted);
+  margin:0 0 var(--s-3);
+  font-weight:600;
+}
+.toc ol{list-style:none;padding:0;margin:0}
+.toc li{margin:var(--s-1) 0}
+.toc a{
+  color:var(--color-ink-3);
+  text-decoration:none;
+  display:block;
+  padding:6px var(--s-3);
+  border-radius:var(--r-sm);
+  border-left:2px solid transparent;
+  line-height:1.45;
+  transition:background var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out);
+}
+.toc a:hover{background:var(--color-surface);color:var(--color-ink)}
+.toc a.active{
+  color:var(--color-primary);
+  border-left-color:var(--color-primary);
+  background:var(--color-primary-soft);
+  font-weight:600;
+}
+.toc ol ol{margin-left:var(--s-3);border-left:1px solid var(--color-border);padding-left:var(--s-2)}
+.content{min-width:0}
+@media(max-width:980px){
+  .page{grid-template-columns:1fr}
+  .toc{position:static;max-height:none;border-bottom:1px solid var(--color-border);padding-bottom:var(--s-4)}
+}
+
+/* ============================================
+   5. TYPOGRAPHY
+   ============================================ */
+h1,h2,h3,h4{color:var(--color-ink);font-weight:700;line-height:var(--lh-tight)}
+h1{font-size:var(--fz-4xl);margin:0 0 var(--s-3);letter-spacing:-0.025em}
+h2{font-size:var(--fz-3xl);margin:var(--s-8) 0 var(--s-4);letter-spacing:-0.02em;line-height:var(--lh-snug)}
+h3{font-size:var(--fz-2xl);margin:var(--s-7) 0 var(--s-3);letter-spacing:-0.015em;line-height:var(--lh-snug)}
+h4{font-size:var(--fz-xl);margin:var(--s-5) 0 var(--s-2);line-height:var(--lh-snug)}
+p{margin:0 0 var(--s-4)}
+a{
+  color:var(--color-primary);
+  text-decoration:none;
+  border-bottom:1px solid transparent;
+  transition:border-color var(--dur-fast) var(--ease-out);
+}
+a:hover{border-bottom-color:var(--color-primary)}
+strong{color:var(--color-ink);font-weight:600}
+em{color:var(--color-ink-2);font-style:normal;font-weight:500} /* 한글에 italic 금지 — weight로 대체 */
+code{
+  font-family:var(--font-mono);
+  font-size:.88em;
+  background:var(--color-surface);
+  color:var(--color-ink-2);
+  padding:2px 6px;
+  border-radius:var(--r-xs);
+  border:1px solid var(--color-border);
+}
+ul,ol{margin:0 0 var(--s-4);padding-left:var(--s-5)}
+li{margin:var(--s-2) 0}
+li>p{margin:0}
+blockquote{
+  margin:var(--s-5) 0;
+  padding:var(--s-3) var(--s-5);
+  border-left:3px solid var(--color-border-strong);
+  color:var(--color-muted);
+  background:var(--color-bg-2);
+}
+
+/* ============================================
+   6. REPORT HEADER
+   ============================================ */
+.report-header{
+  border-bottom:1px solid var(--color-border);
+  padding-bottom:var(--s-6);
+  margin-bottom:var(--s-7);
+}
+.report-header .kicker{
+  display:inline-block;
+  font-size:var(--fz-caption);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--color-primary);
+  background:var(--color-primary-soft);
+  padding:5px 12px;
+  border-radius:var(--r-full);
+  font-weight:700;
+  margin-bottom:var(--s-3);
+}
+.report-header h1{margin-bottom:var(--s-3)}
+.report-header .subtitle{
+  font-size:var(--fz-lg);
+  color:var(--color-muted);
+  margin-bottom:var(--s-5);
+  font-weight:400;
+  line-height:1.5;
+}
+.report-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:var(--s-5);
+  font-size:var(--fz-small);
+  color:var(--color-muted);
+}
+.report-meta .item{display:inline-flex;align-items:center;gap:6px}
+.report-meta .label{color:var(--color-muted-2)}
+.report-meta strong{color:var(--color-ink-2);font-weight:600}
+
+/* ============================================
+   7. BADGE
+   ============================================ */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:var(--fz-caption);
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:var(--r-full);
+  background:var(--color-surface);
+  color:var(--color-ink-3);
+  border:1px solid var(--color-border);
+  line-height:1.4;
+  letter-spacing:.01em;
+}
+.badge.primary{background:var(--color-primary-soft);color:var(--color-primary);border-color:transparent}
+.badge.success{background:var(--color-success-soft);color:var(--color-success-fg);border-color:transparent}
+.badge.warn{background:var(--color-warn-soft);color:var(--color-warn-fg);border-color:transparent}
+.badge.danger{background:var(--color-danger-soft);color:var(--color-danger-fg);border-color:transparent}
+.badge.info{background:var(--color-info-soft);color:var(--color-info-fg);border-color:transparent}
+.badge.muted{background:var(--color-surface);color:var(--color-muted);border-color:transparent}
+/* 다크 — badge 도 hue tint 배경 제거. 무채색 surface + hue text/border 로 의미 전달 */
+[data-theme=dark] .badge.primary,
+[data-theme=dark] .badge.success,
+[data-theme=dark] .badge.warn,
+[data-theme=dark] .badge.danger,
+[data-theme=dark] .badge.info{
+  background:var(--color-surface-2);
+  border:1px solid var(--color-border-strong);
+}
+[data-theme=dark] .badge.primary{color:var(--color-primary)}
+[data-theme=dark] .badge.success{color:var(--color-success)}
+[data-theme=dark] .badge.warn{color:var(--color-warn)}
+[data-theme=dark] .badge.danger{color:var(--color-danger)}
+[data-theme=dark] .badge.info{color:var(--color-info)}
+
+/* ============================================
+   8. CALLOUT (with SVG icon)
+   ============================================ */
+.callout{
+  display:grid;
+  grid-template-columns:24px 1fr;
+  gap:var(--s-3);
+  padding:var(--s-4) var(--s-5);
+  border-radius:var(--r-sm);
+  border:1px solid var(--color-border);
+  background:var(--color-surface);
+  margin:var(--s-5) 0;
+  align-items:start;
+}
+.callout .callout-icon{
+  width:22px;
+  height:22px;
+  flex-shrink:0;
+  margin-top:1px;
+  color:var(--color-muted);
+}
+.callout .body{font-size:var(--fz-base);color:var(--color-ink-3);min-width:0}
+.callout .body>:first-child{margin-top:0}
+.callout .body>:last-child{margin-bottom:0}
+.callout .title{
+  font-weight:700;
+  color:var(--color-ink);
+  margin-bottom:var(--s-1);
+  display:block;
+  font-size:var(--fz-base);
+}
+.callout.note{background:var(--color-surface);border-color:var(--color-border)}
+.callout.note .callout-icon{color:var(--color-muted)}
+.callout.info{background:var(--color-info-soft);border-color:transparent}
+.callout.info .callout-icon{color:var(--color-info)}
+.callout.info .title{color:var(--color-info-fg)}
+.callout.success{background:var(--color-success-soft);border-color:transparent}
+.callout.success .callout-icon{color:var(--color-success)}
+.callout.success .title{color:var(--color-success-fg)}
+.callout.warn{background:var(--color-warn-soft);border-color:transparent}
+.callout.warn .callout-icon{color:var(--color-warn)}
+.callout.warn .title{color:var(--color-warn-fg)}
+.callout.danger{background:var(--color-danger-soft);border-color:transparent}
+.callout.danger .callout-icon{color:var(--color-danger)}
+.callout.danger .title{color:var(--color-danger-fg)}
+/* 다크에선 title도 무채색 — hue는 배경 tint + 아이콘에만. light vivid hue text가 다크에서 형광 떠보이는 것 방지 */
+[data-theme=dark] .callout.info .title,
+[data-theme=dark] .callout.success .title,
+[data-theme=dark] .callout.warn .title,
+[data-theme=dark] .callout.danger .title{color:var(--color-ink)}
+/* 다크 — soft hue tint 배경 완전 제거. surface 단색 + 좌측 4px accent bar 로 의미 전달 */
+[data-theme=dark] .callout.info,
+[data-theme=dark] .callout.success,
+[data-theme=dark] .callout.warn,
+[data-theme=dark] .callout.danger{
+  background:var(--color-surface);
+  border-left:4px solid var(--color-border);
+}
+[data-theme=dark] .callout.info{border-left-color:var(--color-info)}
+[data-theme=dark] .callout.success{border-left-color:var(--color-success)}
+[data-theme=dark] .callout.warn{border-left-color:var(--color-warn)}
+[data-theme=dark] .callout.danger{border-left-color:var(--color-danger)}
+
+/* ============================================
+   9. TL;DR (좌측 4px primary bar + surface)
+   ============================================ */
+.tldr{
+  position:relative;
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:var(--r-md);
+  padding:var(--s-5) var(--s-6);
+  margin:0 0 var(--s-7);
+  overflow:hidden;
+}
+.tldr::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:4px;
+  background:var(--color-primary);
+}
+.tldr .label{
+  font-size:var(--fz-caption);
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:var(--color-primary);
+  font-weight:700;
+  margin-bottom:var(--s-3);
+  display:block;
+}
+.tldr p{
+  font-size:var(--fz-xl);
+  color:var(--color-ink);
+  margin:0;
+  line-height:1.5;
+  font-weight:500;
+  letter-spacing:-0.01em;
+}
+.tldr ul{margin:var(--s-2) 0 0;padding-left:var(--s-5);font-size:var(--fz-lg);color:var(--color-ink-2);line-height:1.55}
+.tldr ul li{margin:var(--s-2) 0}
+
+/* ============================================
+   10. GRID & CARD
+   ============================================ */
+.grid{display:grid;gap:var(--s-4);margin:var(--s-5) 0}
+.grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grid.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:720px){.grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr}}
+
+.card{
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:var(--r-md);
+  padding:var(--s-5);
+}
+.card .card-kicker{
+  font-size:var(--fz-caption);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--color-primary);
+  font-weight:700;
+  margin-bottom:var(--s-2);
+  display:block;
+}
+.card h4{margin:0 0 var(--s-2);font-size:var(--fz-lg)}
+.card p{color:var(--color-ink-3);margin-bottom:var(--s-3)}
+.card p:last-child{margin-bottom:0}
+.card.outline{background:var(--color-bg);border-color:var(--color-border-strong)}
+.card.highlight{background:var(--color-primary-soft);border-color:transparent}
+.card.highlight .card-kicker{color:var(--color-primary-hover)}
+
+/* ============================================
+   11. STAT / KPI (sans bold, mono 폐기)
+   ============================================ */
+.stat{
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:var(--r-md);
+  padding:var(--s-5) var(--s-6);
+  text-align:left;
+}
+.stat .label{
+  font-size:var(--fz-caption);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--color-muted);
+  font-weight:700;
+  margin-bottom:var(--s-3);
+  display:block;
+}
+.stat .value{
+  font-family:var(--font-sans);
+  font-size:var(--fz-display);
+  font-weight:800;
+  color:var(--color-ink);
+  line-height:1.05;
+  letter-spacing:-0.03em;
+  display:block;
+}
+.stat .delta{
+  font-size:var(--fz-small);
+  margin-top:var(--s-2);
+  display:inline-block;
+  font-weight:600;
+}
+.stat .delta.up{color:var(--color-danger)}
+.stat .delta.down{color:var(--color-primary)}
+.stat .note{
+  font-size:var(--fz-small);
+  color:var(--color-muted);
+  margin-top:var(--s-2);
+  line-height:1.5;
+}
+
+/* ============================================
+   12. PROSCONS (중립화 기본, 명시 클래스로 색 옵트인)
+   ============================================ */
+.proscons{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-4);margin:var(--s-5) 0}
+.proscons>div{
+  padding:var(--s-5);
+  border-radius:var(--r-md);
+  border:1px solid var(--color-border);
+  background:var(--color-surface);
+}
+.proscons h4{margin:0 0 var(--s-3);display:flex;align-items:center;gap:var(--s-2);font-size:var(--fz-lg)}
+.proscons ul{margin:0;padding-left:var(--s-5)}
+.proscons li{color:var(--color-ink-3)}
+/* 명시적 의미 — 사용 시 .pros / .cons 클래스 추가. light는 h4 hue, dark는 h4도 무채색 */
+.proscons .pros{background:var(--color-success-soft);border-color:transparent}
+.proscons .pros h4{color:var(--color-success-fg)}
+.proscons .cons{background:var(--color-danger-soft);border-color:transparent}
+.proscons .cons h4{color:var(--color-danger-fg)}
+[data-theme=dark] .proscons .pros h4,
+[data-theme=dark] .proscons .cons h4{color:var(--color-ink)}
+/* 다크 — soft hue tint 제거 */
+[data-theme=dark] .proscons .pros,
+[data-theme=dark] .proscons .cons{
+  background:var(--color-surface);
+  border-left:4px solid var(--color-border);
+}
+[data-theme=dark] .proscons .pros{border-left-color:var(--color-success)}
+[data-theme=dark] .proscons .cons{border-left-color:var(--color-danger)}
+@media(max-width:720px){.proscons{grid-template-columns:1fr}}
+
+/* ============================================
+   13. TABLE
+   ============================================ */
+.table-wrap{
+  overflow-x:auto;
+  margin:var(--s-5) 0;
+  border-radius:var(--r-sm);
+  border:1px solid var(--color-border);
+  background:var(--color-bg);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:var(--fz-small);
+}
+thead{background:var(--color-surface)}
+th,td{
+  text-align:left;
+  padding:var(--s-3) var(--s-4);
+  border-bottom:1px solid var(--color-border);
+  vertical-align:top;
+  color:var(--color-ink-3);
+}
+th{
+  font-weight:700;
+  font-size:var(--fz-caption);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--color-muted);
+}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--color-bg-2)}
+td.num,th.num{font-family:var(--font-mono);text-align:right;font-variant-numeric:tabular-nums}
+td.center,th.center{text-align:center}
+
+table.decision td.score{
+  font-family:var(--font-mono);
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+  text-align:center;
+  color:var(--color-ink);
+}
+table.decision tr.winner{background:var(--color-success-soft)}
+table.decision tr.winner:hover{background:var(--color-success-soft)}
+table.decision tr.winner td{color:var(--color-success-fg);font-weight:600}
+/* 다크 — winner hue tint 제거. 강조는 surface-2 + ink */
+[data-theme=dark] table.decision tr.winner,
+[data-theme=dark] table.decision tr.winner:hover{background:var(--color-surface-2)}
+[data-theme=dark] table.decision tr.winner td{color:var(--color-ink);font-weight:700}
+
+/* ============================================
+   14. TIMELINE
+   ============================================ */
+.timeline{position:relative;margin:var(--s-5) 0;padding-left:var(--s-6);list-style:none}
+.timeline::before{
+  content:"";
+  position:absolute;
+  left:7px;
+  top:8px;
+  bottom:8px;
+  width:2px;
+  background:var(--color-border-strong);
+}
+.timeline .item{position:relative;padding-bottom:var(--s-5)}
+.timeline .item::before{
+  content:"";
+  position:absolute;
+  left:calc(-1 * var(--s-6) + 1px);
+  top:6px;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:var(--color-bg);
+  border:2px solid var(--color-border-strong);
+  box-sizing:border-box;
+}
+.timeline .item.done::before{background:var(--color-primary);border-color:var(--color-primary)}
+.timeline .item.active::before{background:var(--color-bg);border-color:var(--color-primary);box-shadow:0 0 0 4px var(--color-primary-soft)}
+.timeline .item.warn::before{background:var(--color-warn);border-color:var(--color-warn)}
+.timeline .item.danger::before{background:var(--color-danger);border-color:var(--color-danger)}
+.timeline .when{
+  font-size:var(--fz-caption);
+  color:var(--color-muted);
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.timeline .title{font-weight:700;color:var(--color-ink);margin:var(--s-1) 0;font-size:var(--fz-base)}
+.timeline .desc{color:var(--color-ink-3);font-size:var(--fz-small);line-height:1.55}
+
+/* ============================================
+   15. STEPS (grid 2칸 32px+1fr, title·desc는 grid-column:2 고정, absolute 폐기)
+   ============================================ */
+.steps{list-style:none;padding:0;margin:var(--s-5) 0;counter-reset:step}
+.steps>li{
+  counter-increment:step;
+  display:grid;
+  grid-template-columns:32px 1fr;
+  gap:var(--s-4);
+  padding:var(--s-4) var(--s-5);
+  border:1px solid var(--color-border);
+  border-radius:var(--r-sm);
+  margin:var(--s-3) 0;
+  background:var(--color-surface);
+  align-items:start;
+}
+.steps>li::before{
+  content:counter(step);
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:var(--color-primary);
+  color:var(--color-primary-fg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:var(--fz-small);
+  font-family:var(--font-sans);
+  letter-spacing:-0.02em;
+  flex-shrink:0;
+}
+.steps>li .title{grid-column:2;font-weight:700;color:var(--color-ink);font-size:var(--fz-base);display:block;margin-bottom:2px}
+.steps>li .desc{grid-column:2;color:var(--color-muted);font-size:var(--fz-small);line-height:1.55}
+
+/* ============================================
+   16. COMPARE (AS-IS / TO-BE) — 중립화
+   ============================================ */
+.compare{
+  display:flex;
+  gap:var(--s-4);
+  align-items:stretch;
+  margin:var(--s-5) 0;
+}
+.compare .side,.compare .compare-col{
+  flex:1 1 0;
+  min-width:0;
+  padding:var(--s-5);
+  border-radius:var(--r-md);
+  border:1px solid var(--color-border);
+  background:var(--color-surface);
+}
+.compare .side h4{margin:0 0 var(--s-3);font-size:var(--fz-lg);display:flex;align-items:center;gap:var(--s-2)}
+.compare .side ul{margin:0;padding-left:var(--s-5)}
+.compare .side li{color:var(--color-ink-3)}
+.compare .side .side-label{
+  display:inline-block;
+  font-size:var(--fz-caption);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  font-weight:700;
+  color:var(--color-muted);
+  margin-bottom:var(--s-2);
+}
+/* 명시적 의미 — .danger / .success / .primary 추가 클래스로 옵트인 */
+.compare .side.danger{background:var(--color-danger-soft);border-color:transparent}
+.compare .side.danger h4,.compare .side.danger .side-label{color:var(--color-danger-fg)}
+.compare .side.success{background:var(--color-success-soft);border-color:transparent}
+.compare .side.success h4,.compare .side.success .side-label{color:var(--color-success-fg)}
+.compare .side.primary{background:var(--color-primary-soft);border-color:transparent}
+.compare .side.primary h4,.compare .side.primary .side-label{color:var(--color-primary-hover)}
+/* 다크에서 모든 .compare side 의 h4·side-label 도 무채색 — 형광 hue 떠보임 방지 */
+[data-theme=dark] .compare .side.danger h4,
+[data-theme=dark] .compare .side.danger .side-label,
+[data-theme=dark] .compare .side.success h4,
+[data-theme=dark] .compare .side.success .side-label,
+[data-theme=dark] .compare .side.primary h4,
+[data-theme=dark] .compare .side.primary .side-label{color:var(--color-ink)}
+/* 다크 — soft hue tint 제거 */
+[data-theme=dark] .compare .side.danger,
+[data-theme=dark] .compare .side.success,
+[data-theme=dark] .compare .side.primary{
+  background:var(--color-surface);
+  border-left:4px solid var(--color-border);
+}
+[data-theme=dark] .compare .side.danger{border-left-color:var(--color-danger)}
+[data-theme=dark] .compare .side.success{border-left-color:var(--color-success)}
+[data-theme=dark] .compare .side.primary{border-left-color:var(--color-primary)}
+.compare .arrow{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--color-muted-2);
+  font-size:var(--fz-2xl);
+  font-weight:300;
+  flex:0 0 32px;
+}
+@media(max-width:720px){
+  .compare{flex-direction:column}
+  .compare .arrow{display:none}
+}
+
+/* ============================================
+   17. CODE BLOCK
+   ============================================ */
+pre{
+  background:var(--code-bg);
+  color:var(--code-fg);
+  padding:var(--s-4) var(--s-5);
+  border-radius:var(--r-sm);
+  overflow-x:auto;
+  font-family:var(--font-mono);
+  font-size:13px;
+  line-height:1.65;
+  margin:var(--s-5) 0;
+  border:1px solid transparent;
+}
+pre code{background:transparent;color:inherit;padding:0;border:0;font-size:inherit}
+pre .c-comment{color:var(--code-comment);font-style:normal;opacity:.85}
+pre .c-keyword{color:var(--code-keyword)}
+pre .c-string{color:var(--code-string)}
+pre .c-number{color:var(--code-number)}
+pre .label{
+  display:inline-block;
+  font-size:11px;
+  color:var(--color-muted-2);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  margin-bottom:var(--s-2);
+  font-weight:700;
+}
+
+/* ============================================
+   18. PROGRESS
+   ============================================ */
+.progress{
+  background:var(--color-surface-2);
+  border-radius:var(--r-full);
+  height:8px;
+  overflow:hidden;
+  margin:var(--s-2) 0;
+}
+.progress>.bar{
+  height:100%;
+  background:var(--color-primary);
+  border-radius:var(--r-full);
+  transition:width var(--dur-base) var(--ease-out);
+}
+.progress.success>.bar{background:var(--color-success)}
+.progress.warn>.bar{background:var(--color-warn)}
+.progress.danger>.bar{background:var(--color-danger)}
+
+/* ============================================
+   19. CHECKLIST
+   ============================================ */
+.checklist{list-style:none;padding:0;margin:var(--s-4) 0}
+.checklist li{
+  display:flex;
+  align-items:flex-start;
+  gap:var(--s-3);
+  padding:var(--s-3) 0;
+  border-bottom:1px solid var(--color-border);
+}
+.checklist li:last-child{border-bottom:0}
+.checklist input[type=checkbox]{
+  margin-top:3px;
+  width:18px;
+  height:18px;
+  accent-color:var(--color-primary);
+  cursor:pointer;
+  flex-shrink:0;
+}
+.checklist li.done>span{text-decoration:line-through;color:var(--color-muted)}
+
+/* ============================================
+   20. RISK HEATMAP
+   ============================================ */
+.risk-grid{
+  display:grid;
+  grid-template-columns:80px repeat(3,1fr);
+  grid-template-rows:auto repeat(3,minmax(96px,1fr));
+  gap:2px;
+  background:var(--color-border);
+  margin:var(--s-5) 0;
+  border:1px solid var(--color-border);
+  border-radius:var(--r-sm);
+  overflow:hidden;
+}
+.risk-grid>div{background:var(--color-bg);padding:var(--s-3)}
+.risk-grid>.axis{
+  background:var(--color-surface);
+  font-size:var(--fz-caption);
+  font-weight:700;
+  color:var(--color-muted);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.risk-grid>.cell.low{background:var(--color-success-soft)}
+.risk-grid>.cell.mid{background:var(--color-warn-soft)}
+.risk-grid>.cell.high{background:var(--color-danger-soft)}
+.risk-grid .item{
+  display:block;
+  padding:6px 10px;
+  background:var(--color-surface);
+  border-radius:var(--r-xs);
+  margin:3px 0;
+  font-size:var(--fz-small);
+  color:var(--color-ink-2);
+  border-left:3px solid var(--color-muted);
+  line-height:1.45;
+}
+/* cell hue 따라 border 색 변경 — 카드와 cell 톤이 같은 가족으로 연결됨 */
+.risk-grid .cell.low .item{border-left-color:var(--color-success)}
+.risk-grid .cell.mid .item{border-left-color:var(--color-warn)}
+.risk-grid .cell.high .item{border-left-color:var(--color-danger)}
+/* 다크 — risk-grid cell hue tint 제거. 위험도 의미는 axis 위치 + item border-left 색으로만 전달 */
+[data-theme=dark] .risk-grid .cell.low,
+[data-theme=dark] .risk-grid .cell.mid,
+[data-theme=dark] .risk-grid .cell.high{background:var(--color-bg)}
+[data-theme=dark] .risk-grid .item{background:var(--color-surface)}
+
+/* ============================================
+   21. Q&A TOGGLE
+   ============================================ */
+details.qa{
+  border:1px solid var(--color-border);
+  border-radius:var(--r-sm);
+  margin:var(--s-3) 0;
+  background:var(--color-surface);
+  transition:background var(--dur-fast) var(--ease-out);
+}
+details.qa[open]{background:var(--color-bg)}
+details.qa summary{
+  padding:var(--s-4) var(--s-5);
+  cursor:pointer;
+  font-weight:600;
+  color:var(--color-ink);
+  list-style:none;
+  position:relative;
+  padding-right:var(--s-7);
+  font-size:var(--fz-base);
+}
+details.qa summary::-webkit-details-marker{display:none}
+details.qa summary::after{
+  content:"";
+  position:absolute;
+  right:var(--s-5);
+  top:50%;
+  width:10px;
+  height:10px;
+  border-right:2px solid var(--color-muted);
+  border-bottom:2px solid var(--color-muted);
+  transform:translateY(-70%) rotate(45deg);
+  transition:transform var(--dur-base) var(--ease-out);
+}
+details.qa[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
+details.qa>div{padding:0 var(--s-5) var(--s-5);color:var(--color-ink-3)}
+details.qa>div>:first-child{margin-top:0}
+
+/* ============================================
+   22. MERMAID WRAP
+   ============================================ */
+.mermaid-wrap{
+  background:var(--color-bg-2);
+  border:1px solid var(--color-border);
+  border-radius:var(--r-md);
+  padding:var(--s-6) var(--s-5);
+  margin:var(--s-5) 0;
+  text-align:center;
+  overflow-x:auto;
+}
+.mermaid-wrap .mermaid{display:inline-block}
+.mermaid-wrap .caption{
+  font-size:var(--fz-caption);
+  color:var(--color-muted);
+  margin-top:var(--s-3);
+  text-align:center;
+  letter-spacing:.02em;
+}
+
+/* ============================================
+   23. FOOTER
+   ============================================ */
+.report-footer{
+  margin-top:var(--s-9);
+  padding-top:var(--s-5);
+  border-top:1px solid var(--color-border);
+  font-size:var(--fz-small);
+  color:var(--color-muted);
+  display:flex;
+  flex-wrap:wrap;
+  gap:var(--s-4);
+  justify-content:space-between;
+}
+
+/* ============================================
+   24. THEME TOGGLE
+   ============================================ */
+.theme-toggle{
+  position:fixed;
+  top:var(--s-4);
+  right:var(--s-5);
+  z-index:100;
+  width:40px;
+  height:40px;
+  border-radius:var(--r-full);
+  border:1px solid var(--color-border);
+  background:var(--color-bg);
+  color:var(--color-ink-2);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  transition:transform var(--dur-fast) var(--ease-out),background var(--dur-fast) var(--ease-out);
+}
+.theme-toggle:hover{transform:scale(1.05);background:var(--color-surface)}
+.theme-toggle .sun{display:none}
+.theme-toggle .moon{display:block}
+[data-theme=dark] .theme-toggle .sun{display:block}
+[data-theme=dark] .theme-toggle .moon{display:none}
+
+/* ============================================
+   25. UTILITIES
+   ============================================ */
+.u-mono{font-family:var(--font-mono)}
+.u-muted{color:var(--color-muted)}
+.u-small{font-size:var(--fz-small)}
+.u-center{text-align:center}
+.u-right{text-align:right}
+.u-tnum{font-variant-numeric:tabular-nums}
+.u-nowrap{white-space:nowrap}
+.u-mt-0{margin-top:0}
+.u-mb-0{margin-bottom:0}
+
+/* ============================================
+   21.7 FORMULA & WORKED EXAMPLE (해설·방법론 문서용)
+   ============================================ */
+.formula{
+  font-family:var(--font-mono);
+  font-size:var(--fz-base);
+  line-height:1.9;
+  background:var(--color-bg-2);
+  border:1px solid var(--color-border);
+  border-left:3px solid var(--color-primary);
+  border-radius:var(--r-sm);
+  padding:var(--s-4) var(--s-5);
+  margin:var(--s-4) 0;
+  overflow-x:auto;
+  white-space:pre-wrap;
+  color:var(--color-ink);
+}
+.formula sub,.formula sup{font-size:.72em}
+.formula .fx-comment{color:var(--color-muted);font-size:var(--fz-small)}
+.formula .fx-hl{color:var(--color-primary);font-weight:600}
+dl.formula-where{
+  display:grid;
+  grid-template-columns:max-content 1fr;
+  gap:var(--s-1) var(--s-4);
+  margin:calc(-1 * var(--s-2)) 0 var(--s-4);
+  padding:0 var(--s-5);
+  font-size:var(--fz-small);
+}
+dl.formula-where dt{
+  font-family:var(--font-mono);
+  color:var(--color-ink-2);
+  font-weight:600;
+}
+dl.formula-where dd{margin:0;color:var(--color-muted)}
+.example{
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:var(--r-md);
+  padding:var(--s-4) var(--s-5);
+  margin:var(--s-4) 0;
+}
+.example>.label{
+  display:inline-block;
+  font-size:var(--fz-caption);
+  font-weight:700;
+  letter-spacing:.06em;
+  color:var(--color-primary);
+  margin-bottom:var(--s-2);
+}
+.example>:nth-child(2){margin-top:0}
+.example>:last-child{margin-bottom:0}
+.example .formula{background:var(--color-bg);margin:var(--s-3) 0}
+
+/* ============================================
+   26. PRINT
+   ============================================ */
+@media print{
+  @page{size:A4;margin:18mm 14mm}
+  body{background:#fff;color:#000;font-size:11pt}
+  .page{display:block;max-width:none;padding:0}
+  .toc,.theme-toggle{display:none}
+  .content{max-width:none}
+  h2{page-break-after:avoid}
+  pre,.card,.compare,.timeline,table,.callout,.stat,.tldr{page-break-inside:avoid}
+  a{color:#000;text-decoration:underline}
+  a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}
+  .callout,.tldr,.stat,.card{box-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================
+     SVG icon sprite — callout 등에서 <use href="#i-xxx"/> 로 참조
+     ============================================ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-note" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-9"/>
+      <path d="m18 2 4 4-10 10H8v-4Z"/>
+    </symbol>
+    <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 11v5"/>
+      <circle cx="12" cy="8" r=".5" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="m8 12 3 3 5-6"/>
+    </symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
+      <path d="M12 9v4"/>
+      <circle cx="12" cy="17" r=".5" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="m15 9-6 6"/>
+      <path d="m9 9 6 6"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- 다크/라이트 토글 버튼 -->
+<button class="theme-toggle" id="themeToggle" aria-label="테마 전환" title="라이트/다크 전환">
+  <span class="sun" aria-hidden="true">☀</span><span class="moon" aria-hidden="true">☾</span>
+</button>
+
+<div class="page">
+
+  <!-- 좌측 sticky TOC. 섹션이 적으면 통째로 삭제 가능. -->
+  <aside class="toc" id="toc">
+    <h4>Contents</h4>
+    <ol id="tocList">
+      <!-- JS 가 h2/h3 를 스캔해서 자동 채움 -->
+    </ol>
+  </aside>
+
+  <main class="content">
+
+    <style>
+      .swatch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin:16px 0}
+      .swatch{border-radius:8px;border:1px solid var(--color-border);overflow:hidden;background:var(--color-bg)}
+      .swatch .chip{height:64px;display:block}
+      .swatch .meta{padding:10px 12px;font-size:12px;line-height:1.5}
+      .swatch .name{font-weight:700;color:var(--color-ink);display:block;font-family:var(--font-mono);font-size:11px;line-height:1.3}
+      .swatch .hex{font-family:var(--font-mono);color:var(--color-muted);font-size:11px}
+      .type-row{display:grid;grid-template-columns:140px 1fr;gap:16px;padding:14px 0;border-bottom:1px solid var(--color-border);align-items:baseline}
+      .type-row:last-child{border-bottom:0}
+      .type-row code{font-size:11px;background:transparent;border:0;padding:0;color:var(--color-muted)}
+      .demo-block{margin:20px 0;padding:24px;border:1px dashed var(--color-border-strong);border-radius:12px;background:var(--color-bg-2)}
+      .demo-block>.demo-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--color-muted);font-weight:700;margin:0 0 16px;display:block}
+      .spacing-row{display:flex;align-items:center;gap:12px;padding:6px 0;font-size:13px}
+      .spacing-row .bar{height:18px;background:var(--color-primary);border-radius:2px}
+      .spacing-row code{min-width:60px}
+      .radius-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:16px 0}
+      .radius-grid>div{aspect-ratio:1;background:var(--color-primary-soft);border:2px solid var(--color-primary);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:12px;color:var(--color-primary-hover);font-weight:700}
+    </style>
+
+    <header class="report-header">
+      <span class="kicker">Design System</span>
+      <h1>html-report 토큰 · 컴포넌트 카탈로그</h1>
+      <p class="subtitle">Toss 영감 기반 디자인 시스템 v2 — 색상 · 타이포 · 간격 · 컴포넌트 전수 시각 확인용</p>
+      <div class="report-meta">
+        <span class="item"><span class="label">버전</span> <strong>v2.0</strong></span>
+        <span class="item"><span class="label">업데이트</span> <strong>2026-05-26</strong></span>
+        <span class="item"><span class="label">상태</span> <span class="badge primary">Stable</span></span>
+        <span class="item"><span class="label">테마</span> <strong>우상단 토글로 라이트/다크 확인</strong></span>
+      </div>
+    </header>
+
+    <section id="overview">
+      <div class="tldr">
+        <span class="label">TL;DR</span>
+        <p>Primary <strong>#3182F6</strong> · Neutral <strong>zinc</strong> · Semantic는 base/fg/soft 3분리. 컴포넌트 자동 색 코딩 폐기, 명시 클래스로 의도 표현. 헤딩 weight 700, KPI 숫자 sans bold, callout 아이콘 SVG 인라인.</p>
+      </div>
+    </section>
+
+    <section id="colors">
+      <h2>1. 색상 토큰</h2>
+
+      <h3>1.1 Primary</h3>
+      <div class="swatch-grid">
+        <div class="swatch"><span class="chip" style="background:var(--color-primary)"></span><div class="meta"><span class="name">--color-primary</span><span class="hex">#3B82F6</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-primary-hover)"></span><div class="meta"><span class="name">--color-primary-hover</span><span class="hex">#1D4ED8</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-primary-pressed)"></span><div class="meta"><span class="name">--color-primary-pressed</span><span class="hex">#1E40AF</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-primary-soft)"></span><div class="meta"><span class="name">--color-primary-soft</span><span class="hex">#EFF6FF</span></div></div>
+      </div>
+
+      <h3>1.2 Neutral (zinc)</h3>
+      <div class="swatch-grid">
+        <div class="swatch"><span class="chip" style="background:var(--color-bg);border-bottom:1px solid var(--color-border)"></span><div class="meta"><span class="name">--color-bg</span><span class="hex">#FFFFFF / #09090B</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-bg-2)"></span><div class="meta"><span class="name">--color-bg-2</span><span class="hex">#FAFAFA / #0F0F11</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-surface)"></span><div class="meta"><span class="name">--color-surface</span><span class="hex">#F4F4F5 / #18181B</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-surface-2)"></span><div class="meta"><span class="name">--color-surface-2</span><span class="hex">#E4E4E7 / #27272A</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-border-strong)"></span><div class="meta"><span class="name">--color-border-strong</span><span class="hex">#D4D4D8 / #3F3F46</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-muted-2)"></span><div class="meta"><span class="name">--color-muted-2</span><span class="hex">#A1A1AA / #71717A</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-muted)"></span><div class="meta"><span class="name">--color-muted</span><span class="hex">#71717A / #A1A1AA</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-ink-3)"></span><div class="meta"><span class="name">--color-ink-3</span><span class="hex">#3F3F46 / #D4D4D8</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-ink-2)"></span><div class="meta"><span class="name">--color-ink-2</span><span class="hex">#27272A / #E4E4E7</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-ink)"></span><div class="meta"><span class="name">--color-ink</span><span class="hex">#18181B / #FAFAFA</span></div></div>
+      </div>
+
+      <h3>1.3 Semantic (base / fg / soft)</h3>
+      <div class="swatch-grid">
+        <div class="swatch"><span class="chip" style="background:var(--color-success)"></span><div class="meta"><span class="name">--color-success</span><span class="hex">#0D9F6E</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-success-fg)"></span><div class="meta"><span class="name">--color-success-fg</span><span class="hex">#065F46</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-success-soft)"></span><div class="meta"><span class="name">--color-success-soft</span><span class="hex">#D1FAE5</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-warn)"></span><div class="meta"><span class="name">--color-warn</span><span class="hex">#D97706</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-warn-fg)"></span><div class="meta"><span class="name">--color-warn-fg</span><span class="hex">#92400E</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-warn-soft)"></span><div class="meta"><span class="name">--color-warn-soft</span><span class="hex">#FEF3C7</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-danger)"></span><div class="meta"><span class="name">--color-danger</span><span class="hex">#E11D48</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-danger-fg)"></span><div class="meta"><span class="name">--color-danger-fg</span><span class="hex">#9F1239</span></div></div>
+        <div class="swatch"><span class="chip" style="background:var(--color-danger-soft)"></span><div class="meta"><span class="name">--color-danger-soft</span><span class="hex">#FFE4E6</span></div></div>
+      </div>
+    </section>
+
+    <section id="typography">
+      <h2>2. 타이포그래피</h2>
+      <p>한글: Pretendard Variable · 코드: JetBrains Mono. 헤딩 weight 700, 본문 13px 미만 금지, italic 폐기.</p>
+
+      <div class="type-row"><code>display 52</code><span style="font-size:var(--fz-display);font-weight:800;letter-spacing:-0.03em;line-height:1.05;color:var(--color-ink)">42</span></div>
+      <div class="type-row"><code>4xl 40 / h1</code><span style="font-size:var(--fz-4xl);font-weight:700;letter-spacing:-0.025em;line-height:1.2;color:var(--color-ink)">보고서 제목 H1</span></div>
+      <div class="type-row"><code>3xl 32 / h2</code><span style="font-size:var(--fz-3xl);font-weight:700;letter-spacing:-0.02em;color:var(--color-ink)">섹션 헤딩 H2</span></div>
+      <div class="type-row"><code>2xl 26 / h3</code><span style="font-size:var(--fz-2xl);font-weight:700;letter-spacing:-0.015em;color:var(--color-ink)">서브섹션 H3</span></div>
+      <div class="type-row"><code>xl 20 / h4</code><span style="font-size:var(--fz-xl);font-weight:700;color:var(--color-ink)">미니 헤딩 H4</span></div>
+      <div class="type-row"><code>lg 17</code><span style="font-size:var(--fz-lg);color:var(--color-ink-2)">부제·카드 헤딩 (17px)</span></div>
+      <div class="type-row"><code>base 15</code><span style="font-size:var(--fz-base);color:var(--color-ink-2)">본문 기본 (15px) — Pretendard로 한글 가독성 최우선. 한 줄 너비를 820px로 제한한다.</span></div>
+      <div class="type-row"><code>small 13</code><span style="font-size:var(--fz-small);color:var(--color-ink-3)">표 본문 · 보조 텍스트 (13px)</span></div>
+      <div class="type-row"><code>caption 12</code><span style="font-size:var(--fz-caption);color:var(--color-muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700">KICKER · LABEL · META (12px)</span></div>
+    </section>
+
+    <section id="spacing">
+      <h2>3. 간격 · 라운드</h2>
+      <h3>3.1 Spacing scale (4의 배수)</h3>
+      <div class="spacing-row"><code>--s-1</code><span class="bar" style="width:4px"></span>4px</div>
+      <div class="spacing-row"><code>--s-2</code><span class="bar" style="width:8px"></span>8px</div>
+      <div class="spacing-row"><code>--s-3</code><span class="bar" style="width:12px"></span>12px</div>
+      <div class="spacing-row"><code>--s-4</code><span class="bar" style="width:16px"></span>16px</div>
+      <div class="spacing-row"><code>--s-5</code><span class="bar" style="width:24px"></span>24px</div>
+      <div class="spacing-row"><code>--s-6</code><span class="bar" style="width:32px"></span>32px</div>
+      <div class="spacing-row"><code>--s-7</code><span class="bar" style="width:48px"></span>48px</div>
+      <div class="spacing-row"><code>--s-8</code><span class="bar" style="width:64px"></span>64px</div>
+      <div class="spacing-row"><code>--s-9</code><span class="bar" style="width:96px"></span>96px</div>
+
+      <h3>3.2 Radius</h3>
+      <div class="radius-grid">
+        <div style="border-radius:var(--r-xs)">xs 4</div>
+        <div style="border-radius:var(--r-sm)">sm 8</div>
+        <div style="border-radius:var(--r-md)">md 12</div>
+        <div style="border-radius:var(--r-lg)">lg 16</div>
+        <div style="border-radius:var(--r-full)">full</div>
+      </div>
+    </section>
+
+    <section id="callouts">
+      <h2>4. Callout</h2>
+      <p>5종 + SVG sprite 아이콘. <code>&lt;use href="#i-..."/&gt;</code> 로 참조 (외부 의존 0).</p>
+
+      <div class="callout note">
+        <svg class="callout-icon"><use href="#i-note"/></svg>
+        <div class="body">
+          <span class="title">Note</span>
+          <p>이건 <code>.callout.note</code> 입니다. 의미 없는 일반 참고 사항용. 아이콘은 펜·메모 모양.</p>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <svg class="callout-icon"><use href="#i-info"/></svg>
+        <div class="body">
+          <span class="title">Info</span>
+          <p>의사결정 배경·추가 설명. 색은 primary 계열로 안내성 메시지에 적합.</p>
+        </div>
+      </div>
+
+      <div class="callout success">
+        <svg class="callout-icon"><use href="#i-success"/></svg>
+        <div class="body">
+          <span class="title">Success</span>
+          <p>완료·통과·개선 효과 강조. 본문 텍스트는 <code>--color-success-fg</code> 어두운 그린으로 대비 안전.</p>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <svg class="callout-icon"><use href="#i-warn"/></svg>
+        <div class="body">
+          <span class="title">Warn</span>
+          <p>주의·진행 중·중간 리스크. 아이콘은 경고 삼각형.</p>
+        </div>
+      </div>
+
+      <div class="callout danger">
+        <svg class="callout-icon"><use href="#i-danger"/></svg>
+        <div class="body">
+          <span class="title">Danger</span>
+          <p>차단·실패·높은 리스크. 너무 자주 쓰면 의미가 희석되니 페이지당 1~2개로 제한.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="badges">
+      <h2>5. Badge</h2>
+      <div class="demo-block">
+        <span class="demo-label">Variants</span>
+        <p style="display:flex;flex-wrap:wrap;gap:8px;margin:0">
+          <span class="badge">v0.5</span>
+          <span class="badge primary">강조</span>
+          <span class="badge info">검토 중</span>
+          <span class="badge success">완료</span>
+          <span class="badge warn">진행 중</span>
+          <span class="badge danger">차단</span>
+          <span class="badge muted">대기</span>
+        </p>
+      </div>
+    </section>
+
+    <section id="tldr-demo">
+      <h2>6. TL;DR (좌측 primary bar)</h2>
+      <div class="tldr">
+        <span class="label">TL;DR</span>
+        <p>좌측 4px primary 막대 + 중립 surface. gradient 없음. 본문은 <strong>20px medium</strong>으로 들어와 첫 화면에서 강하게 읽힌다.</p>
+      </div>
+
+      <div class="tldr">
+        <span class="label">TL;DR (리스트)</span>
+        <ul>
+          <li>핵심 결정 1 — 한 줄로 명확하게</li>
+          <li>핵심 결정 2 — 근거는 본문에서</li>
+          <li>핵심 결정 3 — 3~5개를 넘지 않게</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="cards">
+      <h2>7. Card Grid</h2>
+      <div class="grid cols-3">
+        <div class="card">
+          <span class="card-kicker">Default</span>
+          <h4>중립 카드</h4>
+          <p>가장 일반적인 카드. surface 배경 + border.</p>
+        </div>
+        <div class="card outline">
+          <span class="card-kicker">Outline</span>
+          <h4>아웃라인 카드</h4>
+          <p>배경 없이 경계만. 화면 중 강조도 낮은 카드.</p>
+        </div>
+        <div class="card highlight">
+          <span class="card-kicker">Highlight</span>
+          <h4>강조 카드</h4>
+          <p>primary-soft 배경. 채택안·핵심 옵션 강조 시.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="stats">
+      <h2>8. Stat / KPI</h2>
+      <p>큰 숫자는 <strong>Pretendard 800 sans</strong>. mono 폐기 — 가독·임팩트 우선.</p>
+      <div class="grid cols-3">
+        <div class="stat">
+          <span class="label">월간 인시던트</span>
+          <span class="value">42</span>
+          <span class="delta up">▲ 5건 (전월)</span>
+        </div>
+        <div class="stat">
+          <span class="label">전환 기간</span>
+          <span class="value">8w</span>
+          <span class="note">staging 4w + prod 4w</span>
+        </div>
+        <div class="stat">
+          <span class="label">블라스트 반경</span>
+          <span class="value">1/12</span>
+          <span class="delta down">▼ 91% 감소</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="proscons">
+      <h2>9. Pros / Cons</h2>
+      <div class="proscons">
+        <div class="pros">
+          <h4>Pros — Watchtower 채택 시</h4>
+          <ul>
+            <li>인바운드 포트 개방 불필요</li>
+            <li>CI/CD 와 디커플링</li>
+            <li>설정 단순 (Docker label 1줄)</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>롤백 자동화 부재</li>
+            <li>polling 지연 5분</li>
+            <li>다중 인스턴스 동시 배포 보장 안 됨</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="demo-block">
+        <span class="demo-label">중립 (의미상 우열 없을 때)</span>
+        <div class="proscons">
+          <div>
+            <h4>Option A</h4>
+            <ul><li>특성 1</li><li>특성 2</li></ul>
+          </div>
+          <div>
+            <h4>Option B</h4>
+            <ul><li>특성 1</li><li>특성 2</li></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="compare">
+      <h2>10. AS-IS / TO-BE</h2>
+      <p>기본 중립 + 명시 클래스로 의도 옵트인.</p>
+
+      <div class="compare">
+        <div class="side danger">
+          <span class="side-label">AS-IS</span>
+          <h4>직접 VM 배포</h4>
+          <ul>
+            <li>VM 에서 직접 <code>git pull</code></li>
+            <li>모든 프로젝트가 같은 파일시스템 공유</li>
+            <li>Secrets가 평문 <code>.env</code> 에 존재</li>
+          </ul>
+        </div>
+        <div class="arrow">→</div>
+        <div class="side success">
+          <span class="side-label">TO-BE</span>
+          <h4>컨테이너 + 격리</h4>
+          <ul>
+            <li>이미지 pull만, 소스 없음</li>
+            <li>컨테이너 간 격리</li>
+            <li>Secrets는 빌드 타임 주입</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="demo-block">
+        <span class="demo-label">중립 비교 (단순 옵션 A vs B)</span>
+        <div class="compare">
+          <div class="side">
+            <span class="side-label">Option A</span>
+            <h4>monorepo</h4>
+            <ul><li>코드 공유 쉬움</li><li>전역 변경 한 번에</li></ul>
+          </div>
+          <div class="arrow">vs</div>
+          <div class="side">
+            <span class="side-label">Option B</span>
+            <h4>polyrepo</h4>
+            <ul><li>독립 배포</li><li>경계 명확</li></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tables">
+      <h2>11. Tables</h2>
+      <h3>11.1 Comparison Table</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>옵션</th><th>비용</th><th class="num">속도</th><th>보안</th><th>상태</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>GCP Artifact Registry</strong></td><td>$0.1/GB-월</td><td class="num">빠름</td><td>SA IAM</td><td><span class="badge success">채택</span></td></tr>
+            <tr><td>GHCR</td><td>무료</td><td class="num">중간</td><td>PAT 의존</td><td><span class="badge danger">탈락</span></td></tr>
+            <tr><td>Docker Hub</td><td>유료</td><td class="num">중간</td><td>토큰</td><td><span class="badge muted">미검토</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>11.2 Decision Matrix</h3>
+      <div class="table-wrap">
+        <table class="decision">
+          <thead>
+            <tr><th>옵션</th><th class="num">보안 (×3)</th><th class="num">운영 비용 (×2)</th><th class="num">학습 곡선 (×1)</th><th class="num">합계</th><th>판정</th></tr>
+          </thead>
+          <tbody>
+            <tr class="winner"><td><strong>GCP AR + Watchtower</strong></td><td class="score">5 (15)</td><td class="score">4 (8)</td><td class="score">3 (3)</td><td class="score">26</td><td><span class="badge success">채택</span></td></tr>
+            <tr><td>GHCR + SSH push</td><td class="score">2 (6)</td><td class="score">5 (10)</td><td class="score">4 (4)</td><td class="score">20</td><td><span class="badge danger">탈락</span></td></tr>
+            <tr><td>Self-hosted</td><td class="score">4 (12)</td><td class="score">2 (4)</td><td class="score">2 (2)</td><td class="score">18</td><td><span class="badge muted">보류</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="timeline">
+      <h2>12. Timeline · Steps</h2>
+      <h3>12.1 Timeline</h3>
+      <ol class="timeline">
+        <li class="item done">
+          <div class="when">Week 1 · 완료</div>
+          <div class="title">GCP 프로젝트·SA 셋업</div>
+          <div class="desc">SA 4종 발급, IAM 정책 검토 통과.</div>
+        </li>
+        <li class="item done">
+          <div class="when">Week 2 · 완료</div>
+          <div class="title">파일럿 컨테이너화</div>
+          <div class="desc">Dockerfile multi-stage, 이미지 380MB.</div>
+        </li>
+        <li class="item active">
+          <div class="when">Week 3 · 진행 중</div>
+          <div class="title">GitHub Actions 워크플로우</div>
+          <div class="desc">deploy-staging.yml, Infisical 연동 작업 중.</div>
+        </li>
+        <li class="item warn">
+          <div class="when">Week 4 · 미착수</div>
+          <div class="title">의존 관계 매핑</div>
+          <div class="desc">컨테이너 경계 결정 전 의존 그래프 필요.</div>
+        </li>
+        <li class="item danger">
+          <div class="when">Week 6 · 차단</div>
+          <div class="title">prod 환경 사전 검증</div>
+          <div class="desc">합의 + 다운타임 윈도우 확보 필요.</div>
+        </li>
+      </ol>
+
+      <h3>12.2 Steps (번호)</h3>
+      <ol class="steps">
+        <li>
+          <div>
+            <span class="title">사전 분석</span>
+            <span class="desc">현재 VM 배포 흐름 문서화, Secrets 인벤토리 작성.</span>
+          </div>
+        </li>
+        <li>
+          <div>
+            <span class="title">파일럿 컨테이너화</span>
+            <span class="desc">web-app 1개 선정, Dockerfile + GHA 워크플로우.</span>
+          </div>
+        </li>
+        <li>
+          <div>
+            <span class="title">검증 환경 구축</span>
+            <span class="desc">staging VM에 Watchtower 배포, 자동 pull 검증.</span>
+          </div>
+        </li>
+        <li>
+          <div>
+            <span class="title">롤아웃</span>
+            <span class="desc">나머지 6개 프로젝트 순차 전환.</span>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section id="progress">
+      <h2>13. Progress · Checklist</h2>
+      <h3>13.1 Progress Bar</h3>
+      <div class="demo-block">
+        <p class="u-small u-muted u-mb-0">기본 (primary) · 57%</p>
+        <div class="progress"><div class="bar" style="width:57%"></div></div>
+        <p class="u-small u-muted u-mb-0" style="margin-top:12px">success · 92%</p>
+        <div class="progress success"><div class="bar" style="width:92%"></div></div>
+        <p class="u-small u-muted u-mb-0" style="margin-top:12px">warn · 30%</p>
+        <div class="progress warn"><div class="bar" style="width:30%"></div></div>
+        <p class="u-small u-muted u-mb-0" style="margin-top:12px">danger · 12%</p>
+        <div class="progress danger"><div class="bar" style="width:12%"></div></div>
+      </div>
+
+      <h3>13.2 Checklist (인터랙티브)</h3>
+      <ul class="checklist">
+        <li class="done"><input type="checkbox" checked><span>SA 발급 완료</span></li>
+        <li class="done"><input type="checkbox" checked><span>Dockerfile 작성</span></li>
+        <li><input type="checkbox"><span>Infisical workspace 생성</span></li>
+        <li><input type="checkbox"><span>Watchtower 배포 검증</span></li>
+        <li><input type="checkbox"><span>롤백 절차 문서화</span></li>
+      </ul>
+    </section>
+
+    <section id="risk">
+      <h2>14. Risk Heatmap (3×3)</h2>
+      <div class="risk-grid">
+        <div class="axis"></div>
+        <div class="axis">확률 ↓</div>
+        <div class="axis">확률 ↔</div>
+        <div class="axis">확률 ↑</div>
+
+        <div class="axis">영향 ↑</div>
+        <div class="cell mid"><span class="item">Watchtower 다운</span></div>
+        <div class="cell high"><span class="item">Secrets 누락으로 prod 다운</span><span class="item">의존 그래프 잘못</span></div>
+        <div class="cell high"><span class="item">롤백 절차 부재</span></div>
+
+        <div class="axis">영향 ↔</div>
+        <div class="cell low"><span class="item">이미지 사이즈 비대</span></div>
+        <div class="cell mid"><span class="item">CI 빌드 시간 증가</span></div>
+        <div class="cell mid"><span class="item">개발자 학습 비용</span></div>
+
+        <div class="axis">영향 ↓</div>
+        <div class="cell low"><span class="item">로그 포맷 변경</span></div>
+        <div class="cell low"><span class="item">컨테이너 이름 충돌</span></div>
+        <div class="cell mid"></div>
+      </div>
+    </section>
+
+    <section id="code">
+      <h2>15. Code Block</h2>
+      <pre><span class="label">deploy-staging.yml</span><code><span class="c-comment"># GitHub Actions 워크플로우</span>
+<span class="c-keyword">name</span>: <span class="c-string">deploy-staging</span>
+<span class="c-keyword">on</span>:
+  <span class="c-keyword">workflow_dispatch</span>:
+    <span class="c-keyword">inputs</span>:
+      <span class="c-keyword">branch</span>:
+        <span class="c-keyword">required</span>: <span class="c-number">true</span></code></pre>
+    </section>
+
+    <section id="qa">
+      <h2>16. Q&amp;A Toggle</h2>
+      <details class="qa">
+        <summary>왜 GHCR 가 아니라 GCP Artifact Registry 인가?</summary>
+        <div><p>GitHub App Installation Token이 GHCR pull을 지원하지 않아 PAT 의존 발생 → 최소권한 원칙 위배. GCP AR + SA JSON 키 조합은 repo 단위 IAM 격리 가능.</p></div>
+      </details>
+      <details class="qa">
+        <summary>Watchtower polling 주기는?</summary>
+        <div><p>기본 5분. <code>WATCHTOWER_POLL_INTERVAL=300</code>. 즉시 배포가 필요한 경우 SIGUSR1 시그널로 강제 트리거.</p></div>
+      </details>
+    </section>
+
+    <section id="formula">
+      <h2>17. Formula · Worked Example</h2>
+      <p class="u-small u-muted">Methodology·Explainer 타입용. mono 선형 표기 + <code>&lt;sub&gt;/&lt;sup&gt;</code>, 외부 수식 렌더러 없음.</p>
+      <div class="formula">지수(오늘) = 지수(직전 리밸런싱일) × Σ [ w<sub>i</sub> × P<sub>i</sub>(오늘) ÷ P<sub>i</sub>(리밸런싱일) ]  <span class="fx-comment">— 체인 방식</span></div>
+      <dl class="formula-where">
+        <dt>w<sub>i</sub></dt><dd>종목 i 의 비중 (합 = 1)</dd>
+        <dt>P<sub>i</sub>(t)</dt><dd>종목 i 의 t 시점 수정주가</dd>
+      </dl>
+      <div class="example">
+        <span class="label">숫자 예시</span>
+        <p>종목 3개(비중 0.5 / 0.3 / 0.2), 리밸런싱일 대비 각각 +2%, −1%, +5% 움직였다면:</p>
+        <div class="formula">지수 = 100 × (0.5×1.02 + 0.3×0.99 + 0.2×1.05) = 100 × 1.017 = <span class="fx-hl">101.7</span></div>
+        <p class="u-small u-muted">비중이 큰 종목의 등락이 지수에 더 크게 반영된다.</p>
+      </div>
+    </section>
+
+    <footer class="report-footer">
+      <span>Design System Catalog · 2026-05-26</span>
+      <span>v2.0 · html-report skill</span>
+    </footer>
+
+  </main>
+</div>
+
+<!-- Mermaid (다이어그램이 있는 보고서에서만 활성화. 없으면 이 두 줄 삭제) -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+(function(){
+  if (!window.mermaid) return;
+  window.renderMermaid = function(){
+    document.querySelectorAll('.mermaid').forEach(function(el){
+      if (el.dataset.src == null) el.dataset.src = el.textContent;
+      el.removeAttribute('data-processed');
+      el.textContent = el.dataset.src;
+    });
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'default',
+      themeVariables: { fontFamily: "'Pretendard Variable', sans-serif", primaryColor: '#3182F6' },
+      flowchart: { curve: 'basis', useMaxWidth: true }
+    });
+    mermaid.run().catch(function(){});
+  };
+  renderMermaid();
+})();
+</script>
+
+<script>
+// ===== Theme Toggle ===== (초기 테마는 <head> 인라인 스크립트가 결정)
+(function(){
+  const KEY = 'html-report-theme';
+  const root = document.documentElement;
+  const btn = document.getElementById('themeToggle');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try { localStorage.setItem(KEY, next); } catch(e) {}
+    if (window.renderMermaid) { renderMermaid();
+  });
+})();
+
+// ===== Auto TOC =====
+(function(){
+  const list = document.getElementById('tocList');
+  if (!list) return;
+  const headings = document.querySelectorAll('main.content h2, main.content h3');
+  let lastH2 = null;
+  headings.forEach((h, i) => {
+    if (!h.id) h.id = 'sec-' + i;
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent;
+    li.appendChild(a);
+    if (h.tagName === 'H2') {
+      list.appendChild(li);
+      lastH2 = li;
+    } else if (h.tagName === 'H3' && lastH2) {
+      let sub = lastH2.querySelector('ol');
+      if (!sub) { sub = document.createElement('ol'); lastH2.appendChild(sub); }
+      sub.appendChild(li);
+    } else {
+      list.appendChild(li);
+    }
+  });
+
+  const links = list.querySelectorAll('a');
+  const linkByHash = {};
+  links.forEach(a => linkByHash[a.getAttribute('href')] = a);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const a = linkByHash['#' + e.target.id];
+      if (!a) return;
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => io.observe(h));
+})();
+
+// ===== Checklist 클릭 시 .done 토글 =====
+document.addEventListener('change', (e) => {
+  if (e.target.matches('.checklist input[type=checkbox]')) {
+    e.target.closest('li').classList.toggle('done', e.target.checked);
+  }
+});
+</script>
+
+</body>
+</html>

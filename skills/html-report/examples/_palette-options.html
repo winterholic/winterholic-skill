@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Palette Options — html-report</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+:root{
+  --ink:#18181B; --ink-2:#27272A; --muted:#71717A; --muted-2:#A1A1AA;
+  --bg:#FAFAFA; --surface:#FFFFFF; --border:#E4E4E7;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:'Pretendard Variable',Pretendard,system-ui,sans-serif;background:var(--bg);color:var(--ink-2);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.wrap{max-width:1400px;margin:0 auto;padding:48px 24px}
+h1{font-size:32px;font-weight:700;color:var(--ink);letter-spacing:-0.02em;margin:0 0 8px}
+.lede{color:var(--muted);font-size:17px;margin:0 0 32px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+@media(max-width:1100px){.grid{grid-template-columns:1fr}}
+
+.palette{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:20px}
+.palette h2{font-size:22px;font-weight:700;color:var(--ink);margin:0;letter-spacing:-0.01em}
+.palette .tag{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);background:#F4F4F5;padding:4px 10px;border-radius:999px;margin-bottom:8px}
+.palette .pitch{color:var(--muted);font-size:14px;line-height:1.55;margin:-8px 0 0;min-height:54px}
+
+.row{display:flex;flex-direction:column;gap:8px}
+.row-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.swatches{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.sw{border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--surface)}
+.sw .chip{height:56px;display:block}
+.sw .meta{padding:6px 8px;font-size:10px;line-height:1.4;font-family:'JetBrains Mono',monospace;color:var(--muted)}
+.sw .meta b{display:block;color:var(--ink-2);font-size:11px;font-weight:700}
+
+.demo{margin-top:8px;display:flex;flex-direction:column;gap:10px}
+.callout{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-radius:8px;font-size:13px;line-height:1.5}
+.callout svg{width:18px;height:18px;flex-shrink:0;margin-top:1px}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.01em}
+
+/* ============ Palette A: Calm Pro (Stripe/Linear 풍) ============ */
+.pa{--pri:#3B82F6; --pri-soft:#EFF6FF;
+   --suc:#0D9F6E; --suc-fg:#065F46; --suc-soft:#D1FAE5;
+   --wan:#D97706; --wan-fg:#92400E; --wan-soft:#FEF3C7;
+   --dan:#E11D48; --dan-fg:#9F1239; --dan-soft:#FFE4E6;}
+
+/* ============ Palette B: Muted Editorial (Notion/Vercel 풍) ============ */
+.pb{--pri:#2563EB; --pri-soft:#EFF6FF;
+    --suc:#2C7A4D; --suc-fg:#1B4D31; --suc-soft:#EEF6F0;
+    --wan:#A05F00; --wan-fg:#6B3F00; --wan-soft:#FBF4E7;
+    --dan:#A02D38; --dan-fg:#741F27; --dan-soft:#FBEDEF;}
+
+/* ============ Palette C: Toss Realistic (재시도) ============ */
+.pc{--pri:#3182F6; --pri-soft:#E8F2FE;
+    --suc:#00B956; --suc-fg:#00753A; --suc-soft:#E1F8EA;
+    --wan:#FF9500; --wan-fg:#A35F00; --wan-soft:#FFF1DA;
+    --dan:#F04452; --dan-fg:#B22230; --dan-soft:#FDE6E8;}
+
+.palette .callout.cal-info{background:var(--pri-soft);color:var(--pri)}
+.palette .callout.cal-suc{background:var(--suc-soft);color:var(--suc-fg)}
+.palette .callout.cal-suc svg{color:var(--suc)}
+.palette .callout.cal-wan{background:var(--wan-soft);color:var(--wan-fg)}
+.palette .callout.cal-wan svg{color:var(--wan)}
+.palette .callout.cal-dan{background:var(--dan-soft);color:var(--dan-fg)}
+.palette .callout.cal-dan svg{color:var(--dan)}
+.palette .badge.b-pri{background:var(--pri-soft);color:var(--pri)}
+.palette .badge.b-suc{background:var(--suc-soft);color:var(--suc-fg)}
+.palette .badge.b-wan{background:var(--wan-soft);color:var(--wan-fg)}
+.palette .badge.b-dan{background:var(--dan-soft);color:var(--dan-fg)}
+
+.notes{margin-top:48px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:12px;font-size:14px;color:var(--ink-2);line-height:1.65}
+.notes h3{margin:0 0 12px;font-size:16px;color:var(--ink)}
+.notes ul{margin:0;padding-left:20px}
+.notes code{background:#F4F4F5;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12px}
+
+footer{margin-top:32px;color:var(--muted);font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>색상 팔레트 후보 비교</h1>
+  <p class="lede">html-report 시멘틱 컬러를 어떻게 잡을지 — 3개 후보를 같은 컴포넌트(callout 4종, badge 4종, 색 swatch 9종)로 나란히 보여줘. 첫 인상으로 골라줘.</p>
+
+  <div class="grid">
+
+    <!-- ===================================================== A -->
+    <article class="palette pa">
+      <div>
+        <span class="tag">Option A</span>
+        <h2>Calm Pro</h2>
+        <p class="pitch">Stripe · Linear 풍. 채도 적당히 살린 모던 SaaS 톤. 신뢰감 + 가벼운 활기. semantic 4색이 비슷한 명도·채도 라인에 모여 통일감.</p>
+      </div>
+
+      <div class="row">
+        <span class="row-label">Primary</span>
+        <div class="swatches">
+          <div class="sw"><span class="chip" style="background:#3B82F6"></span><div class="meta"><b>primary</b>#3B82F6</div></div>
+          <div class="sw"><span class="chip" style="background:#1D4ED8"></span><div class="meta"><b>hover</b>#1D4ED8</div></div>
+          <div class="sw"><span class="chip" style="background:#EFF6FF"></span><div class="meta"><b>soft</b>#EFF6FF</div></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="row-label">Success · emerald</span>
+        <div class="swatches">
+          <div class="sw"><span class="chip" style="background:#0D9F6E"></span><div class="meta"><b>base</b>#0D9F6E</div></div>
+          <div class="sw"><span class="chip" style="background:#065F46"></span><div class="meta"><b>fg</b>#065F46</div></div>
+          <div class="sw"><span class="chip" style="background:#D1FAE5"></span><div class="meta"><b>soft</b>#D1FAE5</div></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="row-label">Warn · amber</span>
+        <div class="swatches">
+          <div class="sw"><span class="chip" style="background:#D97706"></span><div class="meta"><b>base</b>#D97706</div></div>
+          <div class="sw"><span class="chip" style="background:#92400E"></span><div class="meta"><b>fg</b>#92400E</div></div>
+          <div class="sw"><span class="chip" style="background:#FEF3C7"></span><div class="meta"><b>soft</b>#FEF3C7</div></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="row-label">Danger · rose</span>
+        <div class="swatches">
+          <div class="sw"><span class="chip" style="background:#E11D48"></span><div class="meta"><b>base</b>#E11D48</div></div>
+          <div class="sw"><span class="chip" style="background:#9F1239"></span><div class="meta"><b>fg</b>#9F1239</div></div>
+          <div class="sw"><span class="chip" style="background:#FFE4E6"></span><div class="meta"><b>soft</b>#FFE4E6</div></div>
+        </div>
+      </div>
+
+      <div class="demo">
+        <div class="callout cal-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".5" fill="currentColor"/></svg>의사결정 배경 안내</div>
+        <div class="callout cal-suc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>전환 검증 통과</div>
+        <div class="callout cal-wan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/></svg>의존 그래프 명확화 필요</div>
+        <div class="callout cal-dan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>인바운드 포트 개방 불가</div>
+        <div class="badges">
+          <span class="badge b-pri">검토 중</span>
+          <span class="badge b-suc">채택</span>
+          <span class="badge b-wan">진행 중</span>
+          <span class="badge b-dan">차단</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== B -->
+    <article class="palette pb">
+      <div>
+        <span class="tag">Option B</span>
+        <h2>Muted Editorial</h2>
+        <p class="pitch">Notion · Vercel · McKinsey 보고서 풍. 채도를 크게 낮춰 색이 거의 무채색에 가깝게. 가장 정통·진중한 인쇄물 톤. 차분.</p>
+      </div>
+
+      <div class="row">
+        <span class="row-label">Primary</span>
+        <div class="swatches">
+          <div class="sw"><span class="chip" style="background:#2563EB"></span><div class="meta"><b>primary</b>#2563EB</div></div>
+          <div class="sw"><span class="chip" style="background:#1E40AF"></span><div class="meta"><b>hover</b>#1E40AF</div></div>
+          <div class="sw"><span class="chip" style="background:#EFF6FF"></span><div class="meta"><b>soft</b>#EFF6FF</div></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="row-label">Success · moss</span>
+        <div class="swatches">
+          <div class="sw"><span class="chip" style="background:#2C7A4D"></span><div class="meta"><b>base</b>#2C7A4D</div></div>
+          <div class="sw"><span class="chip" style="background:#1B4D31"></span><div class="meta"><b>fg</b>#1B4D31</div></div>
+          <div class="sw"><span class="chip" style="background:#EEF6F0"></span><div class="meta"><b>soft</b>#EEF6F0</div></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="row-label">Warn · ochre</span>
+        <div class="swatches">
+          <div class="sw"><span class="chip" style="background:#A05F00"></span><div class="meta"><b>base</b>#A05F00</div></div>
+          <div class="sw"><span class="chip" style="background:#6B3F00"></span><div class="meta"><b>fg</b>#6B3F00</div></div>
+          <div class="sw"><span class="chip" style="background:#FBF4E7"></span><div class="meta"><b>soft</b>#FBF4E7</div></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="row-label">Danger · wine</span>
+        <div class="swatches">
+          <div class="sw"><span class="chip" style="background:#A02D38"></span><div class="meta"><b>base</b>#A02D38</div></div>
+          <div class="sw"><span class="chip" style="background:#741F27"></span><div class="meta"><b>fg</b>#741F27</div></div>
+          <div class="sw"><span class="chip" style="background:#FBEDEF"></span><div class="meta"><b>soft</b>#FBEDEF</div></div>
+        </div>
+      </div>
+
+      <div class="demo">
+        <div class="callout cal-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".5" fill="currentColor"/></svg>의사결정 배경 안내</div>
+        <div class="callout cal-suc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>전환 검증 통과</div>
+        <div class="callout cal-wan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/></svg>의존 그래프 명확화 필요</div>
+        <div class="callout cal-dan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>인바운드 포트 개방 불가</div>
+        <div class="badges">
+          <span class="badge b-pri">검토 중</span>
+          <span class="badge b-suc">채택</span>
+          <span class="badge b-wan">진행 중</span>
+          <span class="badge b-dan">차단</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== C -->
+    <article class="palette pc">
+      <div>
+        <span class="tag">Option C</span>
+        <h2>Toss Realistic</h2>
+        <p class="pitch">토스 앱 실측 추정 톤. primary가 시그니처 blue, semantic은 채도 살린 vivid한 톤이지만 핀테크답게 균형. 가장 친숙·핀테크 느낌.</p>
+      </div>
+
+      <div class="row">
+        <span class="row-label">Primary</span>
+        <div class="swatches">
+          <div class="sw"><span class="chip" style="background:#3182F6"></span><div class="meta"><b>primary</b>#3182F6</div></div>
+          <div class="sw"><span class="chip" style="background:#1B64DA"></span><div class="meta"><b>hover</b>#1B64DA</div></div>
+          <div class="sw"><span class="chip" style="background:#E8F2FE"></span><div class="meta"><b>soft</b>#E8F2FE</div></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="row-label">Success · green</span>
+        <div class="swatches">
+          <div class="sw"><span class="chip" style="background:#00B956"></span><div class="meta"><b>base</b>#00B956</div></div>
+          <div class="sw"><span class="chip" style="background:#00753A"></span><div class="meta"><b>fg</b>#00753A</div></div>
+          <div class="sw"><span class="chip" style="background:#E1F8EA"></span><div class="meta"><b>soft</b>#E1F8EA</div></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="row-label">Warn · orange</span>
+        <div class="swatches">
+          <div class="sw"><span class="chip" style="background:#FF9500"></span><div class="meta"><b>base</b>#FF9500</div></div>
+          <div class="sw"><span class="chip" style="background:#A35F00"></span><div class="meta"><b>fg</b>#A35F00</div></div>
+          <div class="sw"><span class="chip" style="background:#FFF1DA"></span><div class="meta"><b>soft</b>#FFF1DA</div></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="row-label">Danger · coral red</span>
+        <div class="swatches">
+          <div class="sw"><span class="chip" style="background:#F04452"></span><div class="meta"><b>base</b>#F04452</div></div>
+          <div class="sw"><span class="chip" style="background:#B22230"></span><div class="meta"><b>fg</b>#B22230</div></div>
+          <div class="sw"><span class="chip" style="background:#FDE6E8"></span><div class="meta"><b>soft</b>#FDE6E8</div></div>
+        </div>
+      </div>
+
+      <div class="demo">
+        <div class="callout cal-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".5" fill="currentColor"/></svg>의사결정 배경 안내</div>
+        <div class="callout cal-suc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>전환 검증 통과</div>
+        <div class="callout cal-wan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/></svg>의존 그래프 명확화 필요</div>
+        <div class="callout cal-dan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>인바운드 포트 개방 불가</div>
+        <div class="badges">
+          <span class="badge b-pri">검토 중</span>
+          <span class="badge b-suc">채택</span>
+          <span class="badge b-wan">진행 중</span>
+          <span class="badge b-dan">차단</span>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="notes">
+    <h3>비교 포인트</h3>
+    <ul>
+      <li><b>A · Calm Pro</b> — emerald + amber + rose, primary blue와 hue 거리는 멀지만 모두 명도 50~60% 채도 60~70%의 같은 라인. 따로 보면 vivid한데 모이면 균형. <code>danger</code>가 rose 가족이라 살짝 마젠타 끼.</li>
+      <li><b>B · Muted Editorial</b> — 모든 semantic이 채도 40~50%로 가라앉음. 가장 차분·정통. 임상보고서·연차보고서·법무 메모 톤. 색이 거의 안 보이고 위계는 글자 weight·spacing이 한다.</li>
+      <li><b>C · Toss Realistic</b> — 토스 앱이 실제로 쓰는 톤(추정). primary blue가 시그니처고 semantic은 그 옆에서 채도 살린 vivid green/orange/coral. <strong>이전 v2가 사실 이 방향이었다</strong>. 톤 자체가 발랄해도 컴포넌트 면적이 작으면 핀테크답게 정돈됨.</li>
+    </ul>
+  </div>
+
+  <footer>html-report skill · palette decision · 2026-05-26</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!--
+  Methodology 골격 — 수식·산식·알고리즘 명세 문서
+  (지표 산출 방식, 점수 산식, 가중치 체계, 백테스트 설계 등)
+  사용: templates/base.html 의 <main class="content"> 안에 옮긴다.
+       kicker: "Methodology"
+       파일명: YYYY-MM-DD-method-{slug}.html
+
+  이 타입의 성격:
+  - "무엇을 할지"가 아니라 "어떻게 계산/동작하는지"의 정본(reference).
+    한 번 쓰고 버리는 보고서가 아니라 두고두고 찾아보는 문서다.
+  - 계산 단계마다 [정의 → .formula 수식 → .example 숫자 예시] 3종 세트를 반복한다.
+    수식만 있고 숫자 예시가 없으면 비전문가 독자는 따라오지 못한다.
+  - 변형(variant)이 여러 개면 각 변형을 같은 구조(수식+예시+장단점)로 병렬 기술하고
+    마지막에 비교표로 모은다.
+-->
+
+<header class="report-header">
+  <span class="kicker">Methodology</span>
+  <h1>{{방법론 이름 — 예: 섹터별 상대강도 지수 산출 방법론}}</h1>
+  <p class="subtitle">{{무엇을 어떻게 계산하는지 한 줄}}</p>
+  <div class="report-meta">
+    <span class="item"><span class="label">작성자</span> <strong>{{작성자}}</strong></span>
+    <span class="item"><span class="label">작성일</span> <strong>{{YYYY-MM-DD}}</strong></span>
+    <span class="item"><span class="label">상태</span> <span class="badge info">Draft</span></span>
+    <span class="item"><span class="label">대상</span> <strong>{{독자 — 예: 비금융 개발자}}</strong></span>
+  </div>
+</header>
+
+<section id="tldr">
+  <div class="tldr">
+    <span class="label">TL;DR</span>
+    <p>{{이 문서가 정의하는 것 한 문장 + 핵심 산식의 요지 한 문장}}</p>
+  </div>
+</section>
+
+<section id="overview">
+  <h2>1. 전체 구조</h2>
+  <p>{{입력 → 처리 단계들 → 출력의 큰 흐름. 아래 다이어그램의 각 상자가 이 문서의 섹션과 1:1 대응하게 만든다.}}</p>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart LR
+    A[{{입력 데이터}}] --> B[{{단계 1}}]
+    B --> C[{{단계 2}}]
+    C --> D[{{출력}}]
+    </div>
+    <div class="caption">그림 1. {{방법론 전체 파이프라인}}</div>
+  </div>
+</section>
+
+<section id="notation">
+  <h2>2. 기호·용어</h2>
+  <p>본문 수식에서 반복해 쓰는 기호를 먼저 고정한다. 여기 없는 기호는 본문에 쓰지 않는다.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>기호</th><th>뜻</th><th>예</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>{{P_i(t)}}</code></td><td>{{종목 i 의 t 시점 가격}}</td><td>{{P_삼성전자(오늘) = 71,000}}</td></tr>
+        <tr><td><code>{{r_i}}</code></td><td>{{...}}</td><td>{{...}}</td></tr>
+        <tr><td><code>{{N}}</code></td><td>{{...}}</td><td>{{...}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ▼ 핵심 정의 섹션 — 계산 단계 수만큼 이 섹션 구조를 반복한다 (3, 4, 5, …) -->
+<section id="def-1">
+  <h2>3. {{단계/개념 1 이름 — 예: 테크니컬 점수}}</h2>
+  <p>{{이 단계가 뭘 하는지, 왜 필요한지 두세 문장. 수식보다 말이 먼저.}}</p>
+
+  <div class="formula">{{점수 = w₁ × r_1주 + w₂ × r_1개월 + w₃ × r_3개월}}  <span class="fx-comment">— {{한 줄 주석}}</span></div>
+  <dl class="formula-where">
+    <dt>{{w₁..w₃}}</dt><dd>{{기간별 가중치 (합 = 1)}}</dd>
+    <dt>{{r_기간}}</dt><dd>{{해당 기간 수익률, 수정주가 기준}}</dd>
+  </dl>
+
+  <div class="example">
+    <span class="label">숫자 예시</span>
+    <p>{{실제 값을 넣어 한 번 굴린다. 독자가 손으로 따라 계산해 같은 답이 나오게.}}</p>
+    <div class="formula">{{점수 = 0.2×(+1.5%) + 0.3×(+4.0%) + 0.5×(−2.0%) = +0.5%}}</div>
+    <p class="u-small u-muted">{{결과 해석 한 줄 — 이 값이 크다/작다는 게 무슨 의미인지}}</p>
+  </div>
+
+  <div class="callout warn">
+    <svg class="callout-icon"><use href="#i-warn"/></svg>
+    <div class="body">
+      <span class="title">경계 조건</span>
+      <p>{{0으로 나누기, 데이터 결측, 신규 상장 등 이 수식이 깨지는 입력과 그때의 처리 규칙}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="def-2">
+  <h2>4. {{단계/개념 2 이름}}</h2>
+  <p>{{...}}</p>
+  <div class="formula">{{...}}</div>
+  <div class="example">
+    <span class="label">숫자 예시</span>
+    <p>{{...}}</p>
+  </div>
+</section>
+
+<!-- ▼ 변형 비교 — 변형이 없는 방법론이면 섹션 삭제 -->
+<section id="variants">
+  <h2>5. 변형 비교</h2>
+  <p>{{같은 목적의 대안 산식들. 각 변형은 위와 같은 [수식 + 숫자 예시] 구조로 병렬 기술한 뒤 여기서 모아 비교한다.}}</p>
+  <div class="table-wrap">
+    <table class="decision">
+      <thead>
+        <tr><th>변형</th><th>핵심 아이디어</th><th>장점</th><th>단점</th><th>판정</th></tr>
+      </thead>
+      <tbody>
+        <tr class="winner">
+          <td><strong>{{변형 A}}</strong></td><td>{{...}}</td><td>{{...}}</td><td>{{...}}</td>
+          <td><span class="badge success">권장</span></td>
+        </tr>
+        <tr>
+          <td>{{변형 B}}</td><td>{{...}}</td><td>{{...}}</td><td>{{...}}</td>
+          <td><span class="badge muted">보류</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="parameters">
+  <h2>6. 파라미터</h2>
+  <p>조정 가능한 값과 기본값·허용 범위. 파라미터가 없으면 섹션 삭제.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>파라미터</th><th class="num">기본값</th><th class="num">범위</th><th>민감도 (바꾸면 뭐가 달라지나)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>{{K}}</code></td><td class="num">{{10}}</td><td class="num">{{5~30}}</td><td>{{...}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="decisions">
+  <h2>7. 결정 필요 사항</h2>
+  <p>이 방법론을 확정하기 전에 정해야 할 것들. 없으면 "없음 — v1 확정 가능"으로 명시.</p>
+  <details class="qa">
+    <summary>{{미결 질문 1 — 예: 리밸런싱 주기를 주간/월간 중 무엇으로?}}</summary>
+    <div><p>{{현재 기울어진 쪽과 그 이유, 결정에 필요한 데이터}}</p></div>
+  </details>
+</section>
+
+<section id="references">
+  <h2>8. 참고 자료</h2>
+  <ul>
+    <li>{{출처 1 — 링크 또는 문서 경로}}</li>
+    <li>{{출처 2}}</li>
+  </ul>
+</section>
+
+<section id="glossary">
+  <h2>용어집</h2>
+  <dl class="glossary">
+    <dt>{{용어 1}}</dt>
+    <dd>{{정의 — 비전문가 독자 기준으로. 필요하면 비유 포함}}</dd>
+    <dt>{{용어 2}}</dt>
+    <dd>{{...}}</dd>
+  </dl>
+</section>
+
+<footer class="report-footer">
+  <span>{{방법론 이름}} · {{YYYY-MM-DD}}</span>
+  <span>v0.1 · {{작성자}}</span>
+</footer>

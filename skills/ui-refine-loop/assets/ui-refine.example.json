@@ -1,0 +1,41 @@
+{
+  "_comment": "프로젝트 루트에 .ui-refine.json 으로 복사해 쓴다. 없어도 스킬은 돌지만, 도메인 관례 지적이 전부 보류함으로 간다.",
+
+  "spacingScale": [4, 8, 12, 16, 24, 32, 48],
+
+  "viewports": [
+    { "name": "360", "width": 360, "height": 800 },
+    { "name": "1440", "width": 1440, "height": 900 }
+  ],
+  "states": ["default", "long-ko-text"],
+
+  "intentionalDensity": ["/portfolio", "/orders"],
+  "_intentionalDensity": "고밀도가 의도인 라우트. 축 5(정보 밀도) 지적을 중재자가 폐기한다.",
+
+  "semanticColors": { "up": "#d32f2f", "down": "#1976d2", "neutral": "#616161" },
+  "_semanticColors": "의미를 나르는 색. 등락 색상처럼 관례인 것을 4-1·2-11 이 결함으로 잡는 것을 막는다.",
+
+  "accentTokens": ["--color-primary", "--color-accent"],
+  "_accentTokens": "2-2(강조 요소 개수)를 세려면 무엇이 강조색인지 선언돼 있어야 한다. 없으면 2-2 는 측정 불가로 강등된다.",
+
+  "ignoreSelectors": [".sr-only", "[data-testid]", ".recharts-wrapper"],
+  "_ignoreSelectors": "측정·비평 대상에서 통째로 뺀다. 차트 라이브러리 내부 DOM 처럼 우리가 안 만든 것.",
+
+  "intentionalHScroll": [".data-grid", "[role=table]"],
+  "_intentionalHScroll": "가로 스크롤이 설계인 곳. 3-9·오버플로 판정에서 제외한다.",
+
+  "densityExemptFields": [".trade-time", ".settle-date"],
+  "_densityExemptFields": "5-3(내부 식별자가 본문과 같은 무게)에서 뺄 필드. 체결시각·거래일은 금융에서 핵심 정보라 라우트 통째 면제로는 제어가 안 된다.",
+
+  "contrastDeltaE": 8,
+  "_contrastDeltaE": "4-3(회색 단계가 서로 구분되지 않는다) 판정 임계. 선언하지 않으면 4-3 은 측정 불가로 강등된다.",
+
+  "storageState": null,
+  "_storageState": "로그인이 필요하면 Playwright storageState 파일 경로. null 이면 비로그인으로 캡처한다.",
+
+  "stateRoutes": {
+    "empty": { "pattern": "**/api/orders*", "status": 200, "body": { "items": [] } },
+    "error": { "pattern": "**/api/orders*", "status": 500, "body": { "message": "error" } }
+  },
+  "_stateRoutes": "빈·에러 상태를 만드는 수단. 선언하지 않으면 그 상태는 캡처 세트에서 빠지고, 스킬이 뺐다고 보고한다."
+}

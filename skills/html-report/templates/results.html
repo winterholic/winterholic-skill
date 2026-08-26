@@ -1,0 +1,164 @@
+<!--
+  Results 골격 — 실험·백테스트·측정 결과 보고서
+  (백테스트 결과, 벤치마크 측정, A/B 비교 실험, 성능 프로파일링 결과 등)
+  사용: templates/base.html 의 <main class="content"> 안에 옮긴다.
+       kicker: "Results Report"
+       파일명: YYYY-MM-DD-results-{slug}.html
+
+  이 타입의 성격:
+  - "무엇을 돌렸더니 무엇이 나왔다"가 본문. 계획(plan)도 방법 정의(method)도 아니고,
+    데이터가 주인공이다. 방법론 자체는 별도 method 문서로 빼고 여기선 링크만.
+  - 결과보다 "조건"을 먼저 고정해 보여준다 — 어떤 데이터·기간·파라미터로 돌렸는지
+    없는 숫자는 재현도 비교도 불가능하다.
+  - 차트 이미지는 base64 data URI 로 임베드하고 .zoomable 로 감싸 클릭 확대 지원.
+  - 해석·한계 섹션 필수: 통계적 우연, 과최적화(overfitting), 측정 노이즈 가능성을
+    스스로 지적하지 않는 결과 보고서는 체리피킹으로 읽힌다.
+-->
+
+<header class="report-header">
+  <span class="kicker">Results Report</span>
+  <h1>{{실험 이름 — 예: 모멘텀 가중 변형 9종 백테스트 결과}}</h1>
+  <p class="subtitle">{{무엇을 비교했고 결론이 뭔지 한 줄}}</p>
+  <div class="report-meta">
+    <span class="item"><span class="label">작성자</span> <strong>{{작성자}}</strong></span>
+    <span class="item"><span class="label">실행일</span> <strong>{{YYYY-MM-DD}}</strong></span>
+    <span class="item"><span class="label">데이터</span> <strong>{{기간·표본 — 예: 2020-01~2026-06, KOSPI200}}</strong></span>
+    <span class="item"><span class="label">대상</span> <strong>{{독자}}</strong></span>
+  </div>
+</header>
+
+<section id="tldr">
+  <div class="tldr">
+    <span class="label">TL;DR</span>
+    <p>{{핵심 결과 한두 문장 — 예: "변형 9종 중 ZM+랭크버퍼가 샤프 1.31로 최고. 단 2022년 하락장 구간에선 동일가중이 우세 — 구간 의존성 있음."}}</p>
+  </div>
+</section>
+
+<section id="setup">
+  <h2>1. 실험 조건</h2>
+  <p>{{무엇과 무엇을 비교했는지, 어떤 질문에 답하려는 실험인지.}}</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>조건</th><th>값</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>데이터</td><td>{{출처·기간·표본 수}}</td></tr>
+        <tr><td>비교 대상</td><td>{{후보 목록}}</td></tr>
+        <tr><td>고정 파라미터</td><td>{{모든 후보에 동일하게 적용한 값}}</td></tr>
+        <tr><td>실행 환경</td><td>{{코드 버전·커밋 해시·스크립트 경로 — 재현용}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout note">
+    <svg class="callout-icon"><use href="#i-note"/></svg>
+    <div class="body">
+      <span class="title">방법론 정본</span>
+      <p>{{산식·알고리즘 정의는 별도 문서 참조 — 예: 2026-07-15-method-sector-relative-strength.html}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="metrics">
+  <h2>2. 평가 지표</h2>
+  <p>{{결과를 무엇으로 판정하는지 결과 보기 전에 고정. 지표가 여럿이면 우선순위도.}}</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>지표</th><th>뜻</th><th>좋은 방향</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>{{지표 1 — 예: 샤프 지수}}</td><td>{{한 줄 설명 (비전문 독자 기준)}}</td><td>{{높을수록 좋음}}</td></tr>
+        <tr><td>{{지표 2 — 예: MDD}}</td><td>{{...}}</td><td>{{0에 가까울수록 좋음}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="summary">
+  <h2>3. 종합 결과</h2>
+  <div class="grid cols-3">
+    <div class="stat">
+      <div class="label">{{최고 성과 후보}}</div>
+      <div class="value">{{1.31}}</div>
+      <div class="note">{{지표 이름}}</div>
+    </div>
+    <div class="stat">
+      <div class="label">{{비교 기준(벤치마크)}}</div>
+      <div class="value">{{0.87}}</div>
+      <div class="note">{{지표 이름}}</div>
+    </div>
+    <div class="stat">
+      <div class="label">{{격차}}</div>
+      <div class="value">{{+0.44}}</div>
+      <div class="note">{{해석 한 줄}}</div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="decision">
+      <thead>
+        <tr><th>후보</th><th class="num">{{지표 1}}</th><th class="num">{{지표 2}}</th><th class="num">{{지표 3}}</th><th>판정</th></tr>
+      </thead>
+      <tbody>
+        <tr class="winner">
+          <td><strong>{{후보 A}}</strong></td><td class="num">{{...}}</td><td class="num">{{...}}</td><td class="num">{{...}}</td>
+          <td><span class="badge success">최고</span></td>
+        </tr>
+        <tr>
+          <td>{{후보 B}}</td><td class="num">{{...}}</td><td class="num">{{...}}</td><td class="num">{{...}}</td>
+          <td><span class="badge muted">차순위</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="mermaid-wrap zoomable">
+    <img src="{{data:image/png;base64,... 차트 임베드}}" alt="{{차트 설명}}" style="max-width:100%">
+    <div class="caption">그림 1. {{메인 결과 차트 — 클릭하면 확대}}</div>
+  </div>
+</section>
+
+<!-- ▼ 상세 결과 — 비교 축(구간·조건·후보군)별로 반복 -->
+<section id="detail-1">
+  <h2>4. 상세 — {{비교 축 1: 예: 구간별 성과}}</h2>
+  <p>{{이 절단면에서 무엇이 보이는지. 숫자를 나열하지 말고 "무엇이 갈렸는지"를 말로.}}</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>{{구간}}</th><th class="num">{{후보 A}}</th><th class="num">{{후보 B}}</th><th>비고</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>{{2022 하락장}}</td><td class="num">{{...}}</td><td class="num">{{...}}</td><td>{{여기선 B 우세}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="interpretation">
+  <h2>5. 해석·한계</h2>
+  <p>{{결과가 의미하는 것과, 결과를 믿기 전에 알아야 할 것.}}</p>
+  <div class="callout warn">
+    <svg class="callout-icon"><use href="#i-warn"/></svg>
+    <div class="body">
+      <span class="title">이 결과를 과신하면 안 되는 이유</span>
+      <ul>
+        <li>{{과최적화 가능성 — 파라미터를 이 데이터에 맞춰 고른 정도}}</li>
+        <li>{{표본·기간의 한계 — 특정 장세 편향 등}}</li>
+        <li>{{미반영 비용 — 수수료·슬리피지·세금 등}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="conclusion">
+  <h2>6. 결론·다음 단계</h2>
+  <p>{{그래서 무엇을 채택/기각하는지, 추가로 돌려볼 실험은 무엇인지.}}</p>
+  <ul class="checklist">
+    <li><input type="checkbox" id="n1"><span>{{후속 실험/검증 1}}</span></li>
+    <li><input type="checkbox" id="n2"><span>{{후속 실험/검증 2}}</span></li>
+  </ul>
+</section>
+
+<footer class="report-footer">
+  <span>{{실험 이름}} · {{YYYY-MM-DD}}</span>
+  <span>v0.1 · {{작성자}}</span>
+</footer>

@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{WALKTHROUGH_TITLE}}</title>
+<meta name="description" content="{{WALKTHROUGH_SUBTITLE}}">
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+
+/* ============================================ DESIGN TOKENS (html-report 디자인 시스템) ============================================ */
+:root{
+  --color-primary:#3B82F6;--color-primary-hover:#1D4ED8;--color-primary-pressed:#1E40AF;
+  --color-primary-soft:#EFF6FF;--color-primary-fg:#FFFFFF;
+  --color-bg:#FFFFFF;--color-bg-2:#FAFAFA;--color-surface:#F4F4F5;--color-surface-2:#E4E4E7;
+  --color-border:#E4E4E7;--color-border-strong:#D4D4D8;
+  --color-ink:#18181B;--color-ink-2:#27272A;--color-ink-3:#3F3F46;--color-muted:#71717A;--color-muted-2:#A1A1AA;
+  --color-success:#0D9F6E;--color-success-fg:#065F46;--color-success-soft:#D1FAE5;
+  --color-warn:#D97706;--color-warn-fg:#92400E;--color-warn-soft:#FEF3C7;
+  --color-danger:#E11D48;--color-danger-fg:#9F1239;--color-danger-soft:#FFE4E6;
+  --color-info:var(--color-primary);--color-info-fg:var(--color-primary-hover);--color-info-soft:var(--color-primary-soft);
+  --font-sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+  --font-mono:'JetBrains Mono','SF Mono',Menlo,Consolas,'D2Coding',monospace;
+  --fz-caption:12px;--fz-small:13px;--fz-base:15px;--fz-lg:17px;--fz-xl:20px;
+  --fz-2xl:26px;--fz-3xl:32px;--fz-4xl:40px;--fz-display:52px;
+  --lh-tight:1.2;--lh-snug:1.35;--lh-base:1.65;
+  --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:24px;--s-6:32px;--s-7:48px;--s-8:64px;--s-9:96px;
+  --r-xs:4px;--r-sm:8px;--r-md:12px;--r-lg:16px;--r-full:999px;
+  --w-nav:280px;--w-content:980px;
+  --shadow-overlay:0 8px 24px rgba(15,23,42,.08),0 2px 6px rgba(15,23,42,.04);
+  --shadow-modal:0 24px 64px rgba(15,23,42,.22),0 8px 24px rgba(15,23,42,.12);
+  --ease-out:cubic-bezier(0.22,1,0.36,1);--dur-fast:150ms;--dur-base:200ms;
+  --code-bg:#18181B;--code-fg:#E4E4E7;--code-comment:#71717A;
+  --code-keyword:#93C5FD;--code-string:#7FF0CB;--code-number:#FFC04D;--code-ln:#52525B;
+  --code-hl:rgba(59,130,246,.16);--code-hl-bar:#3B82F6;
+}
+[data-theme=dark]{
+  --color-primary:oklch(72% 0.15 248);--color-primary-hover:oklch(80% 0.13 248);--color-primary-pressed:oklch(86% 0.10 248);
+  --color-primary-soft:var(--color-surface);--color-primary-fg:#0A1F3D;
+  --color-bg:#09090B;--color-bg-2:#0F0F11;--color-surface:#18181B;--color-surface-2:#27272A;
+  --color-border:#27272A;--color-border-strong:#3F3F46;
+  --color-ink:#FAFAFA;--color-ink-2:#E4E4E7;--color-ink-3:#D4D4D8;--color-muted:#A1A1AA;--color-muted-2:#71717A;
+  --color-success:oklch(72% 0.13 158);--color-success-fg:oklch(85% 0.10 158);--color-success-soft:var(--color-surface);
+  --color-warn:oklch(75% 0.13 70);--color-warn-fg:oklch(87% 0.10 70);--color-warn-soft:var(--color-surface);
+  --color-danger:oklch(72% 0.15 18);--color-danger-fg:oklch(85% 0.10 18);--color-danger-soft:var(--color-surface);
+  --shadow-modal:0 24px 64px rgba(0,0,0,.6),0 8px 24px rgba(0,0,0,.4);
+  --code-bg:#0F0F11;--code-hl:rgba(96,165,250,.14);
+}
+
+/* ============================================ BASE ============================================ */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;font-family:var(--font-sans);font-size:var(--fz-base);line-height:var(--lh-base);
+  color:var(--color-ink-2);background:var(--color-bg);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+body.modal-open{overflow:hidden}
+svg{max-width:100%;display:block}
+::selection{background:var(--color-primary-soft);color:var(--color-ink)}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition-duration:0!important;animation-duration:0!important}}
+h1,h2,h3,h4{color:var(--color-ink);font-weight:700;line-height:var(--lh-tight)}
+h1{font-size:var(--fz-4xl);margin:0 0 var(--s-3);letter-spacing:-0.025em}
+p{margin:0 0 var(--s-4)}
+a{color:var(--color-primary);text-decoration:none;border-bottom:1px solid transparent;transition:border-color var(--dur-fast)}
+a:hover{border-bottom-color:var(--color-primary)}
+strong{color:var(--color-ink);font-weight:600}
+ul,ol{margin:0 0 var(--s-4);padding-left:var(--s-5)}
+li{margin:var(--s-2) 0}
+code{font-family:var(--font-mono);font-size:.88em;background:var(--color-surface);color:var(--color-ink-2);
+  padding:2px 6px;border-radius:var(--r-xs);border:1px solid var(--color-border)}
+
+/* ============================================ LAYOUT ============================================ */
+.page{display:grid;grid-template-columns:var(--w-nav) minmax(0,1fr);gap:var(--s-7);
+  max-width:1380px;margin:0 auto;padding:var(--s-6) var(--s-5)}
+.content{min-width:0;max-width:var(--w-content)}
+@media(max-width:1040px){.page{grid-template-columns:1fr}
+  .filenav{position:static!important;max-height:none!important;border-bottom:1px solid var(--color-border);padding-bottom:var(--s-4)}}
+
+/* ============================================ FILE NAV ============================================ */
+.filenav{position:sticky;top:var(--s-4);align-self:start;font-size:var(--fz-small);
+  max-height:calc(100vh - var(--s-6));overflow-y:auto;padding-right:var(--s-3)}
+.filenav h4{font-size:var(--fz-caption);text-transform:uppercase;letter-spacing:.08em;color:var(--color-muted);margin:0 0 var(--s-3);font-weight:700}
+.filenav .nav-search{width:100%;margin-bottom:var(--s-3);padding:6px var(--s-3);font-size:var(--fz-small);
+  font-family:var(--font-sans);border:1px solid var(--color-border);border-radius:var(--r-sm);background:var(--color-bg);color:var(--color-ink-2)}
+.filenav ul{list-style:none;padding:0;margin:0}
+.filenav .dir{color:var(--color-muted);font-weight:600;padding:var(--s-2) var(--s-2) var(--s-1);
+  font-family:var(--font-mono);font-size:var(--fz-caption);display:flex;align-items:center;gap:6px}
+.filenav .dir::before{content:"";width:6px;height:6px;border-right:2px solid var(--color-muted-2);border-bottom:2px solid var(--color-muted-2);transform:rotate(45deg);flex-shrink:0}
+.filenav ul ul{margin-left:var(--s-3);border-left:1px solid var(--color-border);padding-left:var(--s-2)}
+.filenav a.file{color:var(--color-ink-3);display:flex;justify-content:space-between;align-items:center;gap:var(--s-2);
+  padding:5px var(--s-3);border-radius:var(--r-sm);border-left:2px solid transparent;
+  font-family:var(--font-mono);font-size:var(--fz-small);line-height:1.4;transition:background var(--dur-fast),color var(--dur-fast)}
+.filenav a.file:hover{background:var(--color-surface);color:var(--color-ink);border-bottom-color:transparent}
+.filenav a.file.active{color:var(--color-primary);border-left-color:var(--color-primary);background:var(--color-primary-soft);font-weight:600}
+.filenav a.file .fcount{font-size:11px;color:var(--color-muted-2);font-family:var(--font-sans);flex-shrink:0;display:inline-flex;align-items:center;gap:5px}
+.filenav a.file .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block}
+.filenav a.file .dot.risk{background:var(--color-danger)}
+.filenav a.file .dot.warn{background:var(--color-warn)}
+
+/* ============================================ HEADER ============================================ */
+.wt-header{border-bottom:1px solid var(--color-border);padding-bottom:var(--s-5);margin-bottom:var(--s-5)}
+.wt-header .kicker{display:inline-block;font-size:var(--fz-caption);text-transform:uppercase;letter-spacing:.1em;
+  color:var(--color-primary);background:var(--color-primary-soft);padding:5px 12px;border-radius:var(--r-full);font-weight:700;margin-bottom:var(--s-3)}
+.wt-header .subtitle{font-size:var(--fz-lg);color:var(--color-muted);margin:var(--s-2) 0 var(--s-5);font-weight:400;line-height:1.5}
+.wt-meta{display:flex;flex-wrap:wrap;gap:var(--s-5);font-size:var(--fz-small);color:var(--color-muted)}
+.wt-meta .item{display:inline-flex;align-items:center;gap:6px}
+.wt-meta .label{color:var(--color-muted-2)}
+.wt-meta strong{color:var(--color-ink-2);font-weight:600}
+.wt-meta .mono{font-family:var(--font-mono)}
+
+/* ============================================ BADGE ============================================ */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:var(--fz-caption);font-weight:700;
+  padding:3px 10px;border-radius:var(--r-full);background:var(--color-surface);color:var(--color-ink-3);border:1px solid var(--color-border);line-height:1.4}
+.badge.primary{background:var(--color-primary-soft);color:var(--color-primary);border-color:transparent}
+.badge.success{background:var(--color-success-soft);color:var(--color-success-fg);border-color:transparent}
+.badge.warn{background:var(--color-warn-soft);color:var(--color-warn-fg);border-color:transparent}
+.badge.danger{background:var(--color-danger-soft);color:var(--color-danger-fg);border-color:transparent}
+.badge.muted{background:var(--color-surface);color:var(--color-muted);border-color:transparent}
+[data-theme=dark] .badge.primary,[data-theme=dark] .badge.success,[data-theme=dark] .badge.warn,[data-theme=dark] .badge.danger{background:var(--color-surface-2);border:1px solid var(--color-border-strong)}
+[data-theme=dark] .badge.primary{color:var(--color-primary)}
+[data-theme=dark] .badge.success{color:var(--color-success)}
+[data-theme=dark] .badge.warn{color:var(--color-warn)}
+[data-theme=dark] .badge.danger{color:var(--color-danger)}
+
+/* ============================================ TL;DR / LEGEND ============================================ */
+.tldr{position:relative;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--r-md);
+  padding:var(--s-5) var(--s-6);margin:0 0 var(--s-5);overflow:hidden}
+.tldr::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--color-primary)}
+.tldr .label{font-size:var(--fz-caption);text-transform:uppercase;letter-spacing:.12em;color:var(--color-primary);font-weight:700;margin-bottom:var(--s-3);display:block}
+.tldr p{font-size:var(--fz-lg);color:var(--color-ink);margin:0;line-height:1.5;font-weight:500}
+.legend{display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center;margin:var(--s-5) 0;padding:var(--s-4) var(--s-5);
+  background:var(--color-bg-2);border:1px solid var(--color-border);border-radius:var(--r-sm);font-size:var(--fz-small)}
+.legend .hint{color:var(--color-muted);font-weight:600;margin-right:var(--s-2)}
+.legend .li{display:inline-flex;align-items:center;gap:6px;color:var(--color-ink-3)}
+.legend .swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.legend .swatch.intent{background:var(--color-muted-2)}
+.legend .swatch.ref{background:var(--color-primary)}
+.legend .swatch.good{background:var(--color-success)}
+.legend .swatch.warn{background:var(--color-warn)}
+.legend .swatch.risk{background:var(--color-danger)}
+
+/* ============================================ FILE SECTION ============================================ */
+.wt-file{margin:var(--s-8) 0 0;scroll-margin-top:24px}
+.wt-file:first-of-type{margin-top:var(--s-5)}
+.wt-file-head{position:sticky;top:0;z-index:20;background:var(--color-bg);border-bottom:1px solid var(--color-border);padding:var(--s-3) 0;margin-bottom:var(--s-4)}
+.wt-file-head .path{font-family:var(--font-mono);font-size:var(--fz-lg);color:var(--color-ink);font-weight:700;word-break:break-all;display:flex;align-items:center;gap:var(--s-3);flex-wrap:wrap}
+.wt-file-head .lines{font-family:var(--font-sans);font-size:var(--fz-small);color:var(--color-muted);font-weight:400}
+.wt-filecard{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--r-md);padding:var(--s-5);margin:0 0 var(--s-5)}
+.wt-filecard dl{display:grid;grid-template-columns:max-content 1fr;gap:var(--s-2) var(--s-5);margin:0}
+.wt-filecard dt{font-size:var(--fz-caption);text-transform:uppercase;letter-spacing:.08em;color:var(--color-muted);font-weight:700;padding-top:2px}
+.wt-filecard dd{margin:0;color:var(--color-ink-3);font-size:var(--fz-small);line-height:1.6}
+@media(max-width:640px){.wt-filecard dl{grid-template-columns:1fr;gap:var(--s-1)}.wt-filecard dt{padding-top:var(--s-2)}}
+
+/* ============================================ FULL CODE PANE (모달 모드 핵심) ============================================ */
+.wt-codefull{margin:0;background:var(--code-bg);border-radius:var(--r-sm);overflow:hidden;border:1px solid transparent}
+.wt-codefull figcaption{display:flex;justify-content:space-between;align-items:center;gap:var(--s-3);
+  padding:6px var(--s-4);background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.07);
+  font-family:var(--font-mono);font-size:11px;color:var(--code-ln);letter-spacing:.04em}
+.wt-codefull figcaption .lang{text-transform:uppercase;letter-spacing:.1em}
+.code-body{margin:0;padding:var(--s-3) 0;font-family:var(--font-mono);font-size:13px;line-height:1.75;overflow-x:auto;color:var(--code-fg)}
+.code-body .cl{display:grid;grid-template-columns:3.6em 1fr;min-width:max-content;position:relative}
+.code-body .cl .n{color:var(--code-ln);text-align:right;padding:0 var(--s-4) 0 var(--s-2);user-select:none;-webkit-user-select:none;white-space:nowrap}
+.code-body .cl .t{white-space:pre;padding-right:var(--s-6)}
+.code-body .cl.def .n{color:var(--code-keyword);font-weight:700}
+.code-body .cl:target{background:var(--code-hl);box-shadow:inset 3px 0 0 var(--code-hl-bar)}
+/* 토큰 색 */
+.code-body .c-comment{color:var(--code-comment);opacity:.85}
+.code-body .c-keyword{color:var(--code-keyword)}
+.code-body .c-string{color:var(--code-string)}
+.code-body .c-number{color:var(--code-number)}
+/* --- 주석 달린(클릭 가능) 라인 --- */
+.code-body .cl.ann{cursor:pointer}
+.code-body .cl.ann .t{box-shadow:inset 2px 0 0 var(--marker,var(--color-muted-2))}
+.code-body .cl.ann:hover{background:rgba(255,255,255,.05)}
+.code-body .cl.ann.sev-ref{--marker:var(--code-keyword)}
+.code-body .cl.ann.sev-good{--marker:#34D399}
+.code-body .cl.ann.sev-warn{--marker:#FBBF24}
+.code-body .cl.ann.sev-risk{--marker:#FB7185}
+/* gutter 우측 마커 칩: 노트 개수 + 종류색 */
+.code-body .cl.ann .chip{position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;
+  border-radius:var(--r-full);font-family:var(--font-sans);font-size:10px;font-weight:700;line-height:1;
+  background:var(--marker,var(--color-muted-2));color:#0B0B0F;opacity:.92;pointer-events:none}
+.code-body .cl.ann:hover .chip{opacity:1}
+
+/* ============================================ MODAL (라인 클릭 시) ============================================ */
+.modal-backdrop{position:fixed;inset:0;z-index:200;display:none;align-items:flex-start;justify-content:center;
+  background:rgba(9,9,11,.5);padding:var(--s-7) var(--s-4);overflow-y:auto;backdrop-filter:blur(2px)}
+.modal-backdrop.open{display:flex;animation:mfade var(--dur-base) var(--ease-out)}
+@keyframes mfade{from{opacity:0}to{opacity:1}}
+.modal{background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--r-lg);
+  box-shadow:var(--shadow-modal);width:min(680px,100%);margin:auto 0;animation:mrise var(--dur-base) var(--ease-out)}
+@keyframes mrise{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:var(--s-3);
+  padding:var(--s-4) var(--s-5);border-bottom:1px solid var(--color-border);position:sticky;top:0;background:var(--color-bg);border-radius:var(--r-lg) var(--r-lg) 0 0}
+.modal-head .modal-loc{font-family:var(--font-mono);font-size:var(--fz-small);color:var(--color-ink);font-weight:700}
+.modal-head .modal-x{width:32px;height:32px;border-radius:var(--r-sm);border:1px solid var(--color-border);
+  background:var(--color-surface);color:var(--color-ink-2);font-size:20px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:background var(--dur-fast)}
+.modal-head .modal-x:hover{background:var(--color-surface-2)}
+.modal-body{padding:var(--s-5)}
+/* 모달 안에서 본 코드 라인 미리보기 */
+.modal-codeline{background:var(--code-bg);color:var(--code-fg);font-family:var(--font-mono);font-size:13px;
+  padding:var(--s-3) var(--s-4);border-radius:var(--r-sm);margin:0 0 var(--s-4);white-space:pre-wrap;word-break:break-word;line-height:1.6}
+.modal-codeline .c-comment{color:var(--code-comment)}.modal-codeline .c-keyword{color:var(--code-keyword)}
+.modal-codeline .c-string{color:var(--code-string)}.modal-codeline .c-number{color:var(--code-number)}
+
+/* ============================================ NOTE (모달 안 + 범례 공용) ============================================ */
+.wt-note{position:relative;background:var(--color-surface);border:1px solid var(--color-border);
+  border-left:3px solid var(--color-muted-2);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:var(--s-3) var(--s-4);margin:0 0 var(--s-3)}
+.wt-note:last-child{margin-bottom:0}
+.wt-note .ntag{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--color-muted);margin-right:var(--s-2)}
+.wt-note .nloc{font-family:var(--font-mono);font-size:11px;color:var(--color-muted-2);font-weight:600}
+.wt-note .nbody{color:var(--color-ink-3);font-size:var(--fz-small);line-height:1.6;margin-top:var(--s-1)}
+.wt-note .nbody>:first-child{margin-top:0}.wt-note .nbody>:last-child{margin-bottom:0}
+.wt-note.intent{border-left-color:var(--color-muted-2)}
+.wt-note.ref{border-left-color:var(--color-primary)}.wt-note.ref .ntag{color:var(--color-primary)}
+.wt-note.good{border-left-color:var(--color-success);background:var(--color-success-soft)}.wt-note.good .ntag{color:var(--color-success-fg)}
+.wt-note.warn{border-left-color:var(--color-warn);background:var(--color-warn-soft)}.wt-note.warn .ntag{color:var(--color-warn-fg)}
+.wt-note.risk{border-left-color:var(--color-danger);background:var(--color-danger-soft)}.wt-note.risk .ntag{color:var(--color-danger-fg)}
+[data-theme=dark] .wt-note.good,[data-theme=dark] .wt-note.warn,[data-theme=dark] .wt-note.risk{background:var(--color-surface)}
+[data-theme=dark] .wt-note.good .ntag{color:var(--color-success)}
+[data-theme=dark] .wt-note.warn .ntag{color:var(--color-warn)}
+[data-theme=dark] .wt-note.risk .ntag{color:var(--color-danger)}
+a.xref{font-family:var(--font-mono);font-size:.92em;color:var(--color-primary);border-bottom:1px dotted var(--color-primary);white-space:nowrap}
+a.xref::before{content:"↳ ";font-family:var(--font-sans)}
+a.xref.ext{color:var(--color-muted);border-bottom-color:var(--color-muted-2)}
+a.xref.ext::before{content:"↗ "}
+
+/* ============================================ THEME TOGGLE ============================================ */
+.theme-toggle{position:fixed;top:var(--s-4);right:var(--s-5);z-index:100;width:40px;height:40px;border-radius:var(--r-full);
+  border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-ink-2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:18px;transition:transform var(--dur-fast),background var(--dur-fast)}
+.theme-toggle:hover{transform:scale(1.05);background:var(--color-surface)}
+.theme-toggle .sun{display:none}.theme-toggle .moon{display:block}
+[data-theme=dark] .theme-toggle .sun{display:block}[data-theme=dark] .theme-toggle .moon{display:none}
+
+.wt-footer{margin-top:var(--s-9);padding-top:var(--s-5);border-top:1px solid var(--color-border);font-size:var(--fz-small);color:var(--color-muted);display:flex;flex-wrap:wrap;gap:var(--s-4);justify-content:space-between}
+
+/* ============================================ PRINT (모달은 인쇄 불가 → 주석 전부 펼쳐 출력) ============================================ */
+@media print{
+  @page{size:A4;margin:16mm 12mm}
+  body{background:#fff;color:#000;font-size:10.5pt}
+  .page{display:block;max-width:none;padding:0}
+  .filenav,.theme-toggle,.nav-search,.modal-backdrop{display:none!important}
+  .content{max-width:none}
+  .wt-file-head{position:static}
+  .code-body .cl.ann .chip{display:none}
+  /* 인쇄 시 숨겨둔 노트를 코드 뒤에 펼쳐서 보이게 */
+  .notes-store{display:block!important}
+  .notes-store .line-notes{display:block!important;margin:var(--s-3) 0;padding-left:var(--s-4);border-left:2px solid #ccc}
+  .notes-store .line-notes::before{content:attr(data-loc);display:block;font-family:monospace;font-size:9pt;color:#555;margin-bottom:4px}
+}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" aria-label="테마 전환" title="라이트/다크 전환">
+  <span class="sun" aria-hidden="true">☀</span><span class="moon" aria-hidden="true">☾</span>
+</button>
+
+<div class="page">
+
+  <!-- ===== 좌측 파일트리 네비 ===== -->
+  <aside class="filenav" id="filenav">
+    <h4>Files · {{FILE_COUNT}}</h4>
+    <input class="nav-search" id="navSearch" type="text" placeholder="파일 필터…" aria-label="파일 필터">
+    <ul id="navTree">
+      <li>
+        <div class="dir">{{DIR_PATH}}/</div>
+        <ul>
+          <li><a class="file" href="#file-users-py"><span>users.py</span><span class="fcount"><span class="dot risk"></span>3</span></a></li>
+          <li><a class="file" href="#file-sync-py"><span>sync.py</span><span class="fcount">2</span></a></li>
+        </ul>
+      </li>
+    </ul>
+  </aside>
+
+  <main class="content">
+
+    <header class="wt-header">
+      <span class="kicker">Code Walkthrough · 모달 모드</span>
+      <h1>{{WALKTHROUGH_TITLE}}</h1>
+      <p class="subtitle">{{WALKTHROUGH_SUBTITLE}}</p>
+      <div class="wt-meta">
+        <span class="item"><span class="label">범위</span> <strong class="mono">{{SCOPE}}</strong></span>
+        <span class="item"><span class="label">파일</span> <strong>{{FILE_COUNT}}개 · {{LINE_COUNT}} lines</strong></span>
+        <span class="item"><span class="label">작성</span> <strong>{{DATE}}</strong></span>
+        <span class="item"><span class="label">대상</span> <strong>{{AUDIENCE}}</strong></span>
+      </div>
+    </header>
+
+    <div class="tldr">
+      <span class="label">한눈에</span>
+      <p>{{이 코드 범위가 전체적으로 무엇을 하는지 1~2문장.}}</p>
+    </div>
+
+    <div class="legend" aria-label="사용법 + 범례">
+      <span class="hint">💡 색 표시(◧)가 있는 줄을 클릭하면 해설 모달이 열립니다.</span>
+      <span class="li"><span class="swatch ref"></span>참조 흐름</span>
+      <span class="li"><span class="swatch good"></span>잘된 점</span>
+      <span class="li"><span class="swatch warn"></span>주의</span>
+      <span class="li"><span class="swatch risk"></span>위험</span>
+    </div>
+
+    <!-- ============================================================
+         파일 섹션 (모달 모드):
+           file-head → filecard → wt-codefull(파일 전체 코드)
+           → notes-store(라인별 숨은 해설; JS가 모달로 복제)
+         · 주석 달린 라인: class="cl ann sev-{ref|good|warn|risk}"
+           + data-notes="L-..."(자기 id와 동일) + <span class="chip">개수</span>
+         · 정의/점프 타깃 라인: class="cl def" id="L-..."
+         ============================================================ -->
+
+    <section class="wt-file" id="file-users-py">
+      <div class="wt-file-head"><div class="path">backend/app/users.py <span class="lines">· 진입 흐름 · 20 lines (발췌)</span></div></div>
+      <div class="wt-filecard"><dl>
+        <dt>역할</dt><dd>활성 사용자 조회 + 정규화. 이 범위의 진입점.</dd>
+        <dt>의존</dt><dd><code>db</code>, <code>sync.batch_sync</code>에서 호출됨</dd>
+        <dt>정의 심볼</dt><dd><code>get_active()</code>, <code>_norm()</code></dd>
+      </dl></div>
+
+      <figure class="wt-codefull">
+        <figcaption><span>backend/app/users.py</span><span class="lang">python · 전체</span></figcaption>
+        <div class="code-body">
+<div class="cl def ann sev-ref" id="L-users-12" data-notes="L-users-12"><span class="n">12</span><span class="t"><span class="c-keyword">def</span> get_active(uids):<span class="chip">1</span></span></div>
+<div class="cl" id="L-users-13"><span class="n">13</span><span class="t">    rows = db.query(<span class="c-string">"SELECT * FROM users WHERE id IN ..."</span>, uids)</span></div>
+<div class="cl ann sev-risk" id="L-users-14" data-notes="L-users-14"><span class="n">14</span><span class="t">    <span class="c-keyword">return</span> [_norm(r) <span class="c-keyword">for</span> r <span class="c-keyword">in</span> rows]<span class="chip">2</span></span></div>
+<div class="cl" id="L-users-15"><span class="n">15</span><span class="t"></span></div>
+<div class="cl def" id="L-users-16"><span class="n">16</span><span class="t"><span class="c-keyword">def</span> _norm(r):</span></div>
+<div class="cl" id="L-users-17"><span class="n">17</span><span class="t">    <span class="c-keyword">return</span> {</span></div>
+<div class="cl" id="L-users-18"><span class="n">18</span><span class="t">        <span class="c-string">"id"</span>: r.id,</span></div>
+<div class="cl ann sev-warn" id="L-users-19" data-notes="L-users-19"><span class="n">19</span><span class="t">        <span class="c-string">"name"</span>: r.name.strip(),<span class="chip">1</span></span></div>
+<div class="cl" id="L-users-20"><span class="n">20</span><span class="t">    }</span></div>
+        </div>
+      </figure>
+
+      <!-- 라인별 숨은 해설 저장소 — JS가 클릭 시 모달로 복제. data-loc 은 모달 제목. -->
+      <div class="notes-store" hidden>
+        <div class="line-notes" data-for="L-users-12" data-loc="users.py:12">
+          <div class="wt-note intent"><span class="ntag">의도</span><span class="nloc">L12–14</span>
+            <div class="nbody"><code>uids</code> 목록을 받아 활성 사용자 행을 조회하고 <code>_norm</code>으로 정규화해 반환. 함수 전체가 "조회 → 변환" 한 흐름.</div></div>
+        </div>
+        <div class="line-notes" data-for="L-users-14" data-loc="users.py:14">
+          <div class="wt-note ref"><span class="ntag">참조 흐름</span><span class="nloc">L14 · uids/r</span>
+            <div class="nbody"><code>uids</code>는 호출자 <a class="xref" href="#L-sync-30">batch_sync (sync.py:30)</a>에서 옴. <code>r</code>은 ORM Row 약어.</div></div>
+          <div class="wt-note risk"><span class="ntag">위험</span><span class="nloc">L14</span>
+            <div class="nbody">행이 0개면 빈 리스트 반환 → 호출부가 non-empty로 가정하면 <strong>downstream 에러</strong>. <a class="xref" href="#L-sync-31">sync.py:31</a>에서 확정됨.</div></div>
+        </div>
+        <div class="line-notes" data-for="L-users-19" data-loc="users.py:19">
+          <div class="wt-note warn"><span class="ntag">주의</span><span class="nloc">L19</span>
+            <div class="nbody"><code>r.name</code>이 <code>None</code>이면 <code>.strip()</code>에서 터진다. NOT NULL 아니면 <code>(r.name or "").strip()</code>.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wt-file" id="file-sync-py">
+      <div class="wt-file-head"><div class="path">backend/app/sync.py <span class="lines">· 호출자 · 발췌</span></div></div>
+      <div class="wt-filecard"><dl>
+        <dt>역할</dt><dd><code>users.get_active</code>를 호출하는 배치 동기화 잡.</dd>
+      </dl></div>
+      <figure class="wt-codefull">
+        <figcaption><span>backend/app/sync.py</span><span class="lang">python · 발췌</span></figcaption>
+        <div class="code-body">
+<div class="cl def" id="L-sync-29"><span class="n">29</span><span class="t"><span class="c-keyword">def</span> batch_sync(raw_ids):</span></div>
+<div class="cl ann sev-ref" id="L-sync-30" data-notes="L-sync-30"><span class="n">30</span><span class="t">    active = get_active(<span class="c-keyword">list</span>(<span class="c-keyword">set</span>(raw_ids)))<span class="chip">1</span></span></div>
+<div class="cl ann sev-risk" id="L-sync-31" data-notes="L-sync-31"><span class="n">31</span><span class="t">    first = active[<span class="c-number">0</span>]<span class="chip">1</span></span></div>
+        </div>
+      </figure>
+      <div class="notes-store" hidden>
+        <div class="line-notes" data-for="L-sync-30" data-loc="sync.py:30">
+          <div class="wt-note ref"><span class="ntag">참조 흐름</span><span class="nloc">L30 → users.py:12</span>
+            <div class="nbody"><code>set()</code>로 중복 제거 후 <a class="xref" href="#L-users-12">get_active (users.py:12)</a>에 전달. 중복은 없지만 <strong>빈 입력은 그대로 통과</strong>.</div></div>
+        </div>
+        <div class="line-notes" data-for="L-sync-31" data-loc="sync.py:31">
+          <div class="wt-note risk"><span class="ntag">위험</span><span class="nloc">L31</span>
+            <div class="nbody"><code>active</code>가 비면 <code>active[0]</code>에서 <strong>IndexError</strong>. 빈 배치일 때 도달 가능 — 가드 필요.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="wt-footer">
+      <span>{{WALKTHROUGH_TITLE}} · {{DATE}}</span>
+      <span>Code Walkthrough (모달 모드) · {{SCOPE}}</span>
+    </footer>
+
+  </main>
+</div>
+
+<!-- ===== 모달 ===== -->
+<div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalLoc">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-loc" id="modalLoc"></span>
+      <button class="modal-x" id="modalX" aria-label="닫기" title="닫기 (Esc)">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ===== Theme Toggle =====
+(function(){
+  const KEY='code-walkthrough-theme', root=document.documentElement;
+  root.dataset.theme=localStorage.getItem(KEY)||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  const b=document.getElementById('themeToggle');
+  if(b) b.addEventListener('click',()=>{const n=root.dataset.theme==='dark'?'light':'dark';root.dataset.theme=n;localStorage.setItem(KEY,n);});
+})();
+
+// ===== File nav scrollspy + filter =====
+(function(){
+  const links=document.querySelectorAll('#navTree a.file');
+  if(links.length){
+    const byHash={}; links.forEach(a=>byHash[a.getAttribute('href')]=a);
+    const io=new IntersectionObserver(es=>es.forEach(e=>{const a=byHash['#'+e.target.id];if(a&&e.isIntersecting){links.forEach(l=>l.classList.remove('active'));a.classList.add('active');}}),{rootMargin:'-10% 0px -80% 0px'});
+    document.querySelectorAll('.wt-file[id]').forEach(f=>io.observe(f));
+  }
+  const inp=document.getElementById('navSearch');
+  if(inp) inp.addEventListener('input',()=>{const q=inp.value.trim().toLowerCase();
+    document.querySelectorAll('#navTree a.file').forEach(a=>{a.closest('li').style.display=a.textContent.toLowerCase().includes(q)?'':'none';});});
+})();
+
+// ===== Modal (라인 클릭 → 해설) =====
+(function(){
+  const modal=document.getElementById('modal'), body=document.getElementById('modalBody'), loc=document.getElementById('modalLoc');
+  let lastFocus=null;
+
+  function notesFor(id){
+    const store=document.querySelector('.line-notes[data-for="'+id+'"]');
+    return store;
+  }
+  function open(id){
+    const store=notesFor(id); if(!store) return;
+    const line=document.getElementById(id);
+    // 코드 라인 미리보기 (라인 텍스트 복제)
+    const t=line?line.querySelector('.t'):null;
+    let html='';
+    if(t){const c=t.cloneNode(true);const chip=c.querySelector('.chip');if(chip)chip.remove();
+      html+='<div class="modal-codeline">'+c.innerHTML+'</div>';}
+    html+=store.innerHTML;
+    body.innerHTML=html;
+    loc.textContent=store.getAttribute('data-loc')||id;
+    lastFocus=document.activeElement;
+    modal.classList.add('open'); document.body.classList.add('modal-open');
+    document.getElementById('modalX').focus();
+  }
+  function close(){
+    modal.classList.remove('open'); document.body.classList.remove('modal-open'); body.innerHTML='';
+    if(lastFocus&&lastFocus.focus)lastFocus.focus();
+  }
+
+  // 코드 라인 클릭
+  document.addEventListener('click',e=>{
+    const cl=e.target.closest('.cl.ann');
+    if(cl&&cl.dataset.notes){ e.preventDefault(); open(cl.dataset.notes); return; }
+    // 모달 안 xref → 닫고 해당 라인으로 이동 후, 그 라인에 노트 있으면 모달 재오픈
+    const xref=e.target.closest('.modal-body a.xref');
+    if(xref){
+      const href=xref.getAttribute('href')||''; const tid=href.slice(1);
+      if(tid){ e.preventDefault(); close();
+        const el=document.getElementById(tid);
+        if(el){ el.scrollIntoView({block:'center'}); history.replaceState(null,'',href);
+          if(el.classList.contains('ann')&&el.dataset.notes){ setTimeout(()=>open(el.dataset.notes),260); } }
+      }
+    }
+  });
+  document.getElementById('modalX').addEventListener('click',close);
+  modal.addEventListener('click',e=>{ if(e.target===modal) close(); }); // 백드롭
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&modal.classList.contains('open')) close(); });
+})();
+</script>
+
+</body>
+</html>

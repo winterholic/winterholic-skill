@@ -1,0 +1,135 @@
+<!--
+  Guide 골격 — 절차 실행 가이드 (how-to)
+  (설치·설정·마이그레이션 절차, 운영 runbook, 온보딩, 도구 사용법)
+  사용: templates/base.html 의 <main class="content"> 안에 옮긴다.
+       kicker: "Guide" (운영 절차면 "Runbook")
+       파일명: YYYY-MM-DD-guide-{slug}.html
+
+  이 타입의 성격:
+  - 독자가 "따라 하면서" 읽는다. 위→아래 한 방향 진행이 생명 —
+    "앞에서 한 X를 다시 열고" 같은 역참조를 만들지 않는다.
+  - 모든 실행 단계는 [명령/행동 → 예상 결과] 쌍으로. 예상 결과가 없으면
+    독자는 자기가 성공했는지 모른다.
+  - 명령은 복사-붙여넣기 가능해야 한다. 치환 필요한 부분은 {PLACEHOLDER}
+    대문자로 표기하고 전제 조건 섹션에서 값을 미리 정하게 한다.
+  - 위험한 단계(삭제·덮어쓰기·재시작)는 단계 안에 callout warn 을 인라인으로.
+-->
+
+<header class="report-header">
+  <span class="kicker">Guide</span>
+  <h1>{{제목 — 예: GitHub Actions self-hosted 러너 등록 가이드}}</h1>
+  <p class="subtitle">{{이 가이드를 끝내면 얻는 상태 한 줄}}</p>
+  <div class="report-meta">
+    <span class="item"><span class="label">작성자</span> <strong>{{작성자}}</strong></span>
+    <span class="item"><span class="label">작성일</span> <strong>{{YYYY-MM-DD}}</strong></span>
+    <span class="item"><span class="label">소요 시간</span> <strong>{{~20분}}</strong></span>
+    <span class="item"><span class="label">대상</span> <strong>{{독자}}</strong></span>
+  </div>
+</header>
+
+<section id="tldr">
+  <div class="tldr">
+    <span class="label">TL;DR</span>
+    <p>{{무엇을 해서 → 어떤 상태가 되는지. 단계 수와 소요 시간까지: "N단계, 약 M분."}}</p>
+  </div>
+</section>
+
+<section id="prerequisites">
+  <h2>1. 전제 조건</h2>
+  <p>시작 전에 아래가 모두 준비돼 있어야 한다. 하나라도 없으면 해당 단계에서 막힌다.</p>
+  <ul class="checklist">
+    <li><input type="checkbox" id="pre1"><span>{{조건 1 — 예: 대상 서버 SSH 접근 가능}}</span></li>
+    <li><input type="checkbox" id="pre2"><span>{{조건 2 — 예: org admin 권한}}</span></li>
+    <li><input type="checkbox" id="pre3"><span>{{조건 3 — 도구 버전: `tool --version` ≥ X.Y}}</span></li>
+  </ul>
+  <p>아래 값들을 미리 정해 둔다. 본문 명령의 <code>{PLACEHOLDER}</code> 를 이 값으로 치환한다.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>플레이스홀더</th><th>뜻</th><th>예</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>{SERVER}</code></td><td>{{대상 서버 호스트명}}</td><td>{{web-01.example.com}}</td></tr>
+        <tr><td><code>{TOKEN}</code></td><td>{{어디서 발급받는지}}</td><td>{{Settings → ... 경로}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="steps">
+  <h2>2. 진행 단계</h2>
+  <ol class="steps">
+    <li>
+      <div class="title">{{단계 1 이름}}</div>
+      <div class="desc">
+        <p>{{이 단계가 뭘 하는지 한 줄.}}</p>
+        <pre><code>{{복사-붙여넣기 가능한 명령}}</code></pre>
+        <p class="u-small u-muted">예상 결과: {{이 출력/상태가 보이면 성공}}</p>
+      </div>
+    </li>
+    <li>
+      <div class="title">{{단계 2 이름}}</div>
+      <div class="desc">
+        <p>{{...}}</p>
+        <pre><code>{{...}}</code></pre>
+        <p class="u-small u-muted">예상 결과: {{...}}</p>
+        <div class="callout warn">
+          <svg class="callout-icon"><use href="#i-warn"/></svg>
+          <div class="body">
+            <span class="title">주의</span>
+            <p>{{이 단계에서 흔히 하는 실수 / 위험한 부분 (삭제·덮어쓰기 등)}}</p>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li>
+      <div class="title">{{단계 3 이름}}</div>
+      <div class="desc">
+        <p>{{...}}</p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<section id="verify">
+  <h2>3. 완료 검증</h2>
+  <p>전부 끝났는지 확인하는 최종 체크. 아래가 모두 통과하면 완료다.</p>
+  <ul class="checklist">
+    <li><input type="checkbox" id="v1"><span>{{검증 1 — 명령 + 기대 출력}}</span></li>
+    <li><input type="checkbox" id="v2"><span>{{검증 2}}</span></li>
+  </ul>
+</section>
+
+<section id="troubleshooting">
+  <h2>4. 트러블슈팅</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>증상</th><th>원인</th><th>대처</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>{{에러 메시지/증상 1}}</td><td>{{...}}</td><td>{{...}}</td></tr>
+        <tr><td>{{증상 2}}</td><td>{{...}}</td><td>{{...}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="rollback">
+  <h2>5. 되돌리기</h2>
+  <p>{{이 가이드의 작업을 원상 복구하는 절차. 복구 불가능한 단계가 있으면 명시. 되돌릴 게 없으면 섹션 삭제.}}</p>
+  <pre><code>{{복구 명령}}</code></pre>
+</section>
+
+<section id="faq">
+  <h2>6. FAQ</h2>
+  <details class="qa">
+    <summary>{{자주 나오는 질문 1}}</summary>
+    <div><p>{{답}}</p></div>
+  </details>
+</section>
+
+<footer class="report-footer">
+  <span>{{제목}} · {{YYYY-MM-DD}}</span>
+  <span>v0.1 · {{작성자}}</span>
+</footer>

@@ -1,0 +1,203 @@
+<!--
+  Analysis / Big-Picture 골격 — 방대한 작업 착수 전 큰그림
+  사용: templates/base.html 의 <main class="content"> 안에 본문 섹션들을 옮긴다.
+       kicker: "Analysis Report" / 파일명: YYYY-MM-DD-analysis-{slug}.html
+       Mermaid 다이어그램이 거의 항상 들어가므로 base.html 의 mermaid CDN 유지.
+-->
+
+<header class="report-header">
+  <span class="kicker">Analysis Report</span>
+  <h1>{{분석 대상}}</h1>
+  <p class="subtitle">{{현재 → 미래 한 줄 요약}}</p>
+  <div class="report-meta">
+    <span class="item"><span class="label">작성자</span> <strong>{{작성자}}</strong></span>
+    <span class="item"><span class="label">작성일</span> <strong>{{YYYY-MM-DD}}</strong></span>
+    <span class="item"><span class="label">상태</span> <span class="badge info">Draft</span></span>
+    <span class="item"><span class="label">대상</span> <strong>{{청중}}</strong></span>
+  </div>
+</header>
+
+<section id="tldr">
+  <div class="tldr">
+    <span class="label">TL;DR</span>
+    <p>{{전환 한 줄 요약 — "현재 X 구조를 Y 구조로 전환해 Z 문제를 해결한다"}}</p>
+  </div>
+</section>
+
+<section id="context">
+  <h2>1. 컨텍스트·목표</h2>
+  <p>{{왜 이 분석/전환이 필요한가. 비즈니스·운영·기술적 동기.}}</p>
+  <div class="callout info">
+    <svg class="callout-icon"><use href="#i-info"/></svg>
+    <div class="body">
+      <span class="title">전환 목표 한 줄</span>
+      <p>{{명시적 목표 문장. 예: "블라스트 반경을 조직 전체에서 프로젝트 단위로 축소한다."}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="as-is-to-be">
+  <h2>2. AS-IS → TO-BE</h2>
+  <div class="compare">
+    <div class="side as-is">
+      <h4>AS-IS · 현재 구조</h4>
+      <ul>
+        <li>{{현재 구조 핵심 1}}</li>
+        <li>{{현재 구조 핵심 2}}</li>
+        <li>{{현재 구조의 문제 1}}</li>
+        <li>{{현재 구조의 문제 2}}</li>
+      </ul>
+    </div>
+    <div class="arrow">→</div>
+    <div class="side to-be">
+      <h4>TO-BE · 목표 구조</h4>
+      <ul>
+        <li>{{새 구조 핵심 1}}</li>
+        <li>{{새 구조 핵심 2}}</li>
+        <li>{{개선되는 점 1}}</li>
+        <li>{{개선되는 점 2}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="impact">
+  <h2>3. 핵심 변화 KPI</h2>
+  <div class="grid cols-3">
+    <div class="stat">
+      <div class="label">{{지표 1}}</div>
+      <div class="value">{{값}}</div>
+      <div class="note">{{변화 설명}}</div>
+    </div>
+    <div class="stat">
+      <div class="label">{{지표 2}}</div>
+      <div class="value">{{값}}</div>
+      <div class="note">{{...}}</div>
+    </div>
+    <div class="stat">
+      <div class="label">{{지표 3}}</div>
+      <div class="value">{{값}}</div>
+      <div class="note">{{...}}</div>
+    </div>
+  </div>
+</section>
+
+<section id="architecture">
+  <h2>4. 아키텍처 다이어그램</h2>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart LR
+    A[{{입력}}] --> B[{{중간 처리}}]
+    B --> C[{{출력}}]
+    </div>
+    <div class="caption">그림 1. {{다이어그램 설명}}</div>
+  </div>
+</section>
+
+<section id="stack">
+  <h2>5. 기술 스택 선택</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>레이어</th>
+          <th>채택</th>
+          <th>대안</th>
+          <th>선택 이유</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{레이어 1}}</td>
+          <td><strong>{{채택안}}</strong></td>
+          <td>{{대안들}}</td>
+          <td>{{한 줄 근거}}</td>
+        </tr>
+        <tr>
+          <td>{{레이어 2}}</td>
+          <td><strong>{{채택안}}</strong></td>
+          <td>{{대안들}}</td>
+          <td>{{...}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout info">
+    <svg class="callout-icon"><use href="#i-info"/></svg>
+    <div class="body">
+      <span class="title">왜 {{핵심 선택}} 인가</span>
+      <p>{{탈락안과의 결정적 차이를 2~3문장으로}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="migration">
+  <h2>6. 전환 전략</h2>
+  <ol class="steps">
+    <li>
+      <div class="title">{{Phase 1 — 준비}}</div>
+      <div class="desc">{{사전 작업, 인벤토리, 권한 셋업}}</div>
+    </li>
+    <li>
+      <div class="title">{{Phase 2 — 파일럿}}</div>
+      <div class="desc">{{단일 프로젝트로 검증}}</div>
+    </li>
+    <li>
+      <div class="title">{{Phase 3 — 롤아웃}}</div>
+      <div class="desc">{{순차 확산}}</div>
+    </li>
+    <li>
+      <div class="title">{{Phase 4 — 안정화}}</div>
+      <div class="desc">{{모니터링, 운영 정착}}</div>
+    </li>
+  </ol>
+</section>
+
+<section id="risks">
+  <h2>7. 리스크 매트릭스</h2>
+  <div class="risk-grid">
+    <div class="axis"></div>
+    <div class="axis">확률 ↓</div>
+    <div class="axis">확률 ↔</div>
+    <div class="axis">확률 ↑</div>
+    <div class="axis">영향 ↑</div>
+    <div class="cell mid"></div>
+    <div class="cell high"><span class="item">{{고리스크 1}}</span></div>
+    <div class="cell high"><span class="item">{{고리스크 2}}</span></div>
+    <div class="axis">영향 ↔</div>
+    <div class="cell low"></div>
+    <div class="cell mid"><span class="item">{{중리스크 1}}</span></div>
+    <div class="cell mid"></div>
+    <div class="axis">영향 ↓</div>
+    <div class="cell low"><span class="item">{{저리스크}}</span></div>
+    <div class="cell low"></div>
+    <div class="cell mid"></div>
+  </div>
+</section>
+
+<section id="open">
+  <h2>8. 후속 작업·미해결</h2>
+  <div class="callout warn">
+    <svg class="callout-icon"><use href="#i-warn"/></svg>
+    <div class="body">
+      <span class="title">아직 결정되지 않은 것</span>
+      <ul>
+        <li>{{미해결 1}}</li>
+        <li>{{미해결 2}}</li>
+      </ul>
+    </div>
+  </div>
+  <details class="qa">
+    <summary>{{자주 나올 질문 1}}</summary>
+    <div><p>{{현재 답}}</p></div>
+  </details>
+  <details class="qa">
+    <summary>{{자주 나올 질문 2}}</summary>
+    <div><p>{{...}}</p></div>
+  </details>
+</section>
+
+<footer class="report-footer">
+  <span>{{보고서 제목}} · {{YYYY-MM-DD}}</span>
+  <span>v0.1 · {{작성자}}</span>
+</footer>

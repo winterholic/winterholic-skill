@@ -1,0 +1,8 @@
+artifacts/
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+
+# 공개 금지 — 도서 기반 2차적 저작물(로컬 전용). 동기화 시 재유입 차단.
+skills/writer/

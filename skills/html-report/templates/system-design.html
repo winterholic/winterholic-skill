@@ -1,0 +1,220 @@
+<!--
+  System Design / RFC 골격 — 새 기능·시스템 설계 문서
+  사용: templates/base.html 의 <main class="content"> 안에 옮긴다.
+       kicker: "System Design" 또는 "RFC-{번호}"
+       파일명: YYYY-MM-DD-design-{slug}.html
+-->
+
+<header class="report-header">
+  <span class="kicker">System Design · RFC</span>
+  <h1>{{설계 주제}}</h1>
+  <p class="subtitle">{{한 줄 요약}}</p>
+  <div class="report-meta">
+    <span class="item"><span class="label">작성자</span> <strong>{{작성자}}</strong></span>
+    <span class="item"><span class="label">작성일</span> <strong>{{YYYY-MM-DD}}</strong></span>
+    <span class="item"><span class="label">상태</span> <span class="badge info">Draft</span></span>
+    <span class="item"><span class="label">RFC</span> <strong>RFC-{{NN}}</strong></span>
+  </div>
+</header>
+
+<section id="tldr">
+  <div class="tldr">
+    <span class="label">TL;DR</span>
+    <p>{{설계 핵심 한 줄 — 무엇을 만들고, 어떻게 동작하는지}}</p>
+  </div>
+</section>
+
+<section id="motivation">
+  <h2>1. 동기·문제</h2>
+  <p>{{왜 이 시스템/기능이 필요한가. 현재 어떤 한계가 있는가.}}</p>
+  <div class="callout info">
+    <svg class="callout-icon"><use href="#i-info"/></svg>
+    <div class="body">
+      <span class="title">출발점</span>
+      <p>{{사용자/비즈니스 시나리오 1~2개로 구체화}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="goals">
+  <h2>2. 목표·비목표</h2>
+  <div class="proscons">
+    <div class="pros">
+      <h4>✓ Goals</h4>
+      <ul>
+        <li>{{달성 목표 1}}</li>
+        <li>{{달성 목표 2}}</li>
+        <li>{{달성 목표 3}}</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>✕ Non-Goals</h4>
+      <ul>
+        <li>{{명시적으로 배제하는 것 1}}</li>
+        <li>{{명시적으로 배제하는 것 2}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="requirements">
+  <h2>3. 요구사항</h2>
+  <h3>기능 요구사항</h3>
+  <ul>
+    <li>{{F1: 기능 요구 1}}</li>
+    <li>{{F2: 기능 요구 2}}</li>
+  </ul>
+  <h3>비기능 요구사항</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>항목</th><th>요구</th><th>측정 방법</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>응답시간 (p95)</td><td>{{<200ms}}</td><td>{{...}}</td></tr>
+        <tr><td>처리량</td><td>{{N RPS}}</td><td>{{...}}</td></tr>
+        <tr><td>가용성</td><td>{{99.9%}}</td><td>{{...}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="architecture">
+  <h2>4. 아키텍처</h2>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart LR
+    Client[Client] -->|HTTP| API[API Gateway]
+    API --> Service[{{Service}}]
+    Service --> DB[({{DB}})]
+    Service --> Cache[({{Cache}})]
+    Service --> Queue[[{{Queue}}]]
+    </div>
+    <div class="caption">그림 1. 시스템 구성</div>
+  </div>
+</section>
+
+<section id="data-model">
+  <h2>5. 데이터 모델</h2>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+erDiagram
+    USER ||--o{ ORDER : places
+    ORDER ||--|{ ORDER_ITEM : contains
+    USER {
+        bigint id PK
+        string email
+        timestamp created_at
+    }
+    ORDER {
+        bigint id PK
+        bigint user_id FK
+        string status
+        timestamp created_at
+    }
+    </div>
+    <div class="caption">그림 2. ER 다이어그램</div>
+  </div>
+
+  <h3>스키마 변경</h3>
+  <pre><span class="label">migration</span><code>CREATE TABLE {{table}} (
+  id        BIGSERIAL PRIMARY KEY,
+  user_id   BIGINT NOT NULL REFERENCES users(id),
+  status    VARCHAR(32) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_{{table}}_user ON {{table}}(user_id, created_at DESC);</code></pre>
+</section>
+
+<section id="api">
+  <h2>6. API 스펙</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Method</th><th>Path</th><th>설명</th><th>인증</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>POST</code></td><td><code>/v1/{{resource}}</code></td><td>{{생성}}</td><td>Bearer</td></tr>
+        <tr><td><code>GET</code></td><td><code>/v1/{{resource}}/{id}</code></td><td>{{조회}}</td><td>Bearer</td></tr>
+        <tr><td><code>PATCH</code></td><td><code>/v1/{{resource}}/{id}</code></td><td>{{수정}}</td><td>Bearer</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <pre><span class="label">POST /v1/{{resource}} (request)</span><code>{
+  "name": "string",
+  "amount": 1000
+}</code></pre>
+  <pre><span class="label">201 Created (response)</span><code>{
+  "id": 12345,
+  "name": "string",
+  "amount": 1000,
+  "createdAt": "2026-05-11T10:00:00Z"
+}</code></pre>
+</section>
+
+<section id="alternatives">
+  <h2>7. 대안 검토</h2>
+  <details class="qa">
+    <summary>대안 1: {{접근 방식 A}} — 왜 택하지 않았나</summary>
+    <div><p>{{장점과 거절 이유}}</p></div>
+  </details>
+  <details class="qa">
+    <summary>대안 2: {{접근 방식 B}}</summary>
+    <div><p>{{...}}</p></div>
+  </details>
+</section>
+
+<section id="security">
+  <h2>8. 보안·프라이버시</h2>
+  <div class="callout warn">
+    <svg class="callout-icon"><use href="#i-warn"/></svg>
+    <div class="body">
+      <span class="title">고려 사항</span>
+      <ul>
+        <li>{{인증·인가}}</li>
+        <li>{{민감 데이터 처리}}</li>
+        <li>{{Rate limiting / abuse prevention}}</li>
+        <li>{{감사 로그}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="rollout">
+  <h2>9. 단계별 롤아웃</h2>
+  <ol class="timeline">
+    <li class="item">
+      <div class="when">Phase 1 · Week 1-2</div>
+      <div class="title">{{Dark launch / Shadow read}}</div>
+      <div class="desc">{{...}}</div>
+    </li>
+    <li class="item">
+      <div class="when">Phase 2 · Week 3-4</div>
+      <div class="title">{{Feature flag canary 5%}}</div>
+      <div class="desc">{{...}}</div>
+    </li>
+    <li class="item">
+      <div class="when">Phase 3 · Week 5</div>
+      <div class="title">{{Full rollout}}</div>
+      <div class="desc">{{...}}</div>
+    </li>
+  </ol>
+</section>
+
+<section id="open">
+  <h2>10. 미해결 질문</h2>
+  <details class="qa">
+    <summary>{{Open Question 1}}</summary>
+    <div><p>{{현재 가설/논의 상태}}</p></div>
+  </details>
+  <details class="qa">
+    <summary>{{Open Question 2}}</summary>
+    <div><p>{{...}}</p></div>
+  </details>
+</section>
+
+<footer class="report-footer">
+  <span>{{보고서 제목}} · {{YYYY-MM-DD}}</span>
+  <span>RFC-{{NN}} v0.1 · {{작성자}}</span>
+</footer>

@@ -1,0 +1,4 @@
+# Codex harness config. Claude ignores this file.
+# 명시 호출 전용 — 컨텍스트에 자동 주입하지 않는다. $skills-estimate 로 호출.
+policy:
+  allow_implicit_invocation: false

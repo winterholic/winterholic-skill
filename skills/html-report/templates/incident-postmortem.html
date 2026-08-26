@@ -1,0 +1,204 @@
+<!--
+  Incident Postmortem 골격 — 장애 회고 (Blameless)
+  사용: templates/base.html 의 <main class="content"> 안에 옮긴다.
+       kicker: "Incident Postmortem" 또는 "INC-{번호}"
+       파일명: YYYY-MM-DD-incident-{slug}.html
+       Blameless 원칙: 사람 이름·역할 비판 금지. 시스템·프로세스 관점 서술.
+-->
+
+<header class="report-header">
+  <span class="kicker">Incident Postmortem</span>
+  <h1>INC-{{NNN}}: {{장애 한 줄 제목}}</h1>
+  <p class="subtitle">{{발생 시각 ~ 복구 시각 / 영향 한 줄}}</p>
+  <div class="report-meta">
+    <span class="item"><span class="label">작성자</span> <strong>{{작성자}}</strong></span>
+    <span class="item"><span class="label">발생</span> <strong>{{YYYY-MM-DD HH:mm}}</strong></span>
+    <span class="item"><span class="label">복구</span> <strong>{{YYYY-MM-DD HH:mm}}</strong></span>
+    <span class="item"><span class="label">심각도</span> <span class="badge danger">SEV-{{1|2|3}}</span></span>
+    <span class="item"><span class="label">상태</span> <span class="badge info">Postmortem Draft</span></span>
+  </div>
+</header>
+
+<section id="tldr">
+  <div class="tldr">
+    <span class="label">TL;DR</span>
+    <p>{{무엇이·언제·얼마나·어떻게 복구되었는지 1~2문장으로}}</p>
+  </div>
+</section>
+
+<section id="impact">
+  <h2>1. 심각도·영향</h2>
+  <div class="grid cols-3">
+    <div class="stat">
+      <div class="label">다운타임</div>
+      <div class="value">{{NN분}}</div>
+      <div class="note">{{시작 ~ 종료}}</div>
+    </div>
+    <div class="stat">
+      <div class="label">영향 사용자</div>
+      <div class="value">{{~N명}}</div>
+      <div class="note">{{전체 대비 비율}}</div>
+    </div>
+    <div class="stat">
+      <div class="label">데이터 손실</div>
+      <div class="value">{{0}}</div>
+      <div class="note">{{있다면 범위 명시}}</div>
+    </div>
+  </div>
+  <div class="callout danger">
+    <svg class="callout-icon"><use href="#i-danger"/></svg>
+    <div class="body">
+      <span class="title">비즈니스 영향 요약</span>
+      <p>{{매출·SLA·고객 컴플레인 등 정량 + 정성 영향}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="timeline">
+  <h2>2. 타임라인</h2>
+  <p class="u-small u-muted">모든 시각은 KST 24h 표기.</p>
+  <ol class="timeline">
+    <li class="item">
+      <div class="when">{{HH:mm}}</div>
+      <div class="title">{{이벤트 1 — 트리거 발생}}</div>
+      <div class="desc">{{무엇이 일어났나, 누가/무엇이 감지했나}}</div>
+    </li>
+    <li class="item warn">
+      <div class="when">{{HH:mm}}</div>
+      <div class="title">{{이벤트 2 — 첫 알람}}</div>
+      <div class="desc">{{알람 채널·내용}}</div>
+    </li>
+    <li class="item warn">
+      <div class="when">{{HH:mm}}</div>
+      <div class="title">{{이벤트 3 — 대응 시작}}</div>
+      <div class="desc">{{초기 가설·시도}}</div>
+    </li>
+    <li class="item danger">
+      <div class="when">{{HH:mm}}</div>
+      <div class="title">{{이벤트 4 — 영향 확대}}</div>
+      <div class="desc">{{...}}</div>
+    </li>
+    <li class="item done">
+      <div class="when">{{HH:mm}}</div>
+      <div class="title">{{이벤트 5 — 임시 완화}}</div>
+      <div class="desc">{{어떤 조치로 회복}}</div>
+    </li>
+    <li class="item done">
+      <div class="when">{{HH:mm}}</div>
+      <div class="title">{{이벤트 6 — 완전 복구}}</div>
+      <div class="desc">{{검증 후 종료}}</div>
+    </li>
+  </ol>
+</section>
+
+<section id="root-cause">
+  <h2>3. 근본 원인 (Root Cause)</h2>
+  <div class="callout danger">
+    <svg class="callout-icon"><use href="#i-danger"/></svg>
+    <div class="body">
+      <span class="title">한 줄 원인</span>
+      <p>{{기술적 근본 원인을 한 문장으로 명확히 — 시스템 관점, 사람 탓 금지}}</p>
+    </div>
+  </div>
+  <p>{{상세 설명 — 코드 변경, 트래픽 패턴, 환경 변화 등 어떻게 결합되어 장애가 되었나}}</p>
+</section>
+
+<section id="contributing">
+  <h2>4. 기여 요인 (Contributing Factors)</h2>
+  <div class="grid cols-2">
+    <div class="card">
+      <div class="card-kicker">Factor 1</div>
+      <h4>{{기여 요인 1}}</h4>
+      <p>{{근본 원인과 어떻게 결합되어 영향을 키웠나}}</p>
+    </div>
+    <div class="card">
+      <div class="card-kicker">Factor 2</div>
+      <h4>{{기여 요인 2}}</h4>
+      <p>{{...}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="what-worked">
+  <h2>5. 무엇이 잘 작동했나</h2>
+  <div class="callout success">
+    <svg class="callout-icon"><use href="#i-success"/></svg>
+    <div class="body">
+      <ul>
+        <li>{{알람·모니터링이 빠르게 감지}}</li>
+        <li>{{온콜 응답 시간 양호}}</li>
+        <li>{{롤백 절차가 매끄럽게 실행}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="what-failed">
+  <h2>6. 무엇이 못 작동했나</h2>
+  <div class="callout warn">
+    <svg class="callout-icon"><use href="#i-warn"/></svg>
+    <div class="body">
+      <ul>
+        <li>{{감지 시간 지연 사유}}</li>
+        <li>{{문서·런북 부재}}</li>
+        <li>{{영향 범위 추산이 늦었던 이유}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="actions">
+  <h2>7. 액션 아이템</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>분류</th><th>액션</th><th>담당</th><th>기한</th><th>티켓</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="badge danger">즉시</span></td><td>{{단기 액션 1}}</td><td>{{담당}}</td><td>{{YYYY-MM-DD}}</td><td><a href="#">JIRA-{{N}}</a></td></tr>
+        <tr><td><span class="badge warn">단기</span></td><td>{{단기 액션 2}}</td><td>{{담당}}</td><td>{{YYYY-MM-DD}}</td><td><a href="#">JIRA-{{N}}</a></td></tr>
+        <tr><td><span class="badge info">중기</span></td><td>{{중기 액션}}</td><td>{{담당}}</td><td>{{YYYY-MM-DD}}</td><td><a href="#">JIRA-{{N}}</a></td></tr>
+        <tr><td><span class="badge muted">장기</span></td><td>{{장기 액션}}</td><td>{{담당}}</td><td>{{YYYY-MM-DD}}</td><td><a href="#">JIRA-{{N}}</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="prevention">
+  <h2>8. 재발 방지 체크리스트</h2>
+  <ul class="checklist">
+    <li><input type="checkbox"><span>{{재발 방지 검증 1 — 예: 모니터링 알람 추가}}</span></li>
+    <li><input type="checkbox"><span>{{재발 방지 검증 2 — 예: 런북 작성}}</span></li>
+    <li><input type="checkbox"><span>{{재발 방지 검증 3 — 예: 카오스 테스트}}</span></li>
+    <li><input type="checkbox"><span>{{재발 방지 검증 4 — 예: 자동화된 회귀 테스트}}</span></li>
+  </ul>
+</section>
+
+<section id="five-whys">
+  <h2>9. 5 Whys (선택)</h2>
+  <details class="qa">
+    <summary>Why 1 — 왜 장애가 발생했나?</summary>
+    <div><p>{{...}}</p></div>
+  </details>
+  <details class="qa">
+    <summary>Why 2 — 왜 그 원인이 발생했나?</summary>
+    <div><p>{{...}}</p></div>
+  </details>
+  <details class="qa">
+    <summary>Why 3</summary>
+    <div><p>{{...}}</p></div>
+  </details>
+  <details class="qa">
+    <summary>Why 4</summary>
+    <div><p>{{...}}</p></div>
+  </details>
+  <details class="qa">
+    <summary>Why 5 — 근본 원인</summary>
+    <div><p>{{...}}</p></div>
+  </details>
+</section>
+
+<footer class="report-footer">
+  <span>INC-{{NNN}} Postmortem · {{YYYY-MM-DD}}</span>
+  <span>Blameless · {{작성자}}</span>
+</footer>

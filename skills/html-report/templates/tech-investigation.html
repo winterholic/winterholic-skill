@@ -1,0 +1,198 @@
+<!--
+  Tech Investigation 골격 — 옵션 비교·기술 선정 보고서
+  사용: templates/base.html 의 <main class="content"> 안에 옮긴다.
+       kicker: "Tech Investigation" 또는 "RFC: Library Selection"
+       파일명: YYYY-MM-DD-invest-{slug}.html
+-->
+
+<header class="report-header">
+  <span class="kicker">Tech Investigation</span>
+  <h1>{{검토 주제 — 예: 메시지 큐 라이브러리 선정}}</h1>
+  <p class="subtitle">{{선택할 옵션 N개 비교 → 결론 한 줄}}</p>
+  <div class="report-meta">
+    <span class="item"><span class="label">작성자</span> <strong>{{작성자}}</strong></span>
+    <span class="item"><span class="label">작성일</span> <strong>{{YYYY-MM-DD}}</strong></span>
+    <span class="item"><span class="label">상태</span> <span class="badge info">Draft</span></span>
+  </div>
+</header>
+
+<section id="tldr">
+  <div class="tldr">
+    <span class="label">TL;DR</span>
+    <p><strong>{{채택 결론}}</strong> 을 선택한다. 이유: {{핵심 근거 한 줄}}.</p>
+  </div>
+</section>
+
+<section id="problem">
+  <h2>1. 문제 정의</h2>
+  <p>{{무엇을 해결해야 하는가. 현재 어떤 한계가 있는가.}}</p>
+  <div class="callout note">
+    <svg class="callout-icon"><use href="#i-note"/></svg>
+    <div class="body">
+      <span class="title">결정 범위</span>
+      <p>{{이 검토에서 다루는 것·다루지 않는 것}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="criteria">
+  <h2>2. 평가 기준</h2>
+  <p>옵션 보기 전에 평가 기준과 가중치를 먼저 합의한다.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>기준</th><th class="num">가중치</th><th>측정 방법</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>{{기준 1 — 예: 성능}}</td><td class="num">×3</td><td>{{측정/판단 방법}}</td></tr>
+        <tr><td>{{기준 2 — 예: 운영 비용}}</td><td class="num">×2</td><td>{{...}}</td></tr>
+        <tr><td>{{기준 3 — 예: 학습 곡선}}</td><td class="num">×1</td><td>{{...}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="candidates">
+  <h2>3. 후보 옵션</h2>
+  <div class="grid cols-3">
+    <div class="card">
+      <div class="card-kicker">Option A</div>
+      <h4>{{옵션 A 이름}}</h4>
+      <p>{{특징·도입 사례·라이선스 등 한두 문장}}</p>
+    </div>
+    <div class="card">
+      <div class="card-kicker">Option B</div>
+      <h4>{{옵션 B}}</h4>
+      <p>{{...}}</p>
+    </div>
+    <div class="card">
+      <div class="card-kicker">Option C</div>
+      <h4>{{옵션 C}}</h4>
+      <p>{{...}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="compare">
+  <h2>4. 옵션 상세 비교</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>항목</th>
+          <th>{{Option A}}</th>
+          <th>{{Option B}}</th>
+          <th>{{Option C}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>{{기능 차이 1}}</td><td>{{A}}</td><td>{{B}}</td><td>{{C}}</td></tr>
+        <tr><td>{{기능 차이 2}}</td><td>{{A}}</td><td>{{B}}</td><td>{{C}}</td></tr>
+        <tr><td>운영 부담</td><td>{{A}}</td><td>{{B}}</td><td>{{C}}</td></tr>
+        <tr><td>커뮤니티</td><td>{{A}}</td><td>{{B}}</td><td>{{C}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="decision">
+  <h2>5. 결정 매트릭스</h2>
+  <p class="u-small u-muted">점수 1~5 × 가중치 = 환산 점수</p>
+  <div class="table-wrap">
+    <table class="decision">
+      <thead>
+        <tr>
+          <th>옵션</th>
+          <th class="num">{{기준1}} (×3)</th>
+          <th class="num">{{기준2}} (×2)</th>
+          <th class="num">{{기준3}} (×1)</th>
+          <th class="num">합계</th>
+          <th>판정</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="winner">
+          <td><strong>{{Option A}}</strong></td>
+          <td class="score">5 (15)</td>
+          <td class="score">4 (8)</td>
+          <td class="score">3 (3)</td>
+          <td class="score">26</td>
+          <td><span class="badge success">채택</span></td>
+        </tr>
+        <tr>
+          <td>{{Option B}}</td>
+          <td class="score">3 (9)</td>
+          <td class="score">5 (10)</td>
+          <td class="score">4 (4)</td>
+          <td class="score">23</td>
+          <td><span class="badge muted">차순위</span></td>
+        </tr>
+        <tr>
+          <td>{{Option C}}</td>
+          <td class="score">2 (6)</td>
+          <td class="score">2 (4)</td>
+          <td class="score">5 (5)</td>
+          <td class="score">15</td>
+          <td><span class="badge danger">탈락</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="tradeoffs">
+  <h2>6. 채택안의 트레이드오프</h2>
+  <div class="callout warn">
+    <svg class="callout-icon"><use href="#i-warn"/></svg>
+    <div class="body">
+      <span class="title">받아들이는 비용</span>
+      <p>{{채택안이 부담하는 단점·기술 부채를 솔직히 명시}}</p>
+    </div>
+  </div>
+  <div class="proscons">
+    <div class="pros">
+      <h4>✓ 장점</h4>
+      <ul><li>{{장점 1}}</li><li>{{장점 2}}</li></ul>
+    </div>
+    <div class="cons">
+      <h4>✕ 비용</h4>
+      <ul><li>{{비용 1}}</li><li>{{비용 2}}</li></ul>
+    </div>
+  </div>
+</section>
+
+<section id="rollout">
+  <h2>7. 도입 단계</h2>
+  <ol class="steps">
+    <li>
+      <div class="title">PoC</div>
+      <div class="desc">{{검증 범위와 성공 기준}}</div>
+    </li>
+    <li>
+      <div class="title">파일럿 적용</div>
+      <div class="desc">{{어느 모듈/서비스부터}}</div>
+    </li>
+    <li>
+      <div class="title">전사 확산</div>
+      <div class="desc">{{롤아웃 조건}}</div>
+    </li>
+  </ol>
+</section>
+
+<section id="future">
+  <h2>8. 향후 재검토 조건</h2>
+  <details class="qa">
+    <summary>언제 이 결정을 다시 돌아볼까?</summary>
+    <div>
+      <ul>
+        <li>{{재검토 트리거 1 — 예: 동시 처리량 N 초과 시}}</li>
+        <li>{{재검토 트리거 2}}</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<footer class="report-footer">
+  <span>{{보고서 제목}} · {{YYYY-MM-DD}}</span>
+  <span>v0.1 · {{작성자}}</span>
+</footer>

@@ -1,0 +1,139 @@
+<!--
+  Audit 골격 — 감사·점검 보고서
+  (마이그레이션 잔재 점검, 설정·권한 감사, 문서/코드 정합성 점검, 보안 셀프 점검 등)
+  사용: templates/base.html 의 <main class="content"> 안에 옮긴다.
+       kicker: "Audit Report"
+       파일명: YYYY-MM-DD-audit-{slug}.html
+
+  이 타입의 성격:
+  - "현재 상태를 기준에 대고 검사했더니 무엇이 나왔다"가 본문. 분석(analysis)의
+    AS-IS/TO-BE 격차 구조와 달리, 판정 기준 → 발견사항 목록 → 권고 조치가 뼈대.
+  - 발견사항은 반드시 심각도로 등급화하고, "발견 0건"인 영역도 명시한다
+    (검사 안 한 것과 이상 없는 것의 구분이 감사 보고서의 신뢰도다).
+  - 각 발견사항에 증거(파일 경로·명령 출력·설정값)를 붙인다. 증거 없는 지적은
+    발견이 아니라 의견이다.
+-->
+
+<header class="report-header">
+  <span class="kicker">Audit Report</span>
+  <h1>{{점검 대상 — 예: api.md 마이그레이션 잔재 점검}}</h1>
+  <p class="subtitle">{{무엇을 어떤 기준으로 점검했는지 한 줄}}</p>
+  <div class="report-meta">
+    <span class="item"><span class="label">작성자</span> <strong>{{작성자}}</strong></span>
+    <span class="item"><span class="label">점검일</span> <strong>{{YYYY-MM-DD}}</strong></span>
+    <span class="item"><span class="label">판정</span> <span class="badge warn">{{조치 필요 N건}}</span></span>
+    <span class="item"><span class="label">대상</span> <strong>{{독자}}</strong></span>
+  </div>
+</header>
+
+<section id="tldr">
+  <div class="tldr">
+    <span class="label">TL;DR</span>
+    <p>{{종합 판정 한두 문장 — 예: "점검 항목 12개 중 통과 9, 경고 2, 실패 1. 실패 1건(X)은 즉시 조치 필요."}}</p>
+  </div>
+</section>
+
+<section id="scope">
+  <h2>1. 점검 범위·기준</h2>
+  <p>{{무엇을 점검 대상에 넣고 뺐는지. 판정 기준(무엇이면 통과/경고/실패인지)을 먼저 고정한다.}}</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>영역</th><th>점검 항목</th><th>판정 기준</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>{{영역 1}}</td><td>{{무엇을 봤나}}</td><td>{{통과 조건}}</td></tr>
+        <tr><td>{{영역 2}}</td><td>{{...}}</td><td>{{...}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout note">
+    <svg class="callout-icon"><use href="#i-note"/></svg>
+    <div class="body">
+      <span class="title">점검하지 않은 것</span>
+      <p>{{의도적으로 범위에서 뺀 것과 이유 — 다음 감사 대상 후보}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="method">
+  <h2>2. 점검 방법</h2>
+  <p>{{어떻게 검사했는지 — 사용한 명령·스크립트·수동 확인 절차. 재현 가능해야 다음 감사 때 같은 기준으로 비교된다.}}</p>
+  <pre><code>{{사용한 점검 명령 (재현용)}}</code></pre>
+</section>
+
+<section id="summary">
+  <h2>3. 종합 결과</h2>
+  <div class="grid cols-3">
+    <div class="stat">
+      <div class="label">통과</div>
+      <div class="value">{{9}}</div>
+      <div class="note">이상 없음</div>
+    </div>
+    <div class="stat">
+      <div class="label">경고</div>
+      <div class="value">{{2}}</div>
+      <div class="note">조치 권장</div>
+    </div>
+    <div class="stat">
+      <div class="label">실패</div>
+      <div class="value">{{1}}</div>
+      <div class="note">즉시 조치</div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th>발견사항</th><th>영역</th><th>심각도</th><th>조치</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>F-1</td><td>{{발견 요약}}</td><td>{{영역}}</td><td><span class="badge danger">실패</span></td><td>{{한 줄}}</td></tr>
+        <tr><td>F-2</td><td>{{...}}</td><td>{{...}}</td><td><span class="badge warn">경고</span></td><td>{{...}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ▼ 발견사항 상세 — 발견 건수만큼 반복. 통과만 있으면 섹션 삭제하고 3번에 명시 -->
+<section id="findings">
+  <h2>4. 발견사항 상세</h2>
+
+  <h3>F-1. {{발견사항 1 제목}} <span class="badge danger">실패</span></h3>
+  <p>{{무엇이 기준을 어겼는지, 방치 시 어떤 문제가 생기는지.}}</p>
+  <pre><code>{{증거 — 파일 경로, 명령 출력, 설정값 등}}</code></pre>
+  <div class="callout info">
+    <svg class="callout-icon"><use href="#i-info"/></svg>
+    <div class="body">
+      <span class="title">권고 조치</span>
+      <p>{{구체적인 수정 방법}}</p>
+    </div>
+  </div>
+
+  <h3>F-2. {{발견사항 2 제목}} <span class="badge warn">경고</span></h3>
+  <p>{{...}}</p>
+</section>
+
+<section id="actions">
+  <h2>5. 권고 조치 목록</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>발견</th><th>조치</th><th>우선순위</th><th>담당</th><th>기한</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>F-1</td><td>{{조치}}</td><td><span class="badge danger">P0</span></td><td>{{담당}}</td><td>{{기한}}</td></tr>
+        <tr><td>F-2</td><td>{{조치}}</td><td><span class="badge warn">P1</span></td><td>{{담당}}</td><td>{{기한}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="next">
+  <h2>6. 다음 점검</h2>
+  <p>{{재점검 시기·조건, 이번에 범위에서 뺀 것 중 다음에 넣을 것.}}</p>
+</section>
+
+<footer class="report-footer">
+  <span>{{점검 대상}} · {{YYYY-MM-DD}}</span>
+  <span>v0.1 · {{작성자}}</span>
+</footer>

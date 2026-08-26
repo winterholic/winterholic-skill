@@ -1,0 +1,199 @@
+<!--
+  Task Plan 골격 — 받은 업무를 어떻게 할지 구상하는 보고서
+  사용: templates/base.html 을 복사한 뒤, 이 파일의 <main> 본문 섹션들을
+       base.html의 <main class="content"> 안으로 옮긴다.
+       kicker: "Task Plan" / 파일명: YYYY-MM-DD-plan-{slug}.html
+-->
+
+<header class="report-header">
+  <span class="kicker">Task Plan</span>
+  <h1>{{업무 제목}}</h1>
+  <p class="subtitle">{{한 줄 요약 — 무엇을 하는 작업인지}}</p>
+  <div class="report-meta">
+    <span class="item"><span class="label">작성자</span> <strong>{{작성자}}</strong></span>
+    <span class="item"><span class="label">작성일</span> <strong>{{YYYY-MM-DD}}</strong></span>
+    <span class="item"><span class="label">상태</span> <span class="badge info">Draft</span></span>
+    <span class="item"><span class="label">예상 기간</span> <strong>{{N주}}</strong></span>
+  </div>
+</header>
+
+<section id="tldr">
+  <div class="tldr">
+    <span class="label">TL;DR</span>
+    <p>{{접근 방향 한 줄 — "X 방식으로 N주 안에 ~를 한다"}}</p>
+  </div>
+</section>
+
+<section id="context">
+  <h2>1. 컨텍스트</h2>
+  <p>{{왜 이 업무가 들어왔는지, 어떤 배경에서 시작되는지}}</p>
+  <div class="callout note">
+    <svg class="callout-icon"><use href="#i-note"/></svg>
+    <div class="body">
+      <span class="title">전제 / 제약</span>
+      <ul>
+        <li>{{전제 1 — 예: 기존 API 호환성 유지}}</li>
+        <li>{{전제 2}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="scope">
+  <h2>2. 목표·비목표 (Scope)</h2>
+  <div class="proscons">
+    <div class="pros">
+      <h4>✓ 할 것 (In Scope)</h4>
+      <ul>
+        <li>{{목표 1}}</li>
+        <li>{{목표 2}}</li>
+        <li>{{목표 3}}</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>✕ 안 할 것 (Out of Scope)</h4>
+      <ul>
+        <li>{{비목표 1 — 의도적으로 제외하는 것}}</li>
+        <li>{{비목표 2}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="options">
+  <h2>3. 접근 옵션</h2>
+  <p>{{선택지가 여러 개 있는 경우, 각 옵션의 개요와 핵심 차이를 정리한다.}}</p>
+  <div class="grid cols-3">
+    <div class="card">
+      <div class="card-kicker">Option A</div>
+      <h4>{{옵션 A 이름}}</h4>
+      <p>{{한 줄 설명. 기술 선택, 작업 방식, 분할 전략 등.}}</p>
+    </div>
+    <div class="card">
+      <div class="card-kicker">Option B</div>
+      <h4>{{옵션 B 이름}}</h4>
+      <p>{{한 줄 설명.}}</p>
+    </div>
+    <div class="card">
+      <div class="card-kicker">Option C</div>
+      <h4>{{옵션 C 이름}}</h4>
+      <p>{{한 줄 설명.}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="decision">
+  <h2>4. 선택안 · 근거</h2>
+  <div class="callout info">
+    <svg class="callout-icon"><use href="#i-info"/></svg>
+    <div class="body">
+      <span class="title">선택: {{Option X}}</span>
+      <p>{{왜 이걸 선택했나 — 평가 기준에 가장 부합. 한 두 문장으로 압축.}}</p>
+    </div>
+  </div>
+  <div class="proscons">
+    <div class="pros">
+      <h4>✓ Pros</h4>
+      <ul>
+        <li>{{장점 1}}</li>
+        <li>{{장점 2}}</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>✕ Cons / 트레이드오프</h4>
+      <ul>
+        <li>{{단점 1 — 받아들이는 이유 명시}}</li>
+        <li>{{단점 2}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="steps">
+  <h2>5. 실행 단계</h2>
+  <ol class="steps">
+    <li>
+      <div class="title">{{Step 1 — 사전 준비}}</div>
+      <div class="desc">{{무엇을 검토·세팅하는지}}</div>
+    </li>
+    <li>
+      <div class="title">{{Step 2 — 핵심 구현 1}}</div>
+      <div class="desc">{{단계 산출물 명시 — 무엇이 끝났다고 볼 수 있는가}}</div>
+    </li>
+    <li>
+      <div class="title">{{Step 3 — 핵심 구현 2}}</div>
+      <div class="desc">{{...}}</div>
+    </li>
+    <li>
+      <div class="title">{{Step 4 — 검증·롤아웃}}</div>
+      <div class="desc">{{...}}</div>
+    </li>
+  </ol>
+</section>
+
+<section id="timeline">
+  <h2>6. 마일스톤</h2>
+  <ol class="timeline">
+    <li class="item">
+      <div class="when">Week 1</div>
+      <div class="title">{{마일스톤 1}}</div>
+      <div class="desc">{{산출물 또는 검증 기준}}</div>
+    </li>
+    <li class="item">
+      <div class="when">Week 2-3</div>
+      <div class="title">{{마일스톤 2}}</div>
+      <div class="desc">{{...}}</div>
+    </li>
+    <li class="item">
+      <div class="when">Week 4</div>
+      <div class="title">{{완료 기준 충족}}</div>
+      <div class="desc">{{...}}</div>
+    </li>
+  </ol>
+</section>
+
+<section id="risks">
+  <h2>7. 리스크·미해결 질문</h2>
+  <div class="risk-grid">
+    <div class="axis"></div>
+    <div class="axis">확률 ↓</div>
+    <div class="axis">확률 ↔</div>
+    <div class="axis">확률 ↑</div>
+    <div class="axis">영향 ↑</div>
+    <div class="cell mid"></div>
+    <div class="cell high"><span class="item">{{높은 리스크}}</span></div>
+    <div class="cell high"></div>
+    <div class="axis">영향 ↔</div>
+    <div class="cell low"></div>
+    <div class="cell mid"><span class="item">{{중간 리스크}}</span></div>
+    <div class="cell mid"></div>
+    <div class="axis">영향 ↓</div>
+    <div class="cell low"><span class="item">{{낮은 리스크}}</span></div>
+    <div class="cell low"></div>
+    <div class="cell mid"></div>
+  </div>
+
+  <details class="qa">
+    <summary>{{미해결 질문 1}}</summary>
+    <div><p>{{현재 가설 또는 결정 보류 사유}}</p></div>
+  </details>
+  <details class="qa">
+    <summary>{{미해결 질문 2}}</summary>
+    <div><p>{{...}}</p></div>
+  </details>
+</section>
+
+<section id="checklist">
+  <h2>8. 체크리스트</h2>
+  <ul class="checklist">
+    <li><input type="checkbox"><span>{{작업 항목 1}}</span></li>
+    <li><input type="checkbox"><span>{{작업 항목 2}}</span></li>
+    <li><input type="checkbox"><span>{{작업 항목 3}}</span></li>
+    <li><input type="checkbox"><span>완료 기준 점검 (테스트·코드리뷰·배포)</span></li>
+  </ul>
+</section>
+
+<footer class="report-footer">
+  <span>{{보고서 제목}} · {{YYYY-MM-DD}}</span>
+  <span>v0.1 · {{작성자}}</span>
+</footer>

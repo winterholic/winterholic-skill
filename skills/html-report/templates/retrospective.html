@@ -1,0 +1,159 @@
+<!--
+  Retrospective / Review 골격 — 회고·스프린트 리뷰
+  사용: templates/base.html 의 <main class="content"> 안에 옮긴다.
+       kicker: "Retrospective" / 파일명: YYYY-MM-DD-retro-{slug}.html
+       다이어그램이 거의 필요 없으므로 base.html 의 mermaid 스크립트 2줄 삭제 가능.
+-->
+
+<header class="report-header">
+  <span class="kicker">Retrospective</span>
+  <h1>{{회고 주제 — 예: 2026 Q2 스프린트 회고}}</h1>
+  <p class="subtitle">{{기간 · 범위 한 줄}}</p>
+  <div class="report-meta">
+    <span class="item"><span class="label">작성자</span> <strong>{{작성자}}</strong></span>
+    <span class="item"><span class="label">기간</span> <strong>{{YYYY-MM-DD ~ YYYY-MM-DD}}</strong></span>
+    <span class="item"><span class="label">팀</span> <strong>{{팀명}}</strong></span>
+  </div>
+</header>
+
+<section id="tldr">
+  <div class="tldr">
+    <span class="label">TL;DR</span>
+    <p>{{회고 한 줄 결론 — 가장 큰 학습·다음 액션}}</p>
+  </div>
+</section>
+
+<section id="scope">
+  <h2>1. 기간·범위</h2>
+  <div class="callout note">
+    <svg class="callout-icon"><use href="#i-note"/></svg>
+    <div class="body">
+      <p>{{이 회고가 다루는 작업 범위와 참여자}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="done">
+  <h2>2. 한 일</h2>
+  <ol class="timeline">
+    <li class="item done">
+      <div class="when">{{YYYY-MM-DD}}</div>
+      <div class="title">{{완료 항목 1}}</div>
+      <div class="desc">{{결과·산출물}}</div>
+    </li>
+    <li class="item done">
+      <div class="when">{{YYYY-MM-DD}}</div>
+      <div class="title">{{완료 항목 2}}</div>
+      <div class="desc">{{...}}</div>
+    </li>
+    <li class="item warn">
+      <div class="when">{{YYYY-MM-DD}}</div>
+      <div class="title">{{부분 완료}}</div>
+      <div class="desc">{{남은 작업과 사유}}</div>
+    </li>
+  </ol>
+</section>
+
+<section id="metrics">
+  <h2>3. 메트릭</h2>
+  <div class="grid cols-3">
+    <div class="stat">
+      <div class="label">{{지표 1 — 예: 배포 횟수}}</div>
+      <div class="value">{{값}}</div>
+      <span class="delta down">▼ {{변화}} (전 기간 대비)</span>
+    </div>
+    <div class="stat">
+      <div class="label">{{지표 2 — 예: 인시던트}}</div>
+      <div class="value">{{값}}</div>
+      <div class="note">{{...}}</div>
+    </div>
+    <div class="stat">
+      <div class="label">{{지표 3}}</div>
+      <div class="value">{{값}}</div>
+      <div class="note">{{...}}</div>
+    </div>
+  </div>
+</section>
+
+<section id="keep">
+  <h2>4. Keep — 잘된 점</h2>
+  <div class="callout success">
+    <svg class="callout-icon"><use href="#i-success"/></svg>
+    <div class="body">
+      <span class="title">{{잘 작동한 관행 1}}</span>
+      <p>{{왜 효과적이었는지 — 다음에도 유지할 이유}}</p>
+    </div>
+  </div>
+  <div class="callout success">
+    <svg class="callout-icon"><use href="#i-success"/></svg>
+    <div class="body">
+      <span class="title">{{잘 작동한 관행 2}}</span>
+      <p>{{...}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="problem">
+  <h2>5. Problem — 문제·아쉬운 점</h2>
+  <div class="callout warn">
+    <svg class="callout-icon"><use href="#i-warn"/></svg>
+    <div class="body">
+      <span class="title">{{문제 1}}</span>
+      <p>{{문제 상황 + 근본 원인 추정}}</p>
+    </div>
+  </div>
+  <div class="callout warn">
+    <svg class="callout-icon"><use href="#i-warn"/></svg>
+    <div class="body">
+      <span class="title">{{문제 2}}</span>
+      <p>{{...}}</p>
+    </div>
+  </div>
+</section>
+
+<section id="try">
+  <h2>6. Try — 시도해볼 것</h2>
+  <ol class="steps">
+    <li>
+      <div class="title">{{시도 1}}</div>
+      <div class="desc">{{언제까지 · 어떻게 검증할지}}</div>
+    </li>
+    <li>
+      <div class="title">{{시도 2}}</div>
+      <div class="desc">{{...}}</div>
+    </li>
+  </ol>
+</section>
+
+<section id="actions">
+  <h2>7. 액션 아이템</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>항목</th><th>담당</th><th>기한</th><th>상태</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>{{액션 1}}</td><td>{{담당자}}</td><td>{{YYYY-MM-DD}}</td><td><span class="badge info">예정</span></td></tr>
+        <tr><td>{{액션 2}}</td><td>{{담당자}}</td><td>{{YYYY-MM-DD}}</td><td><span class="badge warn">진행</span></td></tr>
+        <tr><td>{{액션 3}}</td><td>{{담당자}}</td><td>{{YYYY-MM-DD}}</td><td><span class="badge info">예정</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="insights">
+  <h2>8. 학습·인사이트</h2>
+  <details class="qa">
+    <summary>{{학습 1}}</summary>
+    <div><p>{{무엇을 배웠나·다음 행동에 어떻게 반영되나}}</p></div>
+  </details>
+  <details class="qa">
+    <summary>{{학습 2}}</summary>
+    <div><p>{{...}}</p></div>
+  </details>
+</section>
+
+<footer class="report-footer">
+  <span>{{회고 제목}} · {{YYYY-MM-DD}}</span>
+  <span>{{팀명}} · {{작성자}}</span>
+</footer>
