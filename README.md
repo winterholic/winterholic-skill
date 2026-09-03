@@ -248,8 +248,9 @@ winterholic-skill/
 - `html-report`: 마크다운보다 구조화된 HTML 문서가 필요할 때 쓰는 스킬. 템플릿 12종 — 결정·보고(작업계획서·분석·RFC·시스템설계·회고·postmortem), 지식(explainer·방법론·runbook 가이드), 증거(audit·실험결과).
 - `life-experts`: 돈, 세금, 법률, 건강, 커리어 같은 일상 의사결정 질문을 맞는 전문가 흐름으로 보내는 스킬.
 - `mcp-builder`: MCP 서버를 설계하거나 구현할 때 사용하는 제작용 스킬.
-- `skill-creator`: 새 스킬을 설계하고 문서화할 때 쓰는 스킬(내부 이름은 `claude-code-skill-optimizer`).
-- `skills-estimate`: 이미 만든 스킬의 완성도, 약점, 개선 포인트를 정량 평가하는 스킬.
+- `new-writer`: 캐주얼·개발자·비즈니스 한국어를 교정·대필·작성하고, 번역체와 AI 지문은 걷어내되 사용자의 말투는 보존하는 스킬.
+- `skill-creator`: 새 스킬을 설계하거나 기존 스킬을 고도화하고, 번들 구성과 기계 검사를 함께 다루는 스킬.
+- `skills-estimate`: 이미 만든 스킬을 14항목 rubric으로 채점하고, 약점 Top 3와 보강 위치를 제시하는 스킬.
 - `stock-experts`: 주식, 투자, 종목 분석 질문을 적절한 투자 분석 흐름으로 라우팅하는 스킬.
 - `systematic-debugging`: 같은 버그를 반복해서 잡을 때 근본 원인 조사 순서를 강제하는 디버깅 스킬.
 - `test-driven-development`: 구현 전에 테스트 관점부터 세우도록 유도하는 TDD 스킬.
@@ -593,7 +594,7 @@ winterholic-skill/
 ### 직접 제작 (winterholic 자작)
 
 - 4대 전문가 팩 전체 (`dev-experts-skills` 93폴더 · `life-experts-skills` 37폴더 · `stock-experts-skills` 22폴더 · `biz-experts-skills` 52폴더) 및 글로벌 디스패처 4종
-- `handoff`, `harness-engineering`, `html-report`, `skills-estimate`
+- `handoff`, `harness-engineering`, `html-report`, `new-writer`, `skills-estimate`
 - `code-walkthrough`, `caveman`, `ui-refine-loop`
 - 워크플로우 스킬: `lite-research`, `senior-review`, `senior-detail-reviewer`, `senior-loop-developer`, `spar`
 - `pr-review`, `self-review` (한국어 작업본 — 다만 `imported-sub-skills/`에 동명 스냅샷이 함께 있어, 일부가 외부 출처에서 출발했는지는 **확인 필요**)
@@ -607,7 +608,7 @@ winterholic-skill/
 
 - `docx`, `pdf`, `pptx`, `xlsx`
 
-- `skill-creator` → 한국어로 개작하고 이름을 `claude-code-skill-optimizer`로 바꾼 **수정본**
+- `skill-creator` → 한국어 환경과 로컬 검증 흐름에 맞게 크게 개작한 **수정본**
   
   https://github.com/anthropics/skills
 

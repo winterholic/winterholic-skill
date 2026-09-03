@@ -1,0 +1,4 @@
+interface:
+  display_name: "New Writer"
+  short_description: "실제로 쓰는 한국어 글을 자연스럽게 다듬습니다"
+  default_prompt: "내 한국어 글을 독자와 용도에 맞게 다듬어 주세요. 번역체와 AI 티는 걷어내되 제 말투는 지켜 주세요."
