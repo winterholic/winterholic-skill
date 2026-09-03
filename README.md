@@ -240,6 +240,7 @@ winterholic-skill/
 
 ### 8-1. `skills/`에 있는 글로벌 스킬
 
+- `agentic-architecture`: LLM 에이전트 시스템의 아키텍처·RAG·도구·평가·보안·비용·내구성을 설계하고 증상을 진단하는 스킬.
 - `biz-experts`: 기획·디자인·마케팅·전략·운영 같은 비개발 직군 작업을 받아서 맞는 비즈 전문가 흐름으로 라우팅하는 진입점(디스패처) 스킬.
 - `dev-experts`: 개발 작업 전반을 받아서 맞는 개발 전문가 흐름으로 라우팅하는 진입점(디스패처) 스킬.
 - `find-skills`: 지금 문제를 해결할 다른 스킬이 있는지 찾고, 설치·확장 방향을 제안하는 스킬.
@@ -594,7 +595,7 @@ winterholic-skill/
 ### 직접 제작 (winterholic 자작)
 
 - 4대 전문가 팩 전체 (`dev-experts-skills` 93폴더 · `life-experts-skills` 37폴더 · `stock-experts-skills` 22폴더 · `biz-experts-skills` 52폴더) 및 글로벌 디스패처 4종
-- `handoff`, `harness-engineering`, `html-report`, `new-writer`, `skills-estimate`
+- `agentic-architecture`, `handoff`, `harness-engineering`, `html-report`, `new-writer`, `skills-estimate`
 - `code-walkthrough`, `caveman`, `ui-refine-loop`
 - 워크플로우 스킬: `lite-research`, `senior-review`, `senior-detail-reviewer`, `senior-loop-developer`, `spar`
 - `pr-review`, `self-review` (한국어 작업본 — 다만 `imported-sub-skills/`에 동명 스냅샷이 함께 있어, 일부가 외부 출처에서 출발했는지는 **확인 필요**)

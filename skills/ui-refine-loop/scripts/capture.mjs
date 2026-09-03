@@ -6,7 +6,8 @@
  *     --out .ui-refine/round-0 [--config .ui-refine.json] [--calibrate]
  *
  * 산출물 (--out 아래):
- *   plain/<id>.png     원본        — 픽셀 diff·회귀 판정용
+ *   experience/<id>.png 실제 사용 단서 보존 — 시각 비평용
+ *   plain/<id>.png     안정화 원본 — 회귀 판정용
  *   badged/<id>.png    번호 배지본 — 비평가 첨부용
  *   measure/<id>.json  1b 측정 + 요소 번호→셀렉터 매핑
  *   summary.json       라운드 점수 카운트 + 불변식 재료
@@ -115,11 +116,18 @@ for (const route of routes) {
         await applyLongKoText(page);
         await page.goto(new URL(route, args.url).href, { waitUntil: 'networkidle' });
       }
-      await stabilize(page);
-
       // 스킴·미디어가 id 에 없으면 다른 조건의 샷이 서로를 덮어쓴다.
       const mediaTag = `${scheme === 'light' ? '' : `__${scheme}`}${media === 'screen' ? '' : `__${media}`}`;
       const id = `${route.replace(/[^\w]/g, '_')}__${vp.name}__${state}${mediaTag}`;
+
+      // 사용자 경험 캡처는 스크롤바·포커스 등 affordance를 숨기는 회귀 안정화 CSS보다 먼저 찍는다.
+      // 지연 이미지와 폰트만 준비해 "아직 안 뜬 화면"을 사용자 경험으로 오인하지 않게 한다.
+      await prepareExperience(page);
+      await mkdir(join(args.out, 'experience'), { recursive: true });
+      await page.screenshot({ path: join(args.out, 'experience', `${id}.png`),
+                              animations: 'disabled', caret: 'initial', scale: 'css',
+                              fullPage: !!config.fullPage });
+      await stabilize(page);
 
       // page.evaluate 의 문자열은 표현식으로 평가된다. 함수 선언문을 넣으려면 IIFE 로 감싼다.
       const inBrowser = (call) => `(() => { ${source}\nreturn ${call}; })()`;
@@ -211,7 +219,9 @@ await browser.close();
 // 사전식 비교용 카운트. 집계 축은 캡처 세트 전체 합 — 화면별 벡터면 A가 좋아지고 B가
 // 나빠질 때 비교가 성립하지 않는다. 토큰 수정이 전역에 퍼지므로 세트 합이어야 한다.
 const summary = {
+  schemaVersion: 2,
   capturedAt: null, // 워크플로 스크립트에서 시각을 주입한다
+  environment: { kind: config.environment || 'local', baseUrl: args.url },
   scale: Object.fromEntries(scaleByVp),
   // 판정 종류를 늘리면 여기와 score.mjs 의 ORDER 를 함께 고친다.
   // 한쪽만 고치면 새 지표가 점수에 반영되지 않아 조용히 무시된다.
@@ -270,6 +280,38 @@ if (emptyShots.length) {
 
 function sum(rs, kind) {
   return rs.reduce((a, r) => a + (r.counts[kind] || 0), 0);
+}
+
+async function prepareExperience(page) {
+  for (const frame of page.frames()) {
+    try {
+      await frame.evaluate(async () => {
+        const scrollers = [document.scrollingElement, ...document.querySelectorAll('*')].filter((el) => {
+          if (!el) return false;
+          const cs = getComputedStyle(el);
+          return el === document.scrollingElement ||
+            (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight + 8);
+        });
+        for (const el of scrollers) {
+          const h = el.clientHeight || 600;
+          for (let y = 0; y <= el.scrollHeight; y += h) {
+            el.scrollTop = y;
+            await new Promise((r) => setTimeout(r, 40));
+          }
+          el.scrollTop = 0;
+        }
+        const imgs = [...document.querySelectorAll('img')];
+        for (const img of imgs) {
+          img.loading = 'eager';
+          if (img.dataset.src && !img.src) img.src = img.dataset.src;
+        }
+        await Promise.all(imgs.map((img) =>
+          (img.complete && img.naturalWidth ? null : img.decode().catch(() => {}))));
+        await document.fonts?.ready;
+      });
+    } catch { /* 교차 출처 프레임은 collectPage가 blind spot으로 보고한다 */ }
+  }
+  await page.waitForTimeout(100);
 }
 
 /** 캡처 아티팩트 제거 — 3층이 이 단계를 참조한다. 여기가 비면 중재자가 판단으로 떠안는다. */

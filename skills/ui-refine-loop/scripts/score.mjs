@@ -57,25 +57,22 @@ function clsBand(v) {
 }
 
 const args = parseArgs(process.argv.slice(2));
+if (args.help) {
+  console.log('usage: score.mjs --prev <round-dir> --next <round-dir> [--resolved N] [--self-test]');
+  process.exit(0);
+}
+if (args['self-test']) runSelfTest();
+if (!args.prev || !args.next) {
+  console.error('usage: score.mjs --prev <round-dir> --next <round-dir> [--resolved N]');
+  process.exit(2);
+}
 const prev = JSON.parse(await readFile(join(args.prev, 'summary.json'), 'utf8'));
 const next = JSON.parse(await readFile(join(args.next, 'summary.json'), 'utf8'));
 
-const violations = checkInvariants(prev, next, Number(args['pixel-budget'] ?? 0.02));
+const schemaErrors = [...validateSummary(prev, 'prev'), ...validateSummary(next, 'next')];
+if (schemaErrors.length) emit({ verdict: 'reject-invariant', violations: schemaErrors }, 2);
 
-/**
- * ⚠️ **불변식이 조용히 건너뛰어지면 안 된다.** 픽셀 diff 와 Feature Congestion 은 `!= null`
- *    가드 뒤에 있는데 `summary.json` 에 그 필드를 넣는 경로가 없어서 **4종 중 2종이 늘 스킵**됐다.
- *    "화면을 갈아엎지 못하게 한다"는 방어선이 문서에만 있던 셈이다. 고칠 때까지 최소한 침묵은 없앤다.
- */
-const skipped = [];
-if (next.pixelDiffRatio == null) skipped.push('픽셀 diff 상한 — summary 에 pixelDiffRatio 가 없다');
-if (prev.featureCongestion == null || next.featureCongestion == null) {
-  skipped.push('Feature Congestion 급락 — summary 에 featureCongestion 이 없다');
-}
-if (skipped.length) {
-  console.error(`⚠️ 불변식 ${skipped.length}종이 재료 부족으로 검사되지 않았다:\n   - ${skipped.join('\n   - ')}`);
-  console.error('   이 라운드는 「화면을 갈아엎었는가」를 검사하지 못했다. 사람이 스크린샷을 봐야 한다.');
-}
+const violations = checkInvariants(prev, next, Number(args['pixel-budget'] ?? 0.02));
 if (violations.length) {
   emit({ verdict: 'reject-invariant', violations }, 2);
 }
@@ -138,14 +135,21 @@ function checkInvariants(a, b, pixelBudget) {
   if (b.invariants.textHash !== a.invariants.textHash) {
     v.push('텍스트 콘텐츠 해시 변경 — 수정이 문구를 건드렸다');
   }
-  if (b.pixelDiffRatio != null && b.pixelDiffRatio > pixelBudget) {
-    v.push(`픽셀 diff ${b.pixelDiffRatio} > 상한 ${pixelBudget} — 한 라운드가 화면을 갈아엎었다`);
+  const captureKey = (s) => JSON.stringify(s.shots.map(({ route, viewport, state, colorScheme, media }) =>
+    ({ route, viewport, state, colorScheme, media })));
+  if (captureKey(a) !== captureKey(b)) v.push('캡처 세트 변경 — 같은 라우트·뷰포트·상태가 아니다');
+  return v;
+}
+
+function validateSummary(s, label) {
+  const v = [];
+  if (s?.schemaVersion !== 2) v.push(`${label}: summary schemaVersion 2가 필요하다`);
+  if (!s?.counts || typeof s.counts !== 'object') v.push(`${label}: counts 누락`);
+  if (!s?.invariants || !Number.isFinite(s.invariants.domNodeCount) || typeof s.invariants.textHash !== 'string') {
+    v.push(`${label}: invariants.domNodeCount/textHash 누락`);
   }
-  // Feature Congestion 급락 = 요소 소실 신호. 절대 판정선이 없으므로 델타로만 쓴다.
-  if (a.featureCongestion != null && b.featureCongestion != null &&
-      b.featureCongestion < a.featureCongestion * 0.7) {
-    v.push(`Feature Congestion 급락 ${a.featureCongestion} → ${b.featureCongestion}`);
-  }
+  if (!Array.isArray(s?.shots) || s.shots.length === 0) v.push(`${label}: shots 누락 또는 빈 배열`);
+  if (s?.emptyShots?.length) v.push(`${label}: 빈 화면이 포함되어 점수 비교 불가`);
   return v;
 }
 
@@ -166,9 +170,24 @@ function diffCounts(a, b) {
 }
 
 function emit(obj, code) {
-  if (skipped.length) obj.invariantsSkipped = skipped;
   console.log(JSON.stringify(obj, null, 2));
   process.exit(code);
+}
+
+function runSelfTest() {
+  const shot = { route: '/', viewport: '360', state: 'default', colorScheme: 'light', media: 'screen' };
+  const base = { schemaVersion: 2, counts: { overflow: 1 }, cls: 0,
+    invariants: { domNodeCount: 30, textHash: 'same' }, shots: [shot], emptyShots: [] };
+  const cases = [
+    ['valid', validateSummary(base, 'x').length === 0],
+    ['schema-missing', validateSummary({ ...base, schemaVersion: undefined }, 'x').length === 1],
+    ['empty-shot', validateSummary({ ...base, emptyShots: ['x'] }, 'x').length === 1],
+    ['dom-regression', checkInvariants(base, { ...base, invariants: { ...base.invariants, domNodeCount: 29 } }, 0.02).length === 1],
+    ['capture-drift', checkInvariants(base, { ...base, shots: [{ ...shot, viewport: '1440' }] }, 0.02).length === 1],
+  ];
+  const failed = cases.filter(([, ok]) => !ok);
+  for (const [name, ok] of cases) console.log(`${ok ? 'PASS' : 'FAIL'} ${name}`);
+  process.exit(failed.length ? 1 : 0);
 }
 
 function parseArgs(argv) {
