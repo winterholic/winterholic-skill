@@ -1,0 +1,56 @@
+[
+  {
+    "id": "dev-repeat-fastapi-422",
+    "prompt": "FastAPI 422가 여전히 나. 또 모델을 바꿔야 해?",
+    "primary": "systematic-debugging",
+    "preflight": "요청 payload, validation error body, 실행 경로를 재현한 뒤 dev-fastapi 적합성을 확인한다.",
+    "forbidden_shortcuts": ["사용자 원인 추정을 사실로 확정", "모델부터 재수정"],
+    "verification": "동일 요청의 재현 실패와 회귀 테스트",
+    "source": "work-history 반복 수정·가설 기각 사례"
+  },
+  {
+    "id": "dev-local-pass-deploy-stale",
+    "prompt": "로컬 테스트는 통과했는데 배포 후에는 옛 동작이 보여.",
+    "primary": "dev-cicd",
+    "preflight": "대상 환경의 배포 버전, artifact, 프로세스 health를 관찰한다.",
+    "forbidden_shortcuts": ["코드 재수정", "로컬 테스트 통과를 운영 검증으로 간주"],
+    "verification": "대상 환경 버전과 수정 동작을 직접 확인",
+    "source": "work-history 빌드 통과 후 실환경 미검증 사례"
+  },
+  {
+    "id": "dev-ui-vague",
+    "prompt": "화면이 답답하고 패딩이 이상해. 알아서 고쳐줘.",
+    "primary": "ui-refine-loop",
+    "preflight": "현재 렌더 화면을 캡처하고 밀도·위계·정렬 가설을 분리한다.",
+    "forbidden_shortcuts": ["dev-react가 코드부터 수정", "padding 문제로 단정"],
+    "verification": "동일 viewport 재캡처와 desktop/mobile 회귀",
+    "source": "work-history UI 느낌과 실제 원인 불일치 사례"
+  },
+  {
+    "id": "dev-slow-api-hypothesis",
+    "prompt": "API가 너무 많아서 느린 것 같아.",
+    "primary": "dev-performance",
+    "preflight": "프로파일·네트워크·쿼리 시간을 측정해 병목 층을 판별한다.",
+    "forbidden_shortcuts": ["API 수를 원인으로 확정", "전문가 여러 명 동시 호출"],
+    "verification": "변경 전후 같은 부하의 latency profile",
+    "source": "work-history 사용자 가설 반증 사례"
+  },
+  {
+    "id": "dev-stock-boundary",
+    "prompt": "삼성전자 지금 사도 돼?",
+    "primary": "stock-experts",
+    "preflight": "개발 작업이 아님을 확인한다.",
+    "forbidden_shortcuts": ["dev-data-analysis 호출"],
+    "verification": "dev 팩 경계 밖으로 라우팅",
+    "source": "경계 회귀"
+  },
+  {
+    "id": "dev-unknown-stack",
+    "prompt": "카탈로그에 없는 새 런타임으로 서비스 구조를 잡아줘.",
+    "primary": "fallback",
+    "preflight": "실제 설치 버전과 공식 문서를 확인하고 가장 가까운 원칙만 빌린다.",
+    "forbidden_shortcuts": ["존재하지 않는 전문가 경로 생성"],
+    "verification": "폴백과 확인 필요 항목 명시",
+    "source": "dead-path·가상 전문가 회귀"
+  }
+]

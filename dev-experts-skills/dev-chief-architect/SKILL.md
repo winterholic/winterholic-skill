@@ -1,6 +1,6 @@
 ---
 name: dev-chief-architect
-description: "개발 전문가 스킬군의 수석 아키텍트 라우터. 개발 작업을 받아 어떤 전문가 스킬을 조합 호출할지 결정하고, 상충하는 권고를 조율해 하나의 실행 방침으로 만들 때 사용. 스택이 특정되지 않은 일반 개발 요청('이 기능 구현해줘', 'API 만들어줘', '왜 느리지'), 여러 축이 얽힌 작업(API+DB+테스트), 설계 방향 결정, 기술 선택 비교('A vs B', '뭐 쓸까'), '어떤 전문가가 필요한지' 같은 라우팅 질문에 트리거. 다음에는 사용하지 않는다 — ① 스택·방법이 이미 명확한 작업(예: 'FastAPI 의존성 주입', 'pytest fixture')은 해당 전문가 직행 ② 디버깅 절차 자체는 글로벌 systematic-debugging ③ 주식 투자 분석·판단은 stock-experts ④ 문서 산출물(pptx/pdf/xlsx/docx)은 해당 sub-skills. 이 스킬군은 C:\\Users\\user\\.claude\\sub-skills\\dev-experts\\ 전용 폴더에 있으며 자동 로드되지 않는다."
+description: "개발 전문가 스킬군의 수석 아키텍트 라우터. 스택이 특정되지 않았거나 여러 축이 얽힌 구현·설계·기술 선택에서 무게중심 전문가와 검증 경로를 정한다. 단일 스택 작업은 해당 전문가로 직행하고, 반복 디버깅 절차는 systematic-debugging이 먼저다. 전용 폴더 C:\\Users\\user\\.claude\\dev-experts-skills\\는 자동 로드되지 않는다."
 ---
 
 # dev-chief-architect — 수석 아키텍트 라우터 / 오케스트레이터
@@ -30,19 +30,21 @@ description: "개발 전문가 스킬군의 수석 아키텍트 라우터. 개�
 
 ## 라우팅 절차
 
-1. **작업 분해** — 4축으로 본다: **언어**(python/ts/java...) × **프레임워크·도메인**(fastapi/react/postgres/docker...) × **방법론**(tdd/ddd/refactoring... — 작업 *방식*) × **품질**(testing/security/performance... — 작업 *검증*).
-2. **상태 확인** — README 카탈로그에서 후보 전문가의 상태(✅/⬜) 확인. **⬜(미제작)이면 Read 시도하지 않고** 일반 지식 + 공식 문서로 그 축을 채우되, 폴백 사실을 한 줄로 알린다. 확인 명령:
+1. **증거와 경계 고정** — `목표·증상 / 직접 관측 / 가설과 반증 조건 / 범위·비범위 / 불변식 / 완료 조건`을 route capsule로 만든다. 반복 오류면 systematic-debugging의 재현과 실행 경로를 먼저 받는다.
+2. **작업 분해** — **언어** × **프레임워크·도메인** × **방법론** × **품질**로 보되, 사용자가 말한 기술명이 아니라 성패를 가르는 축을 찾는다.
+3. **상태 확인** — README에서 후보를 찾은 뒤 실제 `SKILL.md` 존재를 확인한다. 표에 없거나 파일이 없으면 Read를 시도하지 않고 일반 지식 + 최신 공식 문서로 그 축만 채운다. 확인 명령:
    ```
-   Grep: pattern="dev-<후보이름>" path="~/.claude\sub-skills\dev-experts\README.md" output_mode="content"
+   Grep: pattern="dev-<후보이름>" path="~/.claude\dev-experts-skills\README.md" output_mode="content"
    ```
    표에 없는 작업의 후보 탐색과 과거 삽질 검색:
    ```
-   Grep: pattern="<작업 키워드>" path="~/.claude\sub-skills\dev-experts\dev-chief-architect\references\routing-matrix.md" output_mode="content"
-   Grep: pattern="<에러·증상 키워드>" path="~/.claude\sub-skills\dev-experts\troubleshooting\ledger.md" output_mode="content"
+   Grep: pattern="<작업 키워드>" path="~/.claude\dev-experts-skills\dev-chief-architect\references\routing-matrix.md" output_mode="content"
+   Grep: pattern="<에러·증상 키워드>" path="~/.claude\dev-experts-skills\troubleshooting\ledger.md" output_mode="content"
    ```
-3. **전문가 선정** — 아래 라우팅 표로 1~3명. 모든 축을 다 채우려 하지 말 것 — 작업의 무게중심 축부터.
-4. **호출** — 선정한 전문가의 `SKILL.md`를 Read해 그 매뉴얼(워크플로우·안티패턴·검증 명령)대로 작업.
-5. **조율·방침** — 권고가 갈리면 아래 충돌 조율 규칙으로 통합. 결론은 실행 순서가 있는 방침으로.
+4. **전문가 선정** — 주도 1명을 먼저 부른다. 보강 전문가는 주도 결과가 요구하는 게이트에서만 순차 추가한다. 처음부터 3명을 채우지 않는다.
+5. **적합성 핸드셰이크** — 후보 SKILL의 `언제 발동 / 경계`를 route capsule과 대조한다. `ACCEPT: 책임질 결정`이면 진행하고, `REROUTE: 어긋난 경계 + 다음 후보`면 즉시 교체한다. 직행 호출도 예외가 아니다.
+6. **호출** — route capsule을 보존해 선정 전문가의 매뉴얼대로 작업한다.
+7. **조율·검증·receipt** — README의 공통 실행 계약과 검증 사다리로 닫는다. 권고를 한 실행 순서로 통합하고, 실제 변경 표면을 직접 확인하며 미검증 층을 명시한다.
 
 ## 라우팅 표 (작업 성격 → 전문가)
 
@@ -62,12 +64,12 @@ description: "개발 전문가 스킬군의 수석 아키텍트 라우터. 개�
 | "외부 API 연동" | dev-api-integration | dev-error-logging |
 | "봇/알림/스케줄 작업" | dev-bot-building, dev-cron-scheduling | dev-notification |
 | "CCTV/영상 처리" | dev-computer-vision, dev-media-ffmpeg | dev-iot-raspberry |
-| "LLM 앱/에이전트 설계" | dev-llm-engineering | (API 세부는 글로벌 claude-api) |
+| "LLM 앱/에이전트 설계" | dev-llm-engineering | 공급자 API 세부는 설치된 전용 스킬이 있을 때만 위임, 없으면 공식 문서 |
 | "아키텍처 어떻게/MSA 갈까" | dev-msa (모놀리스 먼저 원칙) | dev-ddd, dev-system-design |
 | "기술 선택 비교 (A vs B)" | 라우터가 직접 — 비교 프레임 §아래 | 해당 도메인 전문가 1 |
 | "막연한 요청 ('뭔가 만들어줘')" | 목적·제약 먼저 1회 질문 | — |
 
-> 표에 없는 작업: README 카탈로그(93종)를 grep해 가장 가까운 전문가를 고른다. 없으면 폴백(일반 지식 + 공식 문서) 선언.
+> 표에 없는 작업: README와 파일시스템을 검색한다. 이름을 추측하지 않는다. 없으면 폴백(일반 지식 + 공식 문서) 선언.
 
 ## 충돌 조율 규칙
 
@@ -96,11 +98,14 @@ description: "개발 전문가 스킬군의 수석 아키텍트 라우터. 개�
 ```
 ## [작업명] 작업 방침 (chief-architect)
 ### 작업 분해: 언어 / 프레임워크·도메인 / 방법론 / 품질
+### Route capsule: 목표·증상 / 관측 / 가설·반증 / 범위·비범위 / 불변식 / 완료 확인
 ### 호출 전문가: [n명] + 선정 이유 (⬜ 폴백 있으면 명시)
+### 적합성: ACCEPT 책임질 결정 / REROUTE했다면 이유와 교체 후보
 ### 전문가별 핵심 권고:
   - [전문가]: 권고 + 핵심 근거 + 전제
 ### 조율: 충돌 지점과 해소 (단계 분리·전제 차이·YAGNI 게이트)
-### 실행 방침: 순서 있는 단계 1~5 + 각 단계의 검증 명령
+### 실행 방침: 순서 있는 단계 1~5 + 변경 표면별 검증
+### Execution receipt: 관측 증거 / 검증 결과 / 미검증 표면 / 남은 가설·학습 후보
 ### 리스크·확인 필요
 ```
 
@@ -125,7 +130,7 @@ description: "개발 전문가 스킬군의 수석 아키텍트 라우터. 개�
 
 방침 저장 규칙: 방침은 인라인 출력이 기본. 파일로 남길 때 — 프로젝트 작업이면 그 프로젝트의 `docs/` (ADR 형식, 기존 파일 덮어쓰기 금지·새 파일), 프로젝트 밖 구상·대형 계획이면 html-report 스킬로 위임. **이 라우터 폴더에는 저장하지 않는다.**
 
-> 공통 규칙(우선순위 사다리·버전 라벨·트러블슈팅 ledger·Quick Start)은 `../README.md`를 따른다.
+> 공통 실행 계약(적합성 핸드셰이크·검증 사다리·Execution receipt)과 우선순위 규칙은 `../README.md`를 따른다.
 
 ## 실전 케이스 — Knight Capital (2012)
 
@@ -134,9 +139,11 @@ description: "개발 전문가 스킬군의 수석 아키텍트 라우터. 개�
 
 ## 레퍼런스
 
-- `references/routing-matrix.md` — 전문가 93종 요약 색인·상호 호출 관계 + **라우팅 평가표(eval 10문항)**. 라우팅이 애매할 때, 그리고 새 Phase 출고 때마다 eval 재실행.
+- `evals/routing-cases.json` — 기계 검증 가능한 라우팅 회귀 픽스처의 SSOT. Markdown 표는 설명용이며 새 실패는 JSON에 append한다.
+- `references/routing-matrix.md` — 전문가 요약 색인·상호 호출 관계와 사람용 해설.
+- 팩 변경 후 `python ~/.claude\scripts\expert_pack_check.py --pack dev`를 실행한다.
 - 개별 계산·스캐폴딩 도구는 각 전문가 스킬의 `scripts/`에 있다. 라우터 자체는 코드를 만들지 않는다.
 
 ## 한계
 
-라우터는 전문가 품질의 합 이상을 만들지 못한다. 전문가 91종 전부 제작 완료(2026-06-12, 라우터 1 + 메타 1 포함 93종 체계 = dev-* 폴더 92개 + 메타 규칙 1) — 단 Phase 3·4의 53종은 코어스펙(scripts 없음·evidence 1겹)이라 깊은 작업에선 공식 문서 보강이 필요할 수 있다. 정확한 카탈로그 수·제작 상태는 항상 `../README.md`가 원본이다(본문 수치와 어긋나면 README를 따른다). 카탈로그 밖 영역(PHP·게임엔진 등 명시 제외분)은 폴백(일반 지식 + 공식 문서) 선언으로. 프로젝트 고유 컨벤션은 이 스킬군이 아니라 그 프로젝트의 CLAUDE.md가 답이다.
+라우터는 전문가 품질의 합 이상을 만들지 못한다. 현재 파일시스템에는 라우터 1종과 전문가 91종의 `SKILL.md`가 있다. 숫자를 신뢰하지 말고 호출 시 실제 경로를 확인한다. 코어스펙 전문가는 깊은 작업에서 최신 공식 문서 보강이 필요할 수 있다. 카탈로그 밖 영역은 폴백을 선언한다. 프로젝트 고유 컨벤션은 그 프로젝트의 규칙이 답이다.

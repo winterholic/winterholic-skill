@@ -30,8 +30,10 @@ description: "비개발 직군 전문가 스킬군의 라우터(CPO/CMO 겸 트�
 
 ## 라우팅 절차
 
-1. **작업 분해** — 4축으로 본다: **기능**(제품/디자인/마케팅/사업/운영) × **단계**(발견/정의/제작/출시/성장) × **산출물**(PRD/와이어프레임/캠페인/피치덱/저니맵) × **지표**(어떤 성과로 측정되나).
-2. **상태 확인** — README 카탈로그에서 후보 전문가의 상태(✅/⬜) 확인. **⬜(미제작)이면 Read 시도하지 않고** 거장 원칙 + 공식 자료로 그 축을 채우되 폴백 사실을 한 줄 알린다. 확인 명령:
+1. **증거 우선** — inspect 가능한 화면·문서·데이터·work-history를 먼저 본다. 사용자 증상을 관찰 가능한 가설 2~4개와 반증 조건으로 바꾸고, 현재 의도와 바뀌면 안 되는 면을 적는다. 조사로 채울 수 없고 선택에 따라 결과가 크게 달라질 때만 한 번 묻는다.
+2. **작업 분해** — **기능** × **단계** × **산출물** × **지표**로 본다. 산출물 명사가 아니라 어떤 결정을 왜 내리는지를 무게중심으로 삼는다.
+3. **Route capsule** — `목표·증상 / 직접 관측 / 가설·반증 / 범위·비범위 / 불변식 / 성공 기준·확인 방법`을 만든다. 전문가가 서로 다른 문제를 풀지 않도록 호출마다 그대로 전달한다.
+4. **상태 확인** — README에서 후보를 찾고 실제 `SKILL.md` 존재를 확인한다. 표에 없거나 파일이 없으면 거장 원칙 + 최신 공식 자료로 그 축만 폴백한다. 확인 명령:
    ```
    Grep: pattern="biz-<후보이름>" path="~/.claude\biz-experts-skills\README.md" output_mode="content"
    ```
@@ -39,12 +41,13 @@ description: "비개발 직군 전문가 스킬군의 라우터(CPO/CMO 겸 트�
    ```
    Grep: pattern="<작업 키워드>" path="~/.claude\biz-experts-skills\biz-chief-strategist\references\routing-matrix.md" output_mode="content"
    ```
-3. **전문가 선정** — 아래 라우팅 표로 1~3명. 모든 축을 다 채우려 하지 말 것 — 무게중심 직무부터.
-4. **호출** — 선정한 전문가의 `SKILL.md`를 Read해 그 매뉴얼(워크플로우·안티패턴·산출물 템플릿)대로 작업.
+5. **전문가 선정** — 주도 1명부터 호출한다. 보강 전문가는 선행 산출물의 게이트에서 필요가 드러날 때만 순차 추가한다. 조합표의 긴 행은 동시 소집 명단이 아니라 조건부 파이프라인이다.
+6. **적합성 핸드셰이크** — 후보 SKILL의 경계를 route capsule의 핵심 결정과 대조한다. `ACCEPT: 책임질 결정`이면 진행하고, `REROUTE: 어긋난 경계 + 다음 후보`면 즉시 교체한다. 직행 호출도 예외가 아니다.
+7. **호출** — 선정한 전문가의 `SKILL.md`를 Read해 route capsule과 함께 매뉴얼대로 작업한다.
    ```
    Read: file_path="~/.claude\biz-experts-skills\biz-<선정전문가>\SKILL.md"
    ```
-5. **조율·방침** — 권고가 갈리면 아래 조율 규칙으로 통합. 결론은 실행 순서 + 각 단계의 성공지표가 있는 방침으로.
+8. **조율·검증·receipt** — 권고를 한 실행 순서로 통합하고 README의 공통 실행 계약으로 닫는다. 현재 산출물·행동·데이터 중 확인한 것과 아직 결과를 기다려야 하는 것을 분리한다.
 
 ## 라우팅 표 (작업 성격 → 전문가)
 
@@ -56,6 +59,7 @@ description: "비개발 직군 전문가 스킬군의 라우터(CPO/CMO 겸 트�
 | "화면 기획/화면설계서/정책서/IA" | biz-service-planner | biz-ux-designer |
 | "UX 플로우/와이어프레임/사용성" | biz-ux-designer | biz-ux-researcher, biz-service-planner |
 | "UI 비주얼/시각 디테일/디자인 시스템" | biz-ui-designer | biz-design-system |
+| "이미 렌더된 화면이 어색함/패딩 이상/알아서 개선" | ui-refine-loop가 관찰 주도 (**기본은 T0 `quick.mjs` 단발** — 루프는 사용자가 요구할 때만) | 구조·브랜드 판단만 biz-ui-designer / biz-ux-designer / biz-design-system |
 | "브랜드 아이덴티티/로고" | biz-brand-designer | biz-brand-marketing |
 | "3D 캐릭터/3D 모델/모션/일러스트" | biz-3d-character-artist / biz-3d-designer / biz-motion-designer / biz-illustrator | biz-graphic-designer |
 | "마케팅 전략/그로스/유입 안 됨" | biz-growth-marketing | biz-product-marketing, biz-marketing-analytics |
@@ -97,12 +101,14 @@ description: "비개발 직군 전문가 스킬군의 라우터(CPO/CMO 겸 트�
 ```
 ## [작업명] 작업 방침 (chief-strategist)
 ### 작업 분해: 기능 / 단계 / 산출물 / 지표
+### Route capsule: 목표·증상 / 관측 / 가설·반증 / 범위·비범위 / 불변식 / 성공 확인
 ### 호출 전문가: [n명] + 선정 이유 (⬜ 폴백 있으면 명시)
+### 적합성: ACCEPT 책임질 결정 / REROUTE했다면 이유와 교체 후보
 ### 전문가별 핵심 권고:
   - [전문가]: 권고 + 핵심 근거 + 전제
 ### 조율: 충돌 지점과 해소 (단계 분리·전제 차이·outcome 게이트)
 ### 실행 방침: 순서 있는 단계 1~5 + 각 단계의 성공지표
-### 가설·확인 시점: 이 방침이 맞았는지 언제 무엇으로 확인하나
+### Decision receipt: 근거 / 가설 / 성공지표·확인 시점 / 뒤집을 조건 / 미검증·재라우팅
 ### 리스크·확인 필요 (윤리 게이트 포함)
 ```
 
@@ -127,7 +133,7 @@ description: "비개발 직군 전문가 스킬군의 라우터(CPO/CMO 겸 트�
 
 방침 저장 규칙: 인라인 출력이 기본. 파일로 남길 때 — 프로젝트 작업이면 그 프로젝트 `docs/`(기존 파일 덮어쓰기 금지·새 파일), 프로젝트 밖 대형 구상이면 html-report 스킬로 위임. **이 라우터 폴더에는 저장하지 않는다.**
 
-> 공통 규칙(우선순위 사다리·버전 라벨·사후 채점·Quick Start)은 `../README.md`를 따른다.
+> 공통 실행 계약(적합성 핸드셰이크·검증·Decision receipt)과 우선순위 규칙은 `../README.md`를 따른다.
 
 ## 실전 케이스 — Google+ (2011~2019)
 
@@ -136,9 +142,11 @@ description: "비개발 직군 전문가 스킬군의 라우터(CPO/CMO 겸 트�
 
 ## 레퍼런스
 
-- `references/routing-matrix.md` — 전문가 51종 요약 색인·상호 호출 관계 + 라우팅 평가표(eval). **발화 신호→무게중심 교정표(명사가 아니라 decision을 라우팅)·경계 케이스 규칙·조합 시나리오별 호출 순서/핸드오프·eval 24문항+자가점검 루브릭 포함.** 라우팅이 애매할 때, 그리고 새 Phase 출고 때마다 eval 재실행.
+- `evals/routing-cases.json` — 기계 검증 가능한 라우팅 회귀 픽스처의 SSOT. Markdown 표는 설명용이며 새 실패는 JSON에 append한다.
+- `references/routing-matrix.md` — 발화 신호→무게중심 교정과 조합 순서의 사람용 해설.
+- 팩 변경 후 `python ~/.claude\scripts\expert_pack_check.py --pack biz`를 실행한다.
 - 개별 계산 도구(RICE·CAC/LTV·번레이트 등)는 각 전문가 스킬의 `scripts/`에 있다. 라우터 자체는 산출물을 만들지 않는다.
 
 ## 한계
 
-라우터는 전문가 품질의 합 이상을 만들지 못한다. 제작 상태는 항상 `../README.md`·`../../biz-experts-progress.md`가 원본(본문 수치와 어긋나면 그쪽을 따른다). 카탈로그 밖 영역(순수 오프라인 직군·하드웨어 산업디자인 등 명시 제외분)은 폴백 선언으로. 프로젝트·브랜드 고유 규칙은 이 스킬군이 아니라 그 프로젝트가 답이다. biz는 "무엇을·왜"까지 — 코드 구현은 dev-experts, 투자 판단은 stock-experts로 넘긴다.
+라우터는 전문가 품질의 합 이상을 만들지 못한다. 제작 상태 문구보다 실제 `SKILL.md` 존재가 우선이다. 카탈로그 밖 영역은 폴백을 선언한다. 프로젝트·브랜드 고유 규칙은 그 프로젝트가 답이다. 신규 화면·흐름·정책은 biz가 설계하고, 기존 렌더 화면의 관찰은 ui-refine-loop, 코드 구현은 dev-experts, 투자 판단은 stock-experts로 넘긴다.
