@@ -43,6 +43,9 @@ const DEFAULT_VIEWPORTS = [
   { name: '1440', width: 1440, height: 900 },
 ];
 const DEFAULT_STATES = ['default', 'long-ko-text'];
+// 커버리지 경고선. 1 미만이면 무엇이든 못 본 게 있다는 뜻이라 사실상 상시 발화한다 —
+// 그래서 경고는 0.95 부터, 채택 게이트(score.mjs)는 더 낮은 선에서 건다.
+const COVERAGE_WARN = 0.95;
 
 const args = parseArgs(process.argv.slice(2));
 if (!args.url || !args.out) {
@@ -191,6 +194,25 @@ for (const route of routes) {
       }
       // ⚠️ **교차 출처 iframe 은 원리적으로 못 읽는다.** 그 화면은 "지적 없음"이 아니라
       //    "그만큼 감사하지 못함"이다. 조용히 넘기면 미감사 영역이 깨끗한 것으로 둔갑한다.
+      // ⚠️ **감사 커버리지** — 못 본 영역을 깨끗함으로 읽지 않게 매 샷마다 신고한다.
+      //    실측(2026-08-15): 앱 셸 안쪽 스크롤 때문에 4678px 중 900px(19%)만 감사됐는데
+      //    verdict 는 `accept` 였다. 그 사고를 코드로 못박는 자리다.
+      if (measure.coverage && measure.coverage.ratio < COVERAGE_WARN) {
+        const c = measure.coverage;
+        console.error(
+          `  ⚠️ ${id}: 감사 커버리지 ${Math.round(c.ratio * 100)}% ` +
+          `(잰 높이 ${c.measuredH}px / 전체 ${c.docH + c.innerHidden}px, mode=${c.mode})` +
+          (c.innerScroll.length
+            ? `
+     내부 스크롤 상자가 ${c.innerHidden}px 를 감추고 있다: ` +
+              `${c.innerScroll.map((s2) => `${s2.selector}(+${s2.hidden}px)`).join(', ')}` +
+              `
+     이 구조에서는 fullPage 가 아무 일도 하지 않는다 — .ui-refine.json 의 injectCss 로 높이 잠금을 풀어라.`
+            : `
+     "fullPage": true 를 주지 않으면 첫 화면만 잰다.`) +
+          `
+     나머지는 "지적 없음"이 아니라 "감사 못함"이다.`);
+      }
       if (measure.blindSpots) {
         const bs = measure.blindSpots;
         if (bs.count) {
@@ -238,6 +260,27 @@ const summary = {
                                findings: r.findings.length, elements: r.elements.length })),
 };
 summary.emptyShots = emptyShots;
+// 세트 전체의 **최소** 커버리지를 대표값으로 둔다 — 한 화면만 19% 여도 그 라운드의 판정은
+// 그만큼만 믿을 수 있다. 평균을 쓰면 나머지 화면이 그 사실을 덮는다.
+{
+  const covs = results.filter((r) => r.coverage).map((r) => ({ id: r.id, ...r.coverage }));
+  if (covs.length) {
+    const worst = covs.reduce((a, b) => (b.ratio < a.ratio ? b : a));
+    summary.coverage = {
+      min: worst.ratio, worstShot: worst.id, mode: worst.mode,
+      unmeasuredPx: worst.unmeasuredPx,
+      innerScrollShots: covs.filter((c) => c.innerHidden > 0).map((c) => c.id),
+      perShot: Object.fromEntries(covs.map((c) => [c.id, c.ratio])),
+    };
+  }
+}
+// 구조 신호 — 자동수정하면 안 되는(승인 경계) 판정. 5층이 verdict 를 내릴 때 본다.
+{
+  const narrow = results.flatMap((r) =>
+    (r.findings || []).filter((f) => f.kind === 'narrow-column')
+      .map((f) => ({ shot: r.id, targets: f.targets, detail: f.detail })));
+  if (narrow.length) summary.structuralSignals = { 'narrow-column': narrow };
+}
 if (blindFrames.length) summary.blindSpots = blindFrames;   // 교차 출처 iframe = 감사 사각지대
 if (skippedStates.length) {
   summary.skippedStates = { 'long-ko-text': skippedStates };

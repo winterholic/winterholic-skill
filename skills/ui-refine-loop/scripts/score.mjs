@@ -9,6 +9,7 @@
  * stdout 에 판정 JSON.
  */
 import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 // 앞 항이 같을 때만 다음 항을 본다. 가중치를 지어낼 근거가 없고 단위가 통약 불가하다.
@@ -20,6 +21,12 @@ const ORDER = [
   'overlap',           // 겹쳐서 못 누름
   'collapsed',         // 상자가 무너져 내용이 들어갈 자리가 없다 — 요소 소실의 전조
   'dead-column',       // 화면 한쪽이 통째로 죽음 — 대개 margin:auto 누락
+  'narrow-column',     // 넓은 화면에서 좁은 기둥 + 좌우 빈 띠 — 오너가 실제로 반려한 축
+  'dead-row',          // 화면 아래가 통째로 빔 — 「화면이 너무 빈다」의 세로판
+  'font-too-small',    // 읽을 수 없는 크기 — 읽기를 막으므로 위쪽이다
+  'ko-line-height',    // 받침이 윗줄과 겹쳐 글자가 뭉갬
+  'heading-size',      // 제목이 본문보다 크지 않음 — 위계가 뒤집힘
+  'heading-lineheight',// 제목이 본문 행간을 상속 — 이중 여백의 원인
   'empty-cell',        // 결측/0 구분 불가 — 값을 오독한다
   'decimals',          // 자릿수 혼재 — 숫자를 오독한다
   'placeholder-label', // 입력 중 필드 정체 소실
@@ -54,6 +61,43 @@ const ORDER = [
 function clsBand(v) {
   const x = Number(v) || 0;
   return x <= 0.1 ? 0 : (x <= 0.25 ? 1 : 2);
+}
+
+/**
+ * ★ **채택 판정에 「무엇을 못 봤는가」를 넣는다.**
+ *
+ * 실사용 2026-08-15: 앱 셸 내부 스크롤 때문에 문서의 19% 만 감사됐는데 이 스크립트는
+ * `accept / lexicographic-improvement` 를 냈다. 그 라운드 결과를 오너는 다음 세션 첫 줄에서
+ * 통째로 반려했다. 점수가 틀렸던 게 아니라 **점수가 대표하는 범위가 좁았는데 그걸 안 밝혔다.**
+ *
+ * 그래서 verdict 를 두 갈래로 낮춘다(둘 다 exit 0 — 작업을 막지 않는다. 보고를 바꾼다):
+ *   accept-partial        커버리지가 낮다. "이만큼만 보고 판정했다"를 반드시 함께 전달한다.
+ *   accept-pending-owner  승인 경계에 걸리는 구조 신호가 남아 있다. 오너 확인 전엔 닫지 않는다.
+ * ⚠️ 커버리지 게이트선은 실측값이 아니라 **판단선**이다. 근거는 반려된 실사고가 0.19 였다는 것.
+ */
+const COVERAGE_GATE = 0.8;
+
+function qualify(verdict, prevS, nextS) {
+  const notes = [];
+  let v = verdict;
+  const cov = nextS.coverage;
+  if (cov && cov.min < COVERAGE_GATE) {
+    v = 'accept-partial';
+    notes.push(
+      `감사 커버리지 ${Math.round(cov.min * 100)}% (최저 ${cov.worstShot}, 미감사 ${cov.unmeasuredPx}px). ` +
+      `이 판정은 본 범위 안에서만 유효하다 — 나머지는 "지적 없음"이 아니라 "감사 못함"이다.` +
+      (cov.innerScrollShots?.length
+        ? ` 내부 스크롤 상자 때문에 fullPage 가 무력화된 샷: ${cov.innerScrollShots.join(', ')}` : ''));
+  }
+  const sig = nextS.structuralSignals?.['narrow-column'];
+  if (sig?.length) {
+    v = 'accept-pending-owner';
+    notes.push(
+      `구조 신호 narrow-column ${sig.length}건 — ${sig[0].detail} ` +
+      `레이아웃 구조 변경은 승인 경계(existing-screen-edit 규율 7)라 자동수정하지 않는다. ` +
+      `다열 배치 시안을 먼저 보이고 승인을 받아라.`);
+  }
+  return { verdict: v, notes };
 }
 
 const args = parseArgs(process.argv.slice(2));
@@ -105,7 +149,8 @@ if (cmp === 'better') {
            detail: `상위 항은 개선됐지만 총 건수가 ${total(prevScore)} → ${total(nextScore)} 로 늘었다`,
            regressions, diff: diffCounts(prev, next) }, 1);
   }
-  emit({ verdict: 'accept', reason: 'lexicographic-improvement',
+  const q = qualify('accept', prev, next);
+  emit({ verdict: q.verdict, reason: 'lexicographic-improvement', gates: q.notes,
          regressions, diff: diffCounts(prev, next) }, 0);
 }
 
@@ -115,7 +160,8 @@ if (cmp === 'better') {
 // 오탐이 순위를 뒤집지 못한다.
 const resolved = Number(args.resolved ?? 0);
 if (resolved > 0) {
-  emit({ verdict: 'accept', reason: `tie-break: ${resolved} findings resolved`,
+  const q = qualify('accept', prev, next);
+  emit({ verdict: q.verdict, reason: `tie-break: ${resolved} findings resolved`, gates: q.notes,
          diff: diffCounts(prev, next) }, 0);
 }
 
@@ -185,6 +231,28 @@ function runSelfTest() {
     ['dom-regression', checkInvariants(base, { ...base, invariants: { ...base.invariants, domNodeCount: 29 } }, 0.02).length === 1],
     ['capture-drift', checkInvariants(base, { ...base, shots: [{ ...shot, viewport: '1440' }] }, 0.02).length === 1],
   ];
+  // 게이트 회귀 — 이 셋이 깨지면 08-15 사고가 그대로 재발한다
+  const lowCov = { ...base, coverage: { min: 0.19, worstShot: 's1', unmeasuredPx: 3778, innerScrollShots: ['s1'] } };
+  const sig = { ...base, structuralSignals: { 'narrow-column': [{ shot: 's1', detail: 'x' }] } };
+  cases.push(
+    ['gate-coverage-downgrades', qualify('accept', base, lowCov).verdict === 'accept-partial'],
+    ['gate-structural-downgrades', qualify('accept', base, sig).verdict === 'accept-pending-owner'],
+    ['gate-clean-stays-accept', qualify('accept', base, { ...base, coverage: { min: 1, worstShot: 's1', unmeasuredPx: 0 } }).verdict === 'accept'],
+    ['gate-notes-nonempty', qualify('accept', base, lowCov).notes.length === 1],
+    ['order-has-narrow-column', ORDER.includes('narrow-column')],
+  );
+  /**
+   * ★ **표류 감지.** 이 스킬의 문서가 스스로 경고하는 실패가 「`collect.js` 에 판정을 추가하고
+   *   `ORDER` 를 안 고쳐 새 지표가 조용히 무시되는 것」이다. 경고문으로는 안 막힌다 —
+   *   여기서 실제로 대조한다. `collect.js` 가 내는 kind 중 `ORDER` 에 없는 게 있으면 FAIL.
+   */
+  {
+    const src = readFileSync(new URL('./collect.js', import.meta.url), 'utf8');
+    const emitted = [...src.matchAll(/add(?:Grouped)?\('([a-z-]+)'/g)].map((m) => m[1]);
+    const missing = [...new Set(emitted)].filter((k) => !ORDER.includes(k));
+    cases.push([`order-covers-collect-kinds${missing.length ? ` (누락: ${missing.join(', ')})` : ''}`,
+                missing.length === 0]);
+  }
   const failed = cases.filter(([, ok]) => !ok);
   for (const [name, ok] of cases) console.log(`${ok ? 'PASS' : 'FAIL'} ${name}`);
   process.exit(failed.length ? 1 : 0);

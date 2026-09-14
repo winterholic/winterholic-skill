@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>타이포·세로공간 픽스처</title>
+<!--
+  사용자가 나열한 실패 범주 중 계측이 비어 있던 두 축의 픽스처다.
+
+  ⑤ 글씨 크기·행간 — 하한 미달 / 한글 행간 <1.0 / 제목이 본문보다 작음 / 제목이 본문 행간 상속
+     근거값은 전부 biz-ui-designer/references/korean-typesetting.md 에서 읽어온 것이다.
+  ⑦ 세로 공간 — 화면 높이를 잡아둔 상자인데 콘텐츠가 위쪽에만 몰려 아래가 통째로 빔.
+
+  대조군(잡히면 FAIL):
+  ⑥ 하한과 같은 11px · 본문 행간 1.7 · 제목이 크고 행간 명시
+  ⑧ 같은 높이인데 가운데 정렬 — 남는 공간은 저자가 배치에 쓴 것이다
+
+  ⚠️ 이 픽스처는 **문서 자체가 스크롤**한다(내부 스크롤 셸 없음). quick.fixture.html 과 관심사를
+     분리한 이유다 — 셸 안에 넣으면 첫 뷰포트 밖이라 측정 대상에서 빠진다.
+-->
+<style>
+  :root { --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-6: 24px; --s-8: 32px; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 16px/1.7 system-ui, sans-serif; color: #1a1a1a; background: #fff;
+         word-break: keep-all; }
+  section { padding: var(--s-6); border-bottom: 1px solid #eee; }
+
+  /* ⑤ 결함 */
+  #typo-bad h3 { font-size: 14px; margin: 0 0 var(--s-3); }   /* 아래 p 가 17px */
+  #typo-bad p  { font-size: 17px; margin: 0 0 var(--s-3); }
+  #typo-bad .tiny    { font-size: 9px; }                       /* 하한 11px 미만 */
+  #typo-bad .cramped { font-size: 16px; line-height: 0.9; }    /* 받침 겹침 */
+  #typo-bad h4 { font-size: 20px; line-height: 1.7; margin: 0; } /* 본문 행간 상속 */
+
+  /* ⑥ 대조군 */
+  #typo-ok h3 { font-size: 24px; line-height: 1.3; margin: 0 0 var(--s-6); }
+  #typo-ok p  { font-size: 16px; line-height: 1.7; margin: 0 0 var(--s-3); }
+  #typo-ok .small { font-size: 11px; }
+
+  /* ⑦ 죽은 가로 띠 */
+  #tall-empty { min-height: 100vh; background: #fafafa; }
+
+  /* ⑧ 대조군 — 가운데 정렬이면 남는 공간은 배치다 */
+  #tall-centered { min-height: 100vh; display: flex; flex-direction: column;
+                   justify-content: center; }
+</style>
+</head>
+<body>
+
+<section id="typo-bad">
+  <h3>결함 구역 제목</h3>
+  <p>이 문단은 제목보다 글자가 큽니다. 제목이 본문보다 작으면 위계가 뒤집힙니다.</p>
+  <p class="tiny">이 안내 문구는 아홉 픽셀이라 하한 아래입니다. 읽기가 매우 어렵습니다.</p>
+  <p class="cramped">행간이 영점구라 받침이 윗줄과 겹칩니다. 한글은 받침 때문에 글자 높이가 라틴보다 큽니다.</p>
+  <h4>행간을 상속한 제목</h4>
+</section>
+
+<section id="typo-ok">
+  <h3>정상 구역 제목</h3>
+  <p>이 문단은 제목보다 작고 행간도 넉넉합니다. 여기서는 아무 지적도 나오면 안 됩니다.</p>
+  <p class="small">열한 픽셀 각주입니다. 하한과 같으므로 정상입니다.</p>
+</section>
+
+<section id="tall-empty">
+  <p>이 상자는 화면 높이만큼 잡아뒀는데 콘텐츠가 이 한 줄뿐이라 아래가 통째로 빕니다.</p>
+</section>
+
+<section id="tall-centered">
+  <p>이 상자도 화면 높이지만 가운데 정렬이라 남는 공간은 저자가 배치에 쓴 것입니다.</p>
+</section>
+
+</body>
+</html>

@@ -803,6 +803,133 @@ export function collectPage(config) {
       `(콘텐츠 ${Math.round(w0)}px / 컨테이너 ${Math.round(cw)}px, 반대쪽 ${Math.round(other)}px)`);
   });
 
+  // ---------- 죽은 가로 띠 (세로 공간이 남음) ----------
+  // ★ 「화면이 너무 빈다」의 세로판. `dead-column` 은 가로만 보므로 **화면 아래가 통째로 비는**
+  //   경우를 구조적으로 못 잡았다. 사용자가 실제로 지적하는 범주(공간활용)의 절반이 여기다.
+  //
+  // ⚠️ 세로는 가로와 달리 **아래가 남는 게 정상인 경우가 압도적으로 많다**(문서 끝, 짧은 목록).
+  //    그래서 「저자가 높이를 잡아둔 상자」에서만 본다 — 부모가 화면 높이급으로 크게 잡혀 있는데
+  //    안의 콘텐츠가 위쪽에만 몰려 있으면 그건 채우려던 자리가 빈 것이다.
+  //    이 조건이 없으면 모든 페이지 하단이 결함이 된다.
+  // ⚠️ 두 상수는 실측값이 아니라 **판단선**이다.
+  const ROW_SHARE = 0.35;      // 빈 띠가 부모 높이에서 차지하는 비율 하한
+  const ROW_MIN_PARENT = 0.8;  // 부모가 뷰포트 높이의 이만큼 이상일 때만 본다
+
+  parents.forEach((sibs, p) => {
+    const prec = byNode.get(p);
+    if (!prec) return;
+    const ph = prec.rect.h;
+    // ⚠️ **html·body 는 제외한다.** 이 판정의 전제는 「저자가 높이를 잡아둔 상자」인데,
+    //    루트의 높이는 저자가 선언한 게 아니라 뷰포트에서 온 것이다. 빼지 않으면 **짧은 페이지가
+    //    전부 결함**이 된다(실측: 404 페이지가 `html > body — 아래 828px 비어 있음`으로 잡혔다.
+    //    짧은 문서는 정상이다).
+    if (p === p.ownerDocument.body || p === p.ownerDocument.documentElement) return;
+    if (ph < vhOf(p) * ROW_MIN_PARENT) return;         // 화면을 차지하는 상자가 아니면 대상 아님
+    if (['absolute', 'fixed'].includes(prec.style.position)) return;
+    // 스크롤하는 상자는 "아래가 비었다"가 아니라 "아래가 더 있다"이다 — 커버리지 소관
+    if (/^(auto|scroll)$/.test(prec.style.overflowY) && prec.scroll.sh > prec.scroll.ch + 1) return;
+    // 교차축·주축 정렬이 center·end 계열이면 남는 공간은 저자가 배치에 쓴 것이다
+    // ⚠️ `rec.style` 에는 justify/align 계열이 없다. 여기서 computed 로 직접 읽는다 —
+    //    `prec.style.justifyContent` 로 쓰면 **항상 undefined 라 이 배제가 통째로 무력해진다.**
+    const pcs = csOf(p);
+    if (/(center|end|between|around|evenly)/.test(pcs.justifyContent || '')) return;
+    if (/(center|end)/.test(pcs.alignContent || '')) return;
+    if (/(center|end)/.test(pcs.alignItems || '') && pcs.flexDirection?.startsWith('row')) return;
+
+    const kids = sibs.filter((s) => !['absolute', 'fixed'].includes(s.style.position));
+    if (!kids.length) return;
+    const contentBottom = Math.max(...kids.map((k) => k.rect.bottom));
+    const cTop = prec.rect.top + prec.style.paddingTop;
+    const cBottom = prec.rect.bottom - prec.style.paddingBottom;
+    const band = cBottom - contentBottom;
+    if (band < ph * ROW_SHARE) return;
+    if (contentBottom <= cTop) return;
+
+    // 띠가 실제로 비어 있는지 확인한다(dead-column 과 같은 방어). 문서 전체를 훑는다 —
+    // absolute 로 띄운 배경·일러스트가 그 자리를 쓰고 있으면 빈 게 아니다.
+    const occupied = deepAll().some((el) => {
+      const r = rectOf(el);
+      if (r.width < MIN_SIZE || r.height < MIN_SIZE) return false;
+      if (!(r.top >= contentBottom - 1 && r.bottom <= cBottom + 1)) return false;
+      if (r.right <= prec.rect.left || r.left >= prec.rect.right) return false;
+      const cs = csOf(el);
+      return cs.display !== 'none' && cs.visibility !== 'hidden' && cs.opacity !== '0';
+    });
+    if (occupied) return;
+
+    add('dead-row', kids.map((k) => k.n).slice(0, 8),
+      `${prec.selector} — 아래 ${Math.round(band)}px 가 비어 있음 ` +
+      `(상자 높이 ${Math.round(ph)}px 의 ${Math.round(band / ph * 100)}%, 콘텐츠는 위쪽에만 있음)`);
+  });
+
+  // ---------- 좁은 기둥 (좌우 대칭 쏠림) ----------
+  // ★ **이 스킬이 실사용에서 놓친 축이다.** 2026-08-15 라운드는 `score.mjs` 가
+  //   `accept / lexicographic-improvement` 를 냈는데, 오너는 다음 세션 첫 줄에서 통째로 반려했다 —
+  //   *"가운데에 치우쳐져서 오른쪽왼쪽에 엄청 많은 여백이 있는 거 자체가 이상해 보여."*
+  //   원인은 분명하다. 바로 위 `dead-column` 은 **좌우 대칭이면 중앙정렬 = 의도**로 보고 빼는데,
+  //   반려된 화면이 정확히 그 **대칭 케이스**(1440 폭에 720px 문서 기둥)였다.
+  //   채택 점수 안에 오너가 반려하는 축이 **원리적으로 들어 있지 않았다.**
+  //
+  // 판정: 넓은 뷰포트에서, 뷰포트 폭을 거의 채우는 부모 안의 블록 하나가 뷰포트 폭 대비 좁고,
+  //       **좌우 띠가 둘 다 비어 있을 때**. 띠에 무엇이든 있으면(사이드바·레일·다열 그리드)
+  //       이미 다열이므로 걸리지 않는다.
+  // ⚠️ **자동수정 대상이 아니다.** 좁은 기둥을 넓히는 것은 레이아웃 구조 변경이라 승인 경계
+  //    (`existing-screen-edit.md` 규율 7)에 걸린다. 5층은 이 항목이 남아 있으면 `accept` 대신
+  //    `accept-pending-owner` 를 낸다.
+  // ⚠️ 아래 두 상수는 실측값이 아니라 **판단선**이다. 근거는 반려된 실제 화면(720/1440 = 0.50)과
+  //    biz-ui-designer 판정표의 데스크톱 1차 처방이 "그리드 다열"이라는 것뿐이다.
+  const DESKTOP_MIN = 1024;   // 이 폭 미만은 한 기둥이 정상이다
+  const NARROW_SHARE = 0.55;  // 기둥 폭 / 뷰포트 폭 하한
+
+  if (vw >= DESKTOP_MIN) {
+    const universe = deepAll();
+    const reported = [];
+    const bandOccupied = (l, r, top, bottom) => {
+      if (r - l < MIN_SIZE) return true;            // 띠가 없으면 "비었다"고 말하지 않는다
+      return universe.some((el) => {
+        const rr = rectOf(el);
+        if (rr.width < MIN_SIZE || rr.height < MIN_SIZE) return false;
+        if (!(rr.left >= l - 1 && rr.right <= r + 1)) return false;
+        if (rr.bottom <= top || rr.top >= bottom) return false;  // 세로로 안 겹치면 그 기둥의 옆이 아니다
+        const cs = csOf(el);
+        return cs.display !== 'none' && cs.visibility !== 'hidden' && cs.opacity !== '0';
+      });
+    };
+
+    ALL.forEach((el) => {
+      const rec = byNode.get(el);
+      if (!rec) return;
+      // ⚠️ `rec.visible` 을 쓰면 안 된다 — 그 필드는 "배지를 찍을 만큼 눈에 띄는가"이지
+      //    "렌더되는가"가 아니다. **콘텐츠 기둥은 정의상 배경도 자체 텍스트도 없는 컨테이너**라
+      //    거기서 전부 걸러졌다(실측: #doc-column 이 visible=false 로 통째로 누락).
+      const cs0 = csOf(el);
+      if (cs0.display === 'none' || cs0.visibility === 'hidden' || cs0.opacity === '0') return;
+      if (!/^(block|flex|grid|flow-root)$/.test(rec.style.display)) return;
+      if (['absolute', 'fixed'].includes(rec.style.position)) return;
+      const w = rec.rect.w;
+      if (w < 200 || w >= vw * NARROW_SHARE) return;
+      if (rec.rect.h < vh * 0.4) return;             // 화면을 대표 못 하는 작은 상자는 기둥이 아니다
+      // 부모가 뷰포트 폭을 거의 채워야 "옆이 남는" 상황이다
+      const prec = el.parentElement ? byNode.get(el.parentElement) : null;
+      const pL = prec ? prec.rect.left : 0;
+      const pR = prec ? prec.rect.right : vw;
+      if (pR - pL < vw * 0.9) return;
+      // 이미 보고한 기둥 안쪽이면 중복이다 — 가장 바깥만 보고한다
+      if (reported.some((b) => rec.rect.left >= b.left - 1 && rec.rect.right <= b.right + 1)) return;
+      const gapL = rec.rect.left - pL;
+      const gapR = pR - rec.rect.right;
+      if (Math.min(gapL, gapR) < vw * 0.05) return;  // 한쪽만 남는 것은 dead-column 소관이다
+      if (bandOccupied(pL, rec.rect.left, rec.rect.top, rec.rect.bottom)) return;
+      if (bandOccupied(rec.rect.right, pR, rec.rect.top, rec.rect.bottom)) return;
+      reported.push({ left: rec.rect.left, right: rec.rect.right });
+      add('narrow-column', [rec.n],
+        `${rec.selector} — ` +
+        `${vw}px 뷰포트에서 콘텐츠 기둥이 ${Math.round(w)}px (${Math.round(w / vw * 100)}%), ` +
+        `좌우 ${Math.round(gapL)}px·${Math.round(gapR)}px 가 둘 다 비어 있음 — ` +
+        `구조 변경이라 자동수정 금지, 다열 배치 여부를 오너에게 확인할 것`);
+    });
+  }
+
   // ---------- 위계 역전 ----------
   // 그룹 = 같은 부모 아래 연속 형제 중 간격이 같은 묶음. 간격이 바뀌는 지점이 경계다.
   // 상대 비교만 하므로 스케일 추출(0-2)에 의존하지 않는다 — 순환하지 않는다.
@@ -833,15 +960,26 @@ export function collectPage(config) {
     // 그 그룹 내부 간격보다 크거나 같으면 제목이 자기 덩어리에서 떨어진 것이다.
     const rest = clean.slice(1).map((x) => x.g);
     if (!rest.length) return;
-    const innerMin = Math.min(...rest);
+    const innerMin = Math.min(...rest);   // 아래 「그룹 내부 경계」 판정이 쓴다
     const lead = col[0], next = col[1];
     const isLeader =
       lead.style.fontSize > next.style.fontSize ||
       parseInt(lead.style.fontWeight, 10) > parseInt(next.style.fontWeight, 10);
 
-    if (isLeader && clean[0].g >= innerMin && clean[0].g > 0) {
-      addGrouped('hierarchy', [clean[0].from, clean[0].to],
-        `선두↔그룹 ${clean[0].g}px ≥ 그룹 내 ${innerMin}px`);
+    // ⚠️ **비교 대상이 체크리스트와 달랐다.** 1-3 은 「제목↔본문 간격이 **본문↔다음 섹션** 간격보다
+    //    크거나 같다」인데, 구현은 **그룹 내부 최소 간격**(`innerMin`)과 비교하고 있었다.
+    //    그 둘은 다른 값이다 — 제목·본문·본문 묶음에는 애초에 "다음 섹션"이 없으므로 innerMin 은
+    //    그냥 문단 간격이고, **제목에 문단보다 넉넉한 여백을 준 정상 조판이 전부 위반으로 잡혔다**
+    //    (실측: 대조군으로 만든 정상 구역 — 제목 24px / 문단 12px — 이 지적됐다. 실제 문서에서는
+    //    제목이 있는 거의 모든 화면에서 발화한다).
+    //    → 마지막 간격(= 이 묶음과 다음 것 사이)과 비교하고, 그 간격이 없으면(형제 간격이 2개 이하)
+    //      **판정하지 않는다.** 판정 불가를 판정하지 않는 것이 이 스킬의 원칙이다.
+    if (isLeader && clean.length >= 3) {
+      const toNext = clean[clean.length - 1].g;
+      if (clean[0].g >= toNext && clean[0].g > 0) {
+        addGrouped('hierarchy', [clean[0].from, clean[0].to],
+          `제목↔본문 ${clean[0].g}px ≥ 본문↔다음 ${toNext}px — 제목이 자기 덩어리에서 떨어진다`);
+      }
     }
 
     // 그룹 내부에서도 유독 한 칸만 벌어지면 그 지점이 잘못된 경계다
@@ -1272,10 +1410,138 @@ export function collectPage(config) {
     }
   }
 
+  // ---------- 타이포그래피 (글씨 크기·행간) ----------
+  // ★ **사용자가 나열한 5개 실패 범주 중 통째로 비어 있던 축이다.** 지금까지 `fontSize` 는
+  //   위계 판정의 보조 입력과 행간 계산에만 쓰였고 **판정이 하나도 없었다.** biz-ui-designer 의
+  //   `ui_probe.js` 에는 typography 가 있는데 정작 **점수를 내는 이쪽에 없어서**, 넓은 지시로
+  //   전수를 훑어도 글씨 문제는 구조적으로 0건이 나왔다.
+  //
+  // ⚠️ 아래 값은 지어낸 것이 아니라 `biz-ui-designer/references/korean-typesetting.md` 에서
+  //    읽어온 것이다. 그 문서를 고치면 여기도 같이 고친다.
+  //      · 하한 11px  — "하한 11px 을 먼저 올리는 것이 회귀 위험이 가장 낮다"(실측: 선언 515개 중
+  //        13px 이하 365개(71%), 10px 이하 74개)
+  //      · 행간 1.0   — "1.0 미만은 한글에서 깨진다. 받침 때문에 글자 높이가 라틴보다 크다"
+  //      · 제목 1.3   — "제목·버튼·힌트는 1.3 안팎을 명시한다". 본문값(1.6)을 상속하면 17px 글자가
+  //        27px 줄상자를 만들어 **이중 여백**의 원인이 된다
+  const FONT_MIN = 11;         // px
+  const KO_LH_MIN = 1.0;       // 받침 겹침 경계
+  const HEADING_LH_MAX = 1.5;  // 제목이 본문 행간을 상속했다고 볼 선
+
+  {
+    const ownText = (el) => {
+      const t = Array.from(el.childNodes)
+        .filter((n) => n.nodeType === 3)
+        .map((n) => n.textContent)
+        .join('')
+        .trim();
+      return t;
+    };
+    const isHeading = (el) => /^H[1-6]$/.test(el.tagName)
+      || ['heading', 'columnheader', 'rowheader'].includes(el.getAttribute?.('role') || '');
+
+    const headingSizes = [];   // 위계 비교용
+
+    ALL.forEach((el) => {
+      const rec = byNode.get(el);
+      if (!rec) return;
+      if (el.ownerSVGElement != null || matches(el, ignoreSet)) return;
+      const text = ownText(el);
+      if (!text) return;                       // 자체 텍스트가 없으면 글자 판정 대상이 아니다
+      const cs = csOf(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return;
+      const fs = parseFloat(cs.fontSize);
+      if (!Number.isFinite(fs) || fs <= 0) return;
+
+      // ① 하한 미달
+      if (fs < FONT_MIN) {
+        addGrouped('font-too-small', [rec.n],
+          `${Math.round(fs * 10) / 10}px — 하한 ${FONT_MIN}px 미만 ("${text.slice(0, 20)}")`);
+      }
+
+      // ② 한글 행간이 1.0 미만 — 받침이 윗줄과 겹친다
+      const lhRaw = cs.lineHeight;
+      const lh = lhRaw === 'normal' ? null : parseFloat(lhRaw);
+      const ratio = lh != null && Number.isFinite(lh) ? lh / fs : null;
+      const hasKo = /[가-힣]/.test(text);
+      if (hasKo && ratio != null && ratio < KO_LH_MIN) {
+        addGrouped('ko-line-height', [rec.n],
+          `한글 행간 ${Math.round(ratio * 100) / 100} (<${KO_LH_MIN}) — 받침이 윗줄과 겹친다`);
+      }
+
+      // ③ 제목이 본문 행간을 상속해 줄상자가 글자보다 훨씬 크다 — "이중 여백"의 원인
+      if (isHeading(el) && ratio != null && ratio >= HEADING_LH_MAX) {
+        addGrouped('heading-lineheight', [rec.n],
+          `제목 행간 ${Math.round(ratio * 100) / 100} — 본문값 상속으로 보인다 ` +
+          `(글자 ${Math.round(fs)}px / 줄상자 ${Math.round(lh)}px)`);
+      }
+
+      if (isHeading(el)) headingSizes.push({ el, rec, fs });
+    });
+
+    // ④ 제목이 같은 영역의 본문보다 크지 않다 — 임계값이 필요 없는 순수 구조 판정
+    headingSizes.forEach(({ el, rec, fs }) => {
+      const scope = el.parentElement;
+      if (!scope) return;
+      const bodySizes = Array.from(scope.children)
+        .filter((c) => c !== el && /^(P|LI|SPAN|DIV|DD|TD)$/.test(c.tagName))
+        .map((c) => {
+          const r = byNode.get(c);
+          return r ? r.style.fontSize : null;
+        })
+        .filter((v) => Number.isFinite(v) && v > 0);
+      if (!bodySizes.length) return;
+      const maxBody = Math.max(...bodySizes);
+      if (fs <= maxBody) {
+        add('heading-size', [rec.n],
+          `제목 ${Math.round(fs)}px 가 같은 영역 본문 ${Math.round(maxBody)}px 보다 크지 않다`);
+      }
+    });
+  }
+
+  // ---------- 감사 커버리지 ----------
+  /**
+   * ★ **이 스킬이 낸 가장 비싼 오보의 방지선.** 2026-08-15 실사용에서 앱 셸 안쪽이 스크롤하는
+   *   구조라 `fullPage:true` 가 아무 일도 하지 않았고, 4678px 문서 중 **900px(19%)만 감사**됐다.
+   *   그런데 산출된 verdict 는 `accept` 였다. 비평가 넷이 전부 "아래는 빈 화면"이라고 보고해서
+   *   사람이 눈치챘을 뿐이다. **못 본 영역은 "문제 없음"이 아니라 "확인 못함"이다.**
+   *
+   * 그래서 매 측정이 「무엇을 봤는지」를 숫자로 함께 낸다. 판정이 아니라 **자기 신고**다.
+   *   docH        문서 자연 높이
+   *   innerHidden 내부 스크롤 상자가 감춘 높이의 합 (fullPage 로도 안 잡히는 부분)
+   *   ratio       measuredH / (docH + innerHidden)
+   * ⚠️ 상자가 겹쳐 있으면 innerHidden 이 과대 계상될 수 있다 — 그 방향의 오차는 커버리지를
+   *    **낮게** 보고하므로 안전한 쪽이다. 반대로 부풀린 커버리지를 내지는 않는다.
+   */
+  const coverage = (() => {
+    const root = DOCS[0].doc.documentElement;
+    const body = DOCS[0].doc.body;
+    const docH = Math.max(root ? root.scrollHeight : 0, body ? body.scrollHeight : 0, vh);
+    const innerScroll = [];
+    elements.forEach((rec) => {
+      const hidden = (rec.scroll.sh || 0) - (rec.scroll.ch || 0);
+      if (hidden <= 1) return;
+      if (!/^(auto|scroll)$/.test(rec.style.overflowY)) return;
+      // 화면을 대표하는 큰 스크롤 상자만 본다. 작은 목록의 내부 스크롤은 의도된 UI 다.
+      if (rec.rect.h < vh * 0.5) return;
+      innerScroll.push({ n: rec.n, selector: rec.selector, visibleH: rec.scroll.ch, hidden });
+    });
+    const innerHidden = innerScroll.reduce((a, s) => a + s.hidden, 0);
+    const measuredH = fullPage ? docH : Math.min(vh, docH);
+    const totalH = docH + innerHidden;
+    return {
+      mode: fullPage ? 'fullPage' : 'viewport',
+      viewportH: vh, docH, measuredH, innerHidden,
+      unmeasuredPx: Math.max(0, totalH - measuredH),
+      ratio: totalH > 0 ? Math.round((measuredH / totalH) * 1000) / 1000 : 1,
+      innerScroll: innerScroll.slice(0, 5),
+    };
+  })();
+
   return {
     viewport: { w: vw, h: vh },
     elements,
     findings,
+    coverage,
     counts: findings.reduce((acc, f) => ({ ...acc, [f.kind]: (acc[f.kind] || 0) + 1 }), {}),
     domNodeCount: ALL.length,
     // ⚠️ **교차 출처 iframe 은 원리적으로 못 읽는다.** 조용히 빠지면 그 화면이 "깨끗함"으로

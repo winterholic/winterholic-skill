@@ -165,6 +165,12 @@ function itemKindMap() {
     '6-7': ['cell-padding'],
     '6-9': ['empty-cell'],
     '6-10': ['row-height'],
+    // 7-13 은 측정 수단이 있지만 **자동수정 대상이 아니다** — 5층이 accept-pending-owner 로 낮춘다.
+    '7-13': ['narrow-column'],
+    '2-3': ['heading-size', 'heading-lineheight'],   // 제목·본문 크기 차이가 눈에 안 보인다
+    '2-16': ['font-too-small'],
+    '2-17': ['ko-line-height', 'heading-lineheight'],
+    '7-14': ['dead-row'],
   };
 }
 
