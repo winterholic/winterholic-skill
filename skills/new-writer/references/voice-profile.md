@@ -77,7 +77,7 @@ python ~/.claude\skills\new-writer\scripts\measure-voice.py --compare --samples 
 
 ---
 
-## 사용자가 실제로 반려한 문장 — 가장 값어치 있는 한 쌍
+## 사용자가 실제로 반려한 문장 — 가장 가치 있는 한 쌍
 
 2026-07-29 포트폴리오 작업에서 나왔다. 내가 쓴 제목이 두 번 반려됐다.
 
