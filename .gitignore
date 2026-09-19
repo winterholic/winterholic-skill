@@ -6,3 +6,6 @@ __pycache__/
 
 # 공개 금지 — 도서 기반 2차적 저작물(로컬 전용). 동기화 시 재유입 차단.
 skills/writer/
+
+# 외부 원본 컬렉션 — 저장소 MIT와 개별 스킬 라이선스가 달라 로컬에서만 사용.
+imported-sub-skills/scientific-agent-skills/
