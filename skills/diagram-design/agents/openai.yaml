@@ -1,0 +1,7 @@
+interface:
+  display_name: "Winterholic Diagram Design"
+  short_description: "Winterholic 스타일의 편집형 다이어그램 제작"
+  brand_color: "#2081C3"
+  default_prompt: "Use $diagram-design to create a clear, restrained Winterholic-style diagram for this content."
+policy:
+  allow_implicit_invocation: false
