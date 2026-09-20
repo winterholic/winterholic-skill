@@ -93,7 +93,7 @@ correction_rounds: <number>
 
 ## Typed source boundary
 
-HTML remains the source of truth for the current 40-type skill. Do not invent a universal JSON field or claim deterministic spec-to-render compilation until a renderer and round-trip tests exist for that type. Introduce typed intermediate representation incrementally for architecture, process/data-flow, sequence, and state only after the shared validation gate is stable.
+HTML remains the delivered artifact for all 40 types. The optional typed source path in [`typed-ir.md`](typed-ir.md) is implemented only for architecture, process, data-flow, sequence, and state; its JSON is the editable source and the rendered HTML is a deterministic build artifact. Do not generalize its fields or guarantees to the other 35 types. The typed renderer runs this same artifact gate before atomically replacing its target, while browser evidence and perceptual review remain separate.
 
 ## Gotchas
 
